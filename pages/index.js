@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Inter } from '@next/font/google'
 
 import Tiptap from '../components/Tiptap'
+import Reader from '../components/Reader'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,6 +21,7 @@ export default function Home() {
           Hello world!
         </h1>
         <Tiptap />
+        <Reader />
       </main>
     </>
   )
