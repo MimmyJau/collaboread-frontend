@@ -1,5 +1,7 @@
 import { useState } from 'react'; 
 
+import { Interweave } from 'interweave';
+
 const showHighlight = () => {
 }
 
@@ -37,7 +39,8 @@ const Reader = () => {
   }
 
   return (
-    <div className="reader" onMouseUp={setSelectedText} dangerouslySetInnerHTML={{__html: innerHTML}}>
+    <div className="reader" onMouseUp={setSelectedText}>
+      <Interweave content={innerHTML}/>
     </div>
   )
 }
