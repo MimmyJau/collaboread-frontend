@@ -34,13 +34,14 @@ const normalizeRange = (range) => {
 const innerHTML = `
   <br />
   <h2>Welcome to the reader</h2>
-  <p></p>
+  <br />
   <p>This is where we run tests on selection and annotation.</p>
   <br />
-  <ul className="list-disc pl-5">
+  <ul class="list-disc pl-5">
     <li>The first point being made</li>
     <li>The second point is <i>less important</i> than the first.</li>
   </ul>
+  <br />
   <div>
     <span>This <b>is </b><b>span 1.</b> This is span 2.</span>
   </div>
