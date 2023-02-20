@@ -2,16 +2,33 @@ import { useState } from 'react';
 
 import { Interweave } from 'interweave';
 
-const showHighlight = () => {
+const selectRange = (range) => {
+  const mark = document.createElement('mark');
+  range.surroundContents(mark);
 }
 
-const ShowHighlightButton = (props) => {
+const ShowRangeButton = (props) => {
   return (
-    <button onClick={ () => {console.log(props.highlight); console.log(props.anchorOffset)} }>
-      SHOW HIGHLIGHT!
+    <button onClick={ () => {console.log(props.range); selectRange(props.range)} }>
+      Show Range!
     </button>
   )
 }
+
+// fxn for getting normalized position of tag
+const normalizeRange = (range) => {
+  // !! get all the chars prior to start
+  // get next text node
+  // count text elements in char
+  // if text node is the same as start node in Range, then
+    // add opening tag
+  // if text node is the same as end node in Range, then
+    // add closing tag
+  // if node 
+}
+
+// fxn for counting position of char in html ignoring tags
+// fxn for turning normalized position into into range 
 
 const innerHTML = `
   <br />
@@ -30,17 +47,20 @@ const innerHTML = `
 
 const Reader = () => {
   const [ highlight, setHighlight ] = useState(null);
-  const [ anchorOffset, setAnchorOffset ] = useState(0);
+  const [ range, setRange ] = useState(null);
 
   const setSelectedText = () => {
     if (!document.getSelection().isCollapsed) {
-      console.log(window.getSelection())
+      // console.log(window.getSelection())
+      console.log(window.getSelection().getRangeAt(0))
+      setRange(window.getSelection().getRangeAt(0))
     }
   }
 
   return (
     <div className="reader" onMouseUp={setSelectedText}>
-      <Interweave content={innerHTML}/>
+      <Interweave content={innerHTML} />
+      <ShowRangeButton range={range} />
     </div>
   )
 }
