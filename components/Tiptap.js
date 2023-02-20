@@ -49,11 +49,12 @@ const Tiptap = () => {
   })
 
   return (
-    <>
+    <div className="pl-2">
       <MenuToolbar editor={editor}/>
       <EditorContent editor={editor} />
-    </>
+    </div>
   )
 }
 
 export default Tiptap
+
