@@ -7,12 +7,12 @@ import "rangy/lib/rangy-classapplier";
 
 
 // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
-// TODO: Understand why this works
-function highlightSelection (userSelection) {
+function highlightSelection () {
   rangy.init()
-  let highlighter = rangy.createHighlighter()
+  const highlighter = rangy.createHighlighter()
   highlighter.addClassApplier(rangy.createClassApplier('bg-yellow-300', {
     ignoreWhiteSpace: true,
+    elementProperties: { className: 'hover:bg-yellow-400' },
     tagNames: ['span', 'a']
   }))
 
