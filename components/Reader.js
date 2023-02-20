@@ -7,15 +7,16 @@ const selectRange = (range) => {
   range.surroundContents(mark);
 }
 
-const ShowRangeButton = (props) => {
+const HighlightRangeButton = (props) => {
   return (
-    <button onClick={ () => {console.log(props.range); selectRange(props.range)} }>
-      Show Range!
+    <button onClick={ () => {selectRange(props.range)} }>
+      Highlight Range!
     </button>
   )
 }
 
 // fxn for getting normalized position of tag
+// use node.textContent to get all text (but how to sync with 
 const normalizeRange = (range) => {
   // !! get all the chars prior to start
   // get next text node
@@ -60,7 +61,7 @@ const Reader = () => {
   return (
     <div className="reader" onMouseUp={setSelectedText}>
       <Interweave content={innerHTML} />
-      <ShowRangeButton range={range} />
+      <HighlightRangeButton range={range} />
     </div>
   )
 }
