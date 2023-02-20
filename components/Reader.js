@@ -1,6 +1,23 @@
 import { useState } from 'react'; 
 
 import { Interweave } from 'interweave';
+import rangy from 'rangy';
+import "rangy/lib/rangy-highlighter";
+import "rangy/lib/rangy-classapplier";
+
+
+// Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
+// TODO: Understand why this works
+function highlightSelection (userSelection) {
+  rangy.init()
+  let highlighter = rangy.createHighlighter()
+  highlighter.addClassApplier(rangy.createClassApplier('bg-yellow-300', {
+    ignoreWhiteSpace: true,
+    tagNames: ['span', 'a']
+  }))
+
+  highlighter.highlightSelection('bg-yellow-300')
+}
 
 const selectRange = (range) => {
   const mark = document.createElement('mark');
@@ -53,14 +70,13 @@ const Reader = () => {
 
   const setSelectedText = () => {
     if (!document.getSelection().isCollapsed) {
-      // console.log(window.getSelection())
       console.log(window.getSelection().getRangeAt(0))
       setRange(window.getSelection().getRangeAt(0))
     }
   }
 
   return (
-    <div className="reader" onMouseUp={setSelectedText}>
+    <div className="reader" onMouseUp={highlightSelection}>
       <Interweave content={innerHTML} />
       <HighlightRangeButton range={range} />
     </div>
