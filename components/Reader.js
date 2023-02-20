@@ -12,7 +12,9 @@ function highlightSelection () {
   const highlighter = rangy.createHighlighter()
   highlighter.addClassApplier(rangy.createClassApplier('bg-yellow-300', {
     ignoreWhiteSpace: true,
-    elementProperties: { className: 'hover:bg-yellow-400' },
+    onElementCreate: el => {
+      el.classList.add('poop')
+    },
     tagNames: ['span', 'a']
   }))
 
@@ -64,6 +66,27 @@ const innerHTML = `
   </div>
 `
 
+const removeHover = () => {
+    const otherMarks = document.getElementsByClassName("poop")
+    for (const mark of otherMarks) {
+      mark.classList.remove("bg-yellow-400")
+    }
+}
+
+
+const mouseOver = (e)  => {
+  removeHover()
+
+  // Want the id to start with a recognizable token that we can regex
+  if (e.target.classList.contains("poop")) {
+    const otherMarks = document.getElementsByClassName("poop")
+    console.log(otherMarks)
+    for (const mark of otherMarks) {
+      mark.classList.add("bg-yellow-400")
+    }
+  } 
+}
+
 const Reader = () => {
   const [ highlight, setHighlight ] = useState(null);
   const [ range, setRange ] = useState(null);
@@ -76,7 +99,7 @@ const Reader = () => {
   }
 
   return (
-    <div className="reader" onMouseUp={highlightSelection}>
+    <div className="reader" onMouseUp={highlightSelection} onMouseOver={mouseOver}>
       <Interweave content={innerHTML} />
       <HighlightRangeButton range={range} />
     </div>
