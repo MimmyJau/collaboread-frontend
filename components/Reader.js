@@ -9,11 +9,14 @@ import "rangy/lib/rangy-classapplier";
 function highlightSelection() {
   rangy.init();
   const highlighter = rangy.createHighlighter();
+  // We give each highlight a unique ID so that we
+  // can easily find and synchronize CSS behaviour.
+  const id = "markID-" + crypto.randomUUID();
   highlighter.addClassApplier(
     rangy.createClassApplier("bg-yellow-300", {
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
-        el.classList.add("poop");
+        el.classList.add(id);
       },
       tagNames: ["span", "a"],
     })
@@ -72,20 +75,31 @@ const innerHTML = `
 `;
 
 const removeHover = () => {
-  const otherMarks = document.getElementsByClassName("poop");
-  for (const mark of otherMarks) {
+  // We use Array.from() since geElementsByClassName returns a live collection.
+  // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
+  const relatedMarks = document.getElementsByClassName("bg-yellow-400");
+  for (const mark of Array.from(relatedMarks)) {
     mark.classList.remove("bg-yellow-400");
   }
 };
 
+const getMarkID = (e) => {
+  const classList = e.target.classList;
+  for (const className of classList) {
+    if (className.includes("markID")) {
+      return className;
+    }
+  }
+  return false;
+};
+
 const mouseOver = (e) => {
   removeHover();
+  const markID = getMarkID(e);
 
-  // Want the id to start with a recognizable token that we can regex
-  if (e.target.classList.contains("poop")) {
-    const otherMarks = document.getElementsByClassName("poop");
-    console.log(otherMarks);
-    for (const mark of otherMarks) {
+  if (markID) {
+    const relatedMarks = document.getElementsByClassName(markID);
+    for (const mark of relatedMarks) {
       mark.classList.add("bg-yellow-400");
     }
   }
