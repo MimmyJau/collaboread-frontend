@@ -22,18 +22,20 @@ function highlightSelection() {
     })
   );
   highlighter.highlightSelection("bg-yellow-300");
-  const totalStartIndex = countCharsBeforeStart();
-  console.log(totalStartIndex);
+
+  const range = rangy.getSelection().getRangeAt(0);
+  const startIndex = getIndexInReader(range.startContainer, range.startOffset);
+  const endIndex = getIndexInReader(range.endContainer, range.endOffset);
+  console.log(startIndex, endIndex);
 }
 
 function getReaderNode() {
   return document.getElementById("reader");
 }
 
-function countCharsBeforeStart() {
-  const range = rangy.getSelection().getRangeAt(0);
-  let node = range.startContainer;
-  let count = range.startOffset;
+function getIndexInReader(container, offset) {
+  let node = container;
+  let count = offset;
   const readerNode = getReaderNode();
   if (!readerNode.contains(node)) return 0;
   while (true) {
