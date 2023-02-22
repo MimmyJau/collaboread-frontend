@@ -68,22 +68,6 @@ const HighlightRangeButton = (props) => {
   );
 };
 
-// fxn for getting normalized position of tag
-// use node.textContent to get all text (but how to sync with
-const normalizeRange = (range) => {
-  // !! get all the chars prior to start
-  // get next text node
-  // count text elements in char
-  // if text node is the same as start node in Range, then
-  // add opening tag
-  // if text node is the same as end node in Range, then
-  // add closing tag
-  // if node
-};
-
-// fxn for counting position of char in html ignoring tags
-// fxn for turning normalized position into into range
-
 const innerHTML = `
 <h2>Welcome to the reader</h2>
 <br />
