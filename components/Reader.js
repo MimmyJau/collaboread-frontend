@@ -21,8 +21,32 @@ function highlightSelection() {
       tagNames: ["span", "a"],
     })
   );
-
   highlighter.highlightSelection("bg-yellow-300");
+  const totalStartIndex = countCharsBeforeStart();
+  console.log(totalStartIndex);
+}
+
+function getReaderNode() {
+  return document.getElementById("reader");
+}
+
+function countCharsBeforeStart() {
+  const range = rangy.getSelection().getRangeAt(0);
+  let node = range.startContainer;
+  let count = range.startOffset;
+  const readerNode = getReaderNode();
+  if (!readerNode.contains(node)) return 0;
+  while (true) {
+    if (node.previousSibling) {
+      node = node.previousSibling;
+      count += node.textContent.length;
+    } else if (node.parentNode && node.parentNode.id !== "reader") {
+      node = node.parentNode;
+    } else {
+      break;
+    }
+  }
+  return count;
 }
 
 const selectRange = (range) => {
@@ -59,7 +83,6 @@ const normalizeRange = (range) => {
 // fxn for turning normalized position into into range
 
 const innerHTML = `
-  <br />
   <h2>Welcome to the reader</h2>
   <br />
   <p>This is where we run tests on selection and annotation.</p>
@@ -111,20 +134,22 @@ const Reader = () => {
 
   const setSelectedText = () => {
     if (!document.getSelection().isCollapsed) {
-      console.log(window.getSelection().getRangeAt(0));
       setRange(window.getSelection().getRangeAt(0));
     }
   };
 
   return (
-    <div
-      className="reader"
-      onMouseUp={highlightSelection}
-      onMouseOver={mouseOver}
-    >
-      <Interweave content={innerHTML} />
+    <>
+      <div
+        id="reader"
+        className="mt-2"
+        onMouseUp={highlightSelection}
+        onMouseOver={mouseOver}
+      >
+        <Interweave content={innerHTML} />
+      </div>
       <HighlightRangeButton range={range} />
-    </div>
+    </>
   );
 };
 
