@@ -51,6 +51,20 @@ function getIndexInReader(container, offset) {
   return count;
 }
 
+// Given HTML and annotation data, reinsert highlight.
+// Want to modify HTML string before adding it since this is React.
+function insertHighlight(html, startIndex, endIndex) {
+  const domParser = new DOMParser();
+  const doc = domParser.parseFromString(html, "text/html");
+  const text = doc.body.textContent;
+  // TODO: Read into serializer module in Rangy.
+  // Might not need raw text, just iterate through html
+
+  console.log(text);
+  console.log(startIndex, endIndex);
+  return html;
+}
+
 const selectRange = (range) => {
   const mark = document.createElement("mark");
   range.surroundContents(mark);
@@ -64,6 +78,18 @@ const HighlightRangeButton = (props) => {
       }}
     >
       Highlight Range!
+    </button>
+  );
+};
+
+const InsertHighlightButton = () => {
+  return (
+    <button
+      onClick={() => {
+        insertHighlight(innerHTML, 10, 70);
+      }}
+    >
+      Insert Highlight!
     </button>
   );
 };
@@ -134,7 +160,12 @@ const Reader = () => {
       >
         <Interweave content={innerHTML} />
       </div>
-      <HighlightRangeButton range={range} />
+      <div>
+        <HighlightRangeButton range={range} />
+      </div>
+      <div>
+        <InsertHighlightButton html={innerHTML} />
+      </div>
     </>
   );
 };
