@@ -4,11 +4,15 @@ import { Interweave } from "interweave";
 import rangy from "rangy";
 import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
+import "rangy/lib/rangy-serializer";
 
 // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
-function highlightSelection() {
-  rangy.init();
-  const highlighter = rangy.createHighlighter();
+function highlightSelection({ highlighter, setHighlighter }) {
+  if (!highlighter) {
+    rangy.init();
+    highlighter = rangy.createHighlighter();
+    setHighlighter(highlighter);
+  }
   // We give each highlight a unique ID so that we
   // can easily find and synchronize CSS behaviour.
   const id = "markID-" + crypto.randomUUID();
@@ -22,6 +26,8 @@ function highlightSelection() {
     })
   );
   highlighter.highlightSelection("bg-yellow-300");
+  console.log(highlighter.serialize());
+  console.log(rangy.getSelection().getRangeAt(0));
 
   const range = rangy.getSelection().getRangeAt(0);
   const startIndex = getIndexInReader(range.startContainer, range.startOffset);
@@ -29,14 +35,10 @@ function highlightSelection() {
   console.log(startIndex, endIndex);
 }
 
-function getReaderNode() {
-  return document.getElementById("reader");
-}
-
 function getIndexInReader(container, offset) {
   let node = container;
   let count = offset;
-  const readerNode = getReaderNode();
+  const readerNode = document.getElementById("reader");
   if (!readerNode.contains(node)) return 0;
   while (true) {
     if (node.previousSibling) {
@@ -53,28 +55,78 @@ function getIndexInReader(container, offset) {
 
 // Given HTML and annotation data, reinsert highlight.
 // Want to modify HTML string before adding it since this is React.
-function insertHighlight(html, startIndex, endIndex) {
+function insertHighlight(html) {
   const domParser = new DOMParser();
   const doc = domParser.parseFromString(html, "text/html");
   const text = doc.body.textContent;
-  // TODO: Read into serializer module in Rangy.
-  // Might not need raw text, just iterate through html
 
-  console.log(text);
-  console.log(startIndex, endIndex);
+  rangy.init();
+  const rangeInput = rangy.getSelection().getRangeAt(0);
+  const readerRootInput = document.getElementById("reader-root");
+  const serializedRange = rangy.serializeRange(
+    rangeInput,
+    false,
+    readerRootInput
+  );
+
+  // TODO: Discrepancy because the range is serialized after highlighting
+  const readerRootOutput = doc.getElementById("reader-root");
+  console.log("reader-root in", readerRootInput);
+  console.log("reader-root out", readerRootOutput);
+  const rangeOutput = rangy.deserializeRange(serializedRange, readerRootOutput);
+  console.log(newHTML);
+
   return html;
 }
 
-const selectRange = (range) => {
-  const mark = document.createElement("mark");
-  range.surroundContents(mark);
-};
+function syncHoverBehavior(e) {
+  function removeHover() {
+    // We use Array.from() since geElementsByClassName returns a live collection.
+    // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
+    const relatedMarks = document.getElementsByClassName("bg-yellow-400");
+    for (const mark of Array.from(relatedMarks)) {
+      mark.classList.remove("bg-yellow-400");
+    }
+  }
+
+  function getMarkID(e) {
+    const classList = e.target.classList;
+    for (const className of classList) {
+      if (className.includes("markID")) {
+        return className;
+      }
+    }
+    return false;
+  }
+
+  removeHover();
+  const markID = getMarkID(e);
+
+  if (markID) {
+    const relatedMarks = document.getElementsByClassName(markID);
+    for (const mark of relatedMarks) {
+      mark.classList.add("bg-yellow-400");
+    }
+  }
+}
+
+function saveRange() {
+  rangy.init();
+  const range = rangy.getSelection().getRangeAt(0);
+  // Maybe a place to use a ref
+  const reader = document.getElementById("reader");
+  const serializedRange = rangy.serializeRange(range, false, reader);
+  console.log(serializedRange);
+  const serializedHighlights = rangy.highlighter.serialize();
+  console.log(serializedHighlights);
+  // PUT request
+}
 
 const HighlightRangeButton = (props) => {
   return (
     <button
       onClick={() => {
-        selectRange(props.range);
+        highlightSelection(props);
       }}
     >
       Highlight Range!
@@ -94,74 +146,43 @@ const InsertHighlightButton = () => {
   );
 };
 
-const removeHover = () => {
-  // We use Array.from() since geElementsByClassName returns a live collection.
-  // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
-  const relatedMarks = document.getElementsByClassName("bg-yellow-400");
-  for (const mark of Array.from(relatedMarks)) {
-    mark.classList.remove("bg-yellow-400");
-  }
-};
-
-const getMarkID = (e) => {
-  const classList = e.target.classList;
-  for (const className of classList) {
-    if (className.includes("markID")) {
-      return className;
-    }
-  }
-  return false;
-};
-
-const mouseOver = (e) => {
-  removeHover();
-  const markID = getMarkID(e);
-
-  if (markID) {
-    const relatedMarks = document.getElementsByClassName(markID);
-    for (const mark of relatedMarks) {
-      mark.classList.add("bg-yellow-400");
-    }
-  }
+const SaveRangeButton = () => {
+  return <button onClick={saveRange}>Save Range!</button>;
 };
 
 const innerHTML = `
-  <h2>Welcome to the reader</h2>
-  <br />
-  <p>This is where we run tests on selection and annotation.</p>
-  <br />
-  <ul class="list-disc pl-5">
-    <li>The first point being made</li>
-    <li>The second point is <i>less important</i> than the first.</li>
-  </ul>
-  <br />
-  <div>
-    <span>This <b>is </b><b>span 1.</b> This is span 2.</span>
+  <div id="reader-root">
+    <h2>Welcome to the reader</h2>
+    <br />
+    <p>This is where we run tests on selection and annotation.</p>
+    <br />
+    <ul class="list-disc pl-5">
+      <li>The first point being made</li>
+      <li>The second point is <i>less important</i> than the first.</li>
+    </ul>
+    <br />
+    <div>
+      <span>This <b>is </b><b>span 1.</b> This is span 2.</span>
+    </div>
   </div>
 `;
 
 const Reader = () => {
-  const [highlight, setHighlight] = useState(null);
-  const [range, setRange] = useState(null);
-
-  const setSelectedText = () => {
-    if (!document.getSelection().isCollapsed) {
-      setRange(window.getSelection().getRangeAt(0));
-    }
-  };
+  const [highlighter, setHighlighter] = useState(null);
 
   return (
     <>
-      <div
-        id="reader"
-        className="mt-2"
-        onMouseUp={highlightSelection}
-        onMouseOver={mouseOver}
-      >
+      <div id="reader" className="mt-2" onMouseOver={syncHoverBehavior}>
         <Interweave content={innerHTML} />
       </div>
       <div>
-        <HighlightRangeButton range={range} />
+        <HighlightRangeButton
+          highlighter={highlighter}
+          setHighlighter={setHighlighter}
+        />
+      </div>
+      <div>
+        <SaveRangeButton />
       </div>
       <div>
         <InsertHighlightButton html={innerHTML} />
