@@ -29,7 +29,7 @@ function applyHighlighter(
   return id;
 }
 
-function highlightUserSelection({ highlights }) {
+function highlightUserSelection(highlights) {
   const id = applyHighlighter(
     document.getSelection(),
     "markID-" + crypto.randomUUID(),
@@ -118,7 +118,7 @@ const HighlightRangeButton = (props) => {
   return (
     <button
       onClick={() => {
-        const range = highlightUserSelection(props);
+        const range = highlightUserSelection(props.highlights);
         saveRange(props, range);
       }}
     >
@@ -139,7 +139,7 @@ const InsertHighlightButton = (props) => {
   );
 };
 
-const innerHTML = `
+const fetchedHTML = `
   <div id="reader-root">
     <h2>Welcome to the reader</h2>
     <br />
@@ -158,25 +158,37 @@ const innerHTML = `
 
 const Reader = () => {
   const [highlights, setHighlights] = useState({});
+  const [readerHTML, setReaderHTML] = useState(null);
 
   useEffect(() => {
-    console.log(highlights);
-  }, [highlights]);
+    const domParser = new DOMParser(fetchedHTML);
+    setReaderHTML(domParser.parseFromString(fetchedHTML, "text/html"));
+  }, []);
 
-  return (
-    <div id="reader" className="mt-2" onMouseOver={syncHoverBehavior}>
-      <Interweave content={innerHTML} />
-      <div>
-        <HighlightRangeButton
-          highlights={highlights}
-          setHighlights={setHighlights}
-        />
+  if (readerHTML) {
+    return (
+      <div id="reader" className="mt-2" onMouseOver={syncHoverBehavior}>
+        <Interweave content={readerHTML.body.innerHTML} />
+        <div>
+          <HighlightRangeButton
+            highlights={highlights}
+            setHighlights={setHighlights}
+            readerHTML={readerHTML}
+            setReaderHTML={setReaderHTML}
+          />
+        </div>
+        <div>
+          <InsertHighlightButton
+            highlights={highlights}
+            readerHTML={readerHTML}
+            setReaderHTML={setReaderHTML}
+          />
+        </div>
       </div>
-      <div>
-        <InsertHighlightButton highlights={highlights} />
-      </div>
-    </div>
-  );
+    );
+  } else {
+    return null;
+  }
 };
 
 export default Reader;
