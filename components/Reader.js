@@ -6,14 +6,15 @@ import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 
-// Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
-function highlightSelection({ highlights }) {
+// Each highlight has a unique ID so that we sync :hover behaviour.
+function applyHighlighter(
+  selection = document.getSelection(),
+  id = "markID-" + crypto.randomUUID(),
+  highlights
+) {
   rangy.init();
   const highlighter = rangy.createHighlighter();
 
-  // We give each highlight a unique ID so that we
-  // can easily find and synchronize CSS behaviour.
-  const id = "markID-" + crypto.randomUUID();
   highlighter.addClassApplier(
     rangy.createClassApplier("bg-yellow-300", {
       ignoreWhiteSpace: true,
@@ -25,12 +26,36 @@ function highlightSelection({ highlights }) {
     })
   );
   highlighter.highlightSelection("bg-yellow-300");
+  return id;
+}
 
+// Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
+function highlightUserSelection({ highlights }) {
+  const id = applyHighlighter(
+    document.getSelection(),
+    "markID-" + crypto.randomUUID(),
+    highlights
+  );
   const readerNode = document.getElementById("reader");
-
   const range = rangy.getSelection().saveCharacterRanges(readerNode);
   range.id = id;
   return range;
+}
+
+// Given HTML and annotation data, reinsert highlight.
+// Want to modify HTML string before adding it since this is React.
+function highlightFetchedSelection({ highlights }) {
+  const readerNode = document.getElementById("reader");
+  for (const id in highlights) {
+    const highlight = highlights[id];
+    const selection = rangy
+      .getSelection()
+      .restoreCharacterRanges(readerNode, highlight);
+    applyHighlighter(selection, id, highlights);
+  }
+
+  // To remove what looks like user selection after adding highlight
+  rangy.getSelection().collapseToEnd();
 }
 
 function removeHighlight(highlights, id) {
@@ -52,56 +77,6 @@ function removeHighlight(highlights, id) {
     }
     pa.removeChild(el);
   });
-}
-
-/* Superceded by saveCharacterRanges()
-function getIndexInReader(container, offset) {
-  let node = container;
-  let count = offset;
-  const readerNode = document.getElementById("reader");
-  if (!readerNode.contains(node)) return 0;
-  while (true) {
-    if (node.previousSibling) {
-      node = node.previousSibling;
-      count += node.textContent.length;
-    } else if (node.parentNode && node.parentNode.id !== "reader") {
-      node = node.parentNode;
-    } else {
-      break;
-    }
-  }
-  return count;
-}
-*/
-
-// Given HTML and annotation data, reinsert highlight.
-// Want to modify HTML string before adding it since this is React.
-function insertHighlight({ highlights }) {
-  const readerNode = document.getElementById("reader");
-  const highlighter = rangy.createHighlighter();
-  for (const id in highlights) {
-    const highlight = highlights[id];
-    const selection = rangy
-      .getSelection()
-      .restoreCharacterRanges(readerNode, highlight);
-
-    // Copied code from above to make sure each
-    // highlight reinserted has a unique markID
-    highlighter.addClassApplier(
-      rangy.createClassApplier("bg-yellow-300", {
-        ignoreWhiteSpace: true,
-        onElementCreate: (el) => {
-          el.classList.add(id);
-          el.onclick = () => removeHighlight(highlights, id);
-        },
-        tagNames: ["span", "a"],
-      })
-    );
-    highlighter.highlightSelection("bg-yellow-300");
-  }
-
-  // To remove what looks like user selection after adding highlight
-  rangy.getSelection().collapseToEnd();
 }
 
 function syncHoverBehavior(e) {
@@ -147,7 +122,7 @@ const HighlightRangeButton = (props) => {
   return (
     <button
       onClick={() => {
-        const range = highlightSelection(props);
+        const range = highlightUserSelection(props);
         saveRange(props, range);
       }}
     >
@@ -160,7 +135,7 @@ const InsertHighlightButton = (props) => {
   return (
     <button
       onClick={() => {
-        insertHighlight(props);
+        highlightFetchedSelection(props);
       }}
     >
       Insert Highlight!
