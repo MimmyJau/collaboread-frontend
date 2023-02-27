@@ -6,15 +6,14 @@ import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 
-// Each highlight has a unique ID so that we sync :hover behaviour.
 function applyHighlighter(
   selection = document.getSelection(),
-  id = "markID-" + crypto.randomUUID(),
-  highlights
+  id = "markID-" + crypto.randomUUID(), // Each highlight has a unique ID so that we sync :hover behaviour.
+  highlights // Pass highlights state so we can delete highlight later.
 ) {
+  // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   rangy.init();
   const highlighter = rangy.createHighlighter();
-
   highlighter.addClassApplier(
     rangy.createClassApplier("bg-yellow-300", {
       ignoreWhiteSpace: true,
@@ -26,10 +25,10 @@ function applyHighlighter(
     })
   );
   highlighter.highlightSelection("bg-yellow-300");
+
   return id;
 }
 
-// Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
 function highlightUserSelection({ highlights }) {
   const id = applyHighlighter(
     document.getSelection(),
@@ -42,8 +41,6 @@ function highlightUserSelection({ highlights }) {
   return range;
 }
 
-// Given HTML and annotation data, reinsert highlight.
-// Want to modify HTML string before adding it since this is React.
 function highlightFetchedSelection({ highlights }) {
   const readerNode = document.getElementById("reader");
   for (const id in highlights) {
@@ -54,8 +51,7 @@ function highlightFetchedSelection({ highlights }) {
     applyHighlighter(selection, id, highlights);
   }
 
-  // To remove what looks like user selection after adding highlight
-  rangy.getSelection().collapseToEnd();
+  rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
 }
 
 function removeHighlight(highlights, id) {
