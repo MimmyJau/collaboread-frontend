@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Interweave } from "interweave";
 import rangy from "rangy";
 import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-serializer";
+import "rangy/lib/rangy-textrange";
 
 // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
-function highlightSelection({ highlighter, setHighlighter }) {
+function highlightSelection({ highlighter, setHighlighter, highlights }) {
   if (!highlighter) {
     rangy.init();
     highlighter = rangy.createHighlighter();
     setHighlighter(highlighter);
   }
+
   // We give each highlight a unique ID so that we
   // can easily find and synchronize CSS behaviour.
   const id = "markID-" + crypto.randomUUID();
@@ -21,20 +23,40 @@ function highlightSelection({ highlighter, setHighlighter }) {
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add(id);
+        el.onclick = () => removeHighlight(highlighter, highlights, id);
       },
       tagNames: ["span", "a"],
     })
   );
   highlighter.highlightSelection("bg-yellow-300");
-  console.log(highlighter.serialize());
-  console.log(rangy.getSelection().getRangeAt(0));
 
-  const range = rangy.getSelection().getRangeAt(0);
-  const startIndex = getIndexInReader(range.startContainer, range.startOffset);
-  const endIndex = getIndexInReader(range.endContainer, range.endOffset);
-  console.log(startIndex, endIndex);
+  const readerNode = document.getElementById("reader");
+  const range = rangy.getSelection().saveCharacterRanges(readerNode);
+  range.id = id;
+  return range;
 }
 
+function removeHighlight(highlighter, highlights, id) {
+  const readerNode = document.getElementById("reader");
+  const selection = rangy
+    .getSelection()
+    .restoreCharacterRanges(readerNode, highlights[id]);
+  highlighter.unhighlightSelection();
+
+  // Remove remaining span tags
+  // Source 1: https://stackoverflow.com/a/9848612/
+  // Source 2: https://stackoverflow.com/a/4232971/
+  const highlightFragments = document.querySelectorAll("." + id);
+  highlightFragments.forEach((el) => {
+    const pa = el.parentNode;
+    while (el.firstChild) {
+      pa.insertBefore(el.firstChild, el);
+    }
+    pa.removeChild(el);
+  });
+}
+
+/* Superceded by saveCharacterRanges()
 function getIndexInReader(container, offset) {
   let node = container;
   let count = offset;
@@ -52,6 +74,7 @@ function getIndexInReader(container, offset) {
   }
   return count;
 }
+*/
 
 // Given HTML and annotation data, reinsert highlight.
 // Want to modify HTML string before adding it since this is React.
@@ -110,23 +133,20 @@ function syncHoverBehavior(e) {
   }
 }
 
-function saveRange() {
-  rangy.init();
-  const range = rangy.getSelection().getRangeAt(0);
-  // Maybe a place to use a ref
-  const reader = document.getElementById("reader");
-  const serializedRange = rangy.serializeRange(range, false, reader);
-  console.log(serializedRange);
-  const serializedHighlights = rangy.highlighter.serialize();
-  console.log(serializedHighlights);
-  // PUT request
+function saveRange(props, range) {
+  props.highlights[range.id] = range;
+  props.setHighlights({
+    ...props.highlights,
+    [range.id]: range,
+  });
 }
 
 const HighlightRangeButton = (props) => {
   return (
     <button
       onClick={() => {
-        highlightSelection(props);
+        const range = highlightSelection(props);
+        saveRange(props, range);
       }}
     >
       Highlight Range!
@@ -144,10 +164,6 @@ const InsertHighlightButton = () => {
       Insert Highlight!
     </button>
   );
-};
-
-const SaveRangeButton = () => {
-  return <button onClick={saveRange}>Save Range!</button>;
 };
 
 const innerHTML = `
@@ -169,6 +185,11 @@ const innerHTML = `
 
 const Reader = () => {
   const [highlighter, setHighlighter] = useState(null);
+  const [highlights, setHighlights] = useState({});
+
+  useEffect(() => {
+    console.log(highlights);
+  }, [highlights]);
 
   return (
     <>
@@ -179,10 +200,9 @@ const Reader = () => {
         <HighlightRangeButton
           highlighter={highlighter}
           setHighlighter={setHighlighter}
+          highlights={highlights}
+          setHighlights={setHighlights}
         />
-      </div>
-      <div>
-        <SaveRangeButton />
       </div>
       <div>
         <InsertHighlightButton html={innerHTML} />
