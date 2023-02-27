@@ -31,6 +31,7 @@ function highlightSelection({ highlighter, setHighlighter, highlights }) {
   highlighter.highlightSelection("bg-yellow-300");
 
   const readerNode = document.getElementById("reader");
+
   const range = rangy.getSelection().saveCharacterRanges(readerNode);
   range.id = id;
   return range;
@@ -78,28 +79,31 @@ function getIndexInReader(container, offset) {
 
 // Given HTML and annotation data, reinsert highlight.
 // Want to modify HTML string before adding it since this is React.
-function insertHighlight(html) {
-  const domParser = new DOMParser();
-  const doc = domParser.parseFromString(html, "text/html");
-  const text = doc.body.textContent;
+function insertHighlight({ highlights, highlighter }) {
+  const readerNode = document.getElementById("reader");
+  for (const id in highlights) {
+    const highlight = highlights[id];
+    const selection = rangy
+      .getSelection()
+      .restoreCharacterRanges(readerNode, highlight);
 
-  rangy.init();
-  const rangeInput = rangy.getSelection().getRangeAt(0);
-  const readerRootInput = document.getElementById("reader-root");
-  const serializedRange = rangy.serializeRange(
-    rangeInput,
-    false,
-    readerRootInput
-  );
+    // Copied code from above to make sure each
+    // highlight reinserted has a unique markID
+    highlighter.addClassApplier(
+      rangy.createClassApplier("bg-yellow-300", {
+        ignoreWhiteSpace: true,
+        onElementCreate: (el) => {
+          el.classList.add(id);
+          el.onclick = () => removeHighlight(highlighter, highlights, id);
+        },
+        tagNames: ["span", "a"],
+      })
+    );
+    highlighter.highlightSelection("bg-yellow-300");
+  }
 
-  // TODO: Discrepancy because the range is serialized after highlighting
-  const readerRootOutput = doc.getElementById("reader-root");
-  console.log("reader-root in", readerRootInput);
-  console.log("reader-root out", readerRootOutput);
-  const rangeOutput = rangy.deserializeRange(serializedRange, readerRootOutput);
-  console.log(newHTML);
-
-  return html;
+  // To remove what looks like user selection after adding highlight
+  rangy.getSelection().collapseToEnd();
 }
 
 function syncHoverBehavior(e) {
@@ -154,11 +158,11 @@ const HighlightRangeButton = (props) => {
   );
 };
 
-const InsertHighlightButton = () => {
+const InsertHighlightButton = (props) => {
   return (
     <button
       onClick={() => {
-        insertHighlight(innerHTML, 10, 70);
+        insertHighlight(props);
       }}
     >
       Insert Highlight!
@@ -192,10 +196,8 @@ const Reader = () => {
   }, [highlights]);
 
   return (
-    <>
-      <div id="reader" className="mt-2" onMouseOver={syncHoverBehavior}>
-        <Interweave content={innerHTML} />
-      </div>
+    <div id="reader" className="mt-2" onMouseOver={syncHoverBehavior}>
+      <Interweave content={innerHTML} />
       <div>
         <HighlightRangeButton
           highlighter={highlighter}
@@ -205,9 +207,12 @@ const Reader = () => {
         />
       </div>
       <div>
-        <InsertHighlightButton html={innerHTML} />
+        <InsertHighlightButton
+          highlighter={highlighter}
+          highlights={highlights}
+        />
       </div>
-    </>
+    </div>
   );
 };
 
