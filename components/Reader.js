@@ -4,16 +4,12 @@ import { Interweave } from "interweave";
 import rangy from "rangy";
 import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
-import "rangy/lib/rangy-serializer";
 import "rangy/lib/rangy-textrange";
 
 // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
-function highlightSelection({ highlighter, setHighlighter, highlights }) {
-  if (!highlighter) {
-    rangy.init();
-    highlighter = rangy.createHighlighter();
-    setHighlighter(highlighter);
-  }
+function highlightSelection({ highlights }) {
+  rangy.init();
+  const highlighter = rangy.createHighlighter();
 
   // We give each highlight a unique ID so that we
   // can easily find and synchronize CSS behaviour.
@@ -23,7 +19,7 @@ function highlightSelection({ highlighter, setHighlighter, highlights }) {
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add(id);
-        el.onclick = () => removeHighlight(highlighter, highlights, id);
+        el.onclick = () => removeHighlight(highlights, id);
       },
       tagNames: ["span", "a"],
     })
@@ -37,7 +33,8 @@ function highlightSelection({ highlighter, setHighlighter, highlights }) {
   return range;
 }
 
-function removeHighlight(highlighter, highlights, id) {
+function removeHighlight(highlights, id) {
+  const highlighter = rangy.createHighlighter();
   const readerNode = document.getElementById("reader");
   const selection = rangy
     .getSelection()
@@ -79,8 +76,9 @@ function getIndexInReader(container, offset) {
 
 // Given HTML and annotation data, reinsert highlight.
 // Want to modify HTML string before adding it since this is React.
-function insertHighlight({ highlights, highlighter }) {
+function insertHighlight({ highlights }) {
   const readerNode = document.getElementById("reader");
+  const highlighter = rangy.createHighlighter();
   for (const id in highlights) {
     const highlight = highlights[id];
     const selection = rangy
@@ -94,7 +92,7 @@ function insertHighlight({ highlights, highlighter }) {
         ignoreWhiteSpace: true,
         onElementCreate: (el) => {
           el.classList.add(id);
-          el.onclick = () => removeHighlight(highlighter, highlights, id);
+          el.onclick = () => removeHighlight(highlights, id);
         },
         tagNames: ["span", "a"],
       })
@@ -188,7 +186,6 @@ const innerHTML = `
 `;
 
 const Reader = () => {
-  const [highlighter, setHighlighter] = useState(null);
   const [highlights, setHighlights] = useState({});
 
   useEffect(() => {
@@ -200,17 +197,12 @@ const Reader = () => {
       <Interweave content={innerHTML} />
       <div>
         <HighlightRangeButton
-          highlighter={highlighter}
-          setHighlighter={setHighlighter}
           highlights={highlights}
           setHighlights={setHighlights}
         />
       </div>
       <div>
-        <InsertHighlightButton
-          highlighter={highlighter}
-          highlights={highlights}
-        />
+        <InsertHighlightButton highlights={highlights} />
       </div>
     </div>
   );
