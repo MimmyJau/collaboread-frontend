@@ -143,7 +143,7 @@ const InsertHighlightButton = (props) => {
   );
 };
 
-const innerHTML = `
+const fetchedHTML = `
   <div id="content-highlightable">
     <h2>Welcome to the reader</h2>
     <br />
@@ -160,16 +160,13 @@ const innerHTML = `
   </div>
 `;
 
-const Reader = () => {
-  const [highlights, setHighlights] = useState({});
-
-  useEffect(() => {
-    console.log(highlights);
-  }, [highlights]);
+const Text = (props) => {
+  const highlights = props.highlights;
+  const setHighlights = props.setHighlights;
 
   return (
-    <div id="reader" className="mt-2" onMouseOver={syncHoverBehavior}>
-      <Interweave content={innerHTML} />
+    <div>
+      <Interweave content={fetchedHTML} />
       <div>
         <HighlightRangeButton
           highlights={highlights}
@@ -179,6 +176,25 @@ const Reader = () => {
       <div>
         <InsertHighlightButton highlights={highlights} />
       </div>
+    </div>
+  );
+};
+
+const Comments = (props) => {
+  return <div>Comments</div>;
+};
+
+const Reader = () => {
+  const [highlights, setHighlights] = useState({});
+
+  return (
+    <div
+      id="reader"
+      className="flex flex-row mt-2"
+      onMouseOver={syncHoverBehavior}
+    >
+      <Text highlights={highlights} setHighlights={setHighlights} />
+      <Comments />
     </div>
   );
 };
