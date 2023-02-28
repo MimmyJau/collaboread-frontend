@@ -9,7 +9,8 @@ import "rangy/lib/rangy-textrange";
 function applyHighlighter(
   selection = document.getSelection(),
   id = "markID-" + crypto.randomUUID(), // Each highlight has a unique ID so that we sync :hover behaviour.
-  highlights // Pass highlights state so we can delete highlight later.
+  highlights, // Pass highlights state so we can delete highlight later.
+  setHighlightableHTML
 ) {
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   rangy.init();
@@ -19,47 +20,58 @@ function applyHighlighter(
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add(id);
-        el.onclick = () => removeHighlight(highlights, id);
+        el.onclick = () =>
+          removeHighlight(highlights, id, setHighlightableHTML);
       },
       tagNames: ["span", "a"],
     })
   );
   highlighter.highlightSelection("bg-yellow-300");
 
+  console.log(getHighlightableRoot().outerHTML);
+  setHighlightableHTML(getHighlightableRoot().outerHTML);
+
   return id;
 }
 
-function highlightUserSelection(highlights) {
+function getHighlightableRoot() {
+  return document.getElementById("content-highlightable");
+}
+
+function highlightUserSelection(highlights, setHighlightableHTML) {
   const id = applyHighlighter(
     document.getSelection(),
     "markID-" + crypto.randomUUID(),
-    highlights
+    highlights,
+    setHighlightableHTML
   );
-  const readerNode = document.getElementById("reader");
-  const range = rangy.getSelection().saveCharacterRanges(readerNode);
+  const root = getHighlightableRoot();
+  const range = rangy.getSelection().saveCharacterRanges(root);
   range.id = id;
+  setHighlightableHTML(getHighlightableRoot().outerHTML);
   return range;
 }
 
-function highlightFetchedSelection({ highlights }) {
-  const readerNode = document.getElementById("reader");
+function highlightFetchedSelection(highlights, setHighlightableHTML) {
+  const root = getHighlightableRoot();
   for (const id in highlights) {
     const highlight = highlights[id];
     const selection = rangy
       .getSelection()
-      .restoreCharacterRanges(readerNode, highlight);
+      .restoreCharacterRanges(root, highlight);
     applyHighlighter(selection, id, highlights);
   }
 
   rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
+  setHighlightableHTML(getHighlightableRoot().outerHTML);
 }
 
 function removeHighlight(highlights, id) {
   const highlighter = rangy.createHighlighter();
-  const readerNode = document.getElementById("reader");
+  const root = getHighlightableRoot();
   const selection = rangy
     .getSelection()
-    .restoreCharacterRanges(readerNode, highlights[id]);
+    .restoreCharacterRanges(root, highlights[id]);
   highlighter.unhighlightSelection();
 
   // Remove remaining span tags
@@ -73,6 +85,8 @@ function removeHighlight(highlights, id) {
     }
     pa.removeChild(el);
   });
+
+  setHighlightableHTML(getHighlightableRoot().outerHTML);
 }
 
 function syncHoverBehavior(e) {
@@ -106,7 +120,7 @@ function syncHoverBehavior(e) {
   }
 }
 
-function saveRange(props, range) {
+function saveHighlight(props, range) {
   props.highlights[range.id] = range;
   props.setHighlights({
     ...props.highlights,
@@ -118,8 +132,11 @@ const HighlightRangeButton = (props) => {
   return (
     <button
       onClick={() => {
-        const range = highlightUserSelection(props.highlights);
-        saveRange(props, range);
+        const range = highlightUserSelection(
+          props.highlights,
+          props.setHighlightableHTML
+        );
+        // saveHighlight(props, range);
       }}
     >
       Highlight Range!
@@ -131,7 +148,7 @@ const InsertHighlightButton = (props) => {
   return (
     <button
       onClick={() => {
-        highlightFetchedSelection(props);
+        highlightFetchedSelection(props.highlight, props.setHighlightableHTML);
       }}
     >
       Insert Highlight!
@@ -140,7 +157,7 @@ const InsertHighlightButton = (props) => {
 };
 
 const fetchedHTML = `
-  <div id="reader-root">
+  <div id="content-highlightable">
     <h2>Welcome to the reader</h2>
     <br />
     <p>This is where we run tests on selection and annotation.</p>
@@ -158,30 +175,34 @@ const fetchedHTML = `
 
 const Reader = () => {
   const [highlights, setHighlights] = useState({});
-  const [readerHTML, setReaderHTML] = useState(null);
+  const [highlightableHTML, setHighlightableHTML] = useState(fetchedHTML);
 
+  function setHTMLState() {
+    setHighlightableHTML;
+  }
+
+  /*
   useEffect(() => {
     const domParser = new DOMParser(fetchedHTML);
-    setReaderHTML(domParser.parseFromString(fetchedHTML, "text/html"));
+    setHighlightableHTML(domParser.parseFromString(fetchedHTML, "text/html"));
   }, []);
+  */
 
-  if (readerHTML) {
+  if (highlightableHTML) {
     return (
       <div id="reader" className="mt-2" onMouseOver={syncHoverBehavior}>
-        <Interweave content={readerHTML.body.innerHTML} />
+        <Interweave content={highlightableHTML} />
         <div>
           <HighlightRangeButton
             highlights={highlights}
             setHighlights={setHighlights}
-            readerHTML={readerHTML}
-            setReaderHTML={setReaderHTML}
+            setHighlightableHTML={setHighlightableHTML}
           />
         </div>
         <div>
           <InsertHighlightButton
             highlights={highlights}
-            readerHTML={readerHTML}
-            setReaderHTML={setReaderHTML}
+            setHighlightableHTML={setHighlightableHTML}
           />
         </div>
       </div>
