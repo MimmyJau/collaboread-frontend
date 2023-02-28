@@ -29,25 +29,29 @@ function applyHighlighter(
   return id;
 }
 
+function getHighlightableRoot() {
+  return document.getElementById("content-highlightable");
+}
+
 function highlightUserSelection({ highlights }) {
   const id = applyHighlighter(
     document.getSelection(),
     "markID-" + crypto.randomUUID(),
     highlights
   );
-  const readerNode = document.getElementById("reader");
-  const range = rangy.getSelection().saveCharacterRanges(readerNode);
+  const highlightableRoot = getHighlightableRoot();
+  const range = rangy.getSelection().saveCharacterRanges(highlightableRoot);
   range.id = id;
   return range;
 }
 
 function highlightFetchedSelection({ highlights }) {
-  const readerNode = document.getElementById("reader");
+  const highlightableRoot = getHighlightableRoot();
   for (const id in highlights) {
     const highlight = highlights[id];
     const selection = rangy
       .getSelection()
-      .restoreCharacterRanges(readerNode, highlight);
+      .restoreCharacterRanges(highlightableRoot, highlight);
     applyHighlighter(selection, id, highlights);
   }
 
@@ -56,10 +60,10 @@ function highlightFetchedSelection({ highlights }) {
 
 function removeHighlight(highlights, id) {
   const highlighter = rangy.createHighlighter();
-  const readerNode = document.getElementById("reader");
+  const highlightableRoot = getHighlightableRoot();
   const selection = rangy
     .getSelection()
-    .restoreCharacterRanges(readerNode, highlights[id]);
+    .restoreCharacterRanges(highlightableRoot, highlights[id]);
   highlighter.unhighlightSelection();
 
   // Remove remaining span tags
@@ -140,7 +144,7 @@ const InsertHighlightButton = (props) => {
 };
 
 const innerHTML = `
-  <div id="reader-root">
+  <div id="content-highlightable">
     <h2>Welcome to the reader</h2>
     <br />
     <p>This is where we run tests on selection and annotation.</p>
