@@ -5,6 +5,7 @@ import rangy from "rangy";
 import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
+import { useForm } from "react-hook-form";
 
 function applyHighlighter(
   selection = document.getSelection(),
@@ -181,7 +182,29 @@ const Text = (props) => {
 };
 
 const Comments = (props) => {
-  return <div>Comments</div>;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      comment: "",
+    },
+  });
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit((data) => console.log(data))}>
+        <input
+          {...register("comment", { required: true, maxLength: 300 })}
+          placeholder="What's your interpretation of this passage? What questions do you have?"
+        />
+        {errors.comment?.type === "required" && <p>required</p>}
+        {errors.comment?.type === "maxLength" && <p>too long bruh</p>}v
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
 };
 
 const Reader = () => {
