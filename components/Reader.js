@@ -187,25 +187,42 @@ const Comments = (props) => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
     defaultValues: {
       comment: "",
     },
   });
 
-  return (
-    <div>
-      <form onSubmit={handleSubmit((data) => console.log(data))}>
-        <input
-          {...register("comment", { required: true, maxLength: 300 })}
-          placeholder="What's your interpretation of this passage? What questions do you have?"
-        />
-        {errors.comment?.type === "required" && <p>required</p>}
-        {errors.comment?.type === "maxLength" && <p>too long bruh</p>}v
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-  );
+  function submitCallback(data) {
+    console.log(data);
+  }
+
+  if (!props.focusedHighlight) {
+    return;
+  } else {
+    return (
+      <div>
+        <p>{props.focusedHighlight}</p>
+        <form onSubmit={handleSubmit((data) => submitCallback(data))}>
+          <textarea
+            {...register("comment", { required: true, maxLength: 300 })}
+            type="textarea"
+            placeholder="What's your interpretation of this passage? What questions do you have?"
+          ></textarea>
+          {errors.comment?.type === "required" && <p>required</p>}
+          {errors.comment?.type === "maxLength" && <p>too long bruh</p>}
+          <input {...register("markID", { required: true })} type="hidden" />
+          <button
+            type="submit"
+            onClick={() => setValue("markID", props.focusedHighlight)}
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    );
+  }
 };
 
 const Reader = () => {
@@ -219,7 +236,7 @@ const Reader = () => {
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlight)}
     >
       <Text highlights={highlights} setHighlights={setHighlights} />
-      <Comments />
+      <Comments focusedHighlight={focusedHighlight} />
     </div>
   );
 };
