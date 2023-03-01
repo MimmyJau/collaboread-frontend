@@ -80,7 +80,7 @@ function removeHighlight(highlights, id) {
   });
 }
 
-function syncHoverBehavior(e) {
+function syncHoverBehavior(e, setFocusedHighlight) {
   function removeHover() {
     // We use Array.from() since geElementsByClassName returns a live collection.
     // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
@@ -104,6 +104,7 @@ function syncHoverBehavior(e) {
   const markID = getMarkID(e);
 
   if (markID) {
+    setFocusedHighlight(markID);
     const relatedMarks = document.getElementsByClassName(markID);
     for (const mark of relatedMarks) {
       mark.classList.add("bg-yellow-400");
@@ -209,12 +210,13 @@ const Comments = (props) => {
 
 const Reader = () => {
   const [highlights, setHighlights] = useState({});
+  const [focusedHighlight, setFocusedHighlight] = useState();
 
   return (
     <div
       id="reader"
       className="flex flex-row mt-2"
-      onMouseOver={syncHoverBehavior}
+      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlight)}
     >
       <Text highlights={highlights} setHighlights={setHighlights} />
       <Comments />
