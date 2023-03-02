@@ -5,7 +5,9 @@ import rangy from "rangy";
 import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
-import { useForm } from "react-hook-form";
+import { Controller, useController, useForm } from "react-hook-form";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 function applyHighlighter(
   selection = document.getSelection(),
@@ -182,12 +184,25 @@ const Text = (props) => {
   );
 };
 
+const CommentEditor = (props) => {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "",
+    onUpdate: ({ editor }) => {
+      props.onChange(editor.getHTML());
+    },
+  });
+
+  return <EditorContent editor={editor} />;
+};
+
 const Comments = (props) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
   } = useForm({
     defaultValues: {
       comment: "",
@@ -205,11 +220,15 @@ const Comments = (props) => {
       <div>
         <p>{props.focusedHighlight}</p>
         <form onSubmit={handleSubmit((data) => submitCallback(data))}>
-          <textarea
-            {...register("comment", { required: true, maxLength: 300 })}
-            type="textarea"
-            placeholder="What's your interpretation of this passage? What questions do you have?"
-          ></textarea>
+          <Controller
+            control={control}
+            name="comment"
+            render={({ field: { onChange } }) => (
+              <CommentEditor
+                onChange={onChange} // send value to hook form
+              />
+            )}
+          />
           {errors.comment?.type === "required" && <p>required</p>}
           {errors.comment?.type === "maxLength" && <p>too long bruh</p>}
           <input {...register("markID", { required: true })} type="hidden" />
