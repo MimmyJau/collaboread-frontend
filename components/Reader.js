@@ -8,6 +8,7 @@ import "rangy/lib/rangy-textrange";
 import { Controller, useController, useForm } from "react-hook-form";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
 
 function applyHighlighter(
   selection = document.getSelection(),
@@ -186,7 +187,13 @@ const Text = (props) => {
 
 const CommentEditor = (props) => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder:
+          "This is interesting because... This isn't clear to me because...",
+      }),
+    ],
     content: "",
     onUpdate: ({ editor }) => {
       props.onChange(editor.getHTML());
