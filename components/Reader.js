@@ -5,7 +5,6 @@ import rangy from "rangy";
 import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
-import { Controller, useController, useForm } from "react-hook-form";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -203,22 +202,13 @@ const CommentEditor = (props) => {
   return <EditorContent editor={editor} />;
 };
 
-const Comments = (props) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    control,
-  } = useForm({
-    defaultValues: {
-      comment: "",
-    },
-  });
+function postComment(route, body) {
+  console.log(route, body.markID, body.comment);
+  // POST
+}
 
-  function submitCallback(data) {
-    console.log(data);
-  }
+const Comments = (props) => {
+  const [editorState, setEditorState] = useState();
 
   if (!props.focusedHighlight) {
     return;
@@ -226,26 +216,18 @@ const Comments = (props) => {
     return (
       <div>
         <p>{props.focusedHighlight}</p>
-        <form onSubmit={handleSubmit((data) => submitCallback(data))}>
-          <Controller
-            control={control}
-            name="comment"
-            render={({ field: { onChange } }) => (
-              <CommentEditor
-                onChange={onChange} // send value to hook form
-              />
-            )}
-          />
-          {errors.comment?.type === "required" && <p>required</p>}
-          {errors.comment?.type === "maxLength" && <p>too long bruh</p>}
-          <input {...register("markID", { required: true })} type="hidden" />
-          <button
-            type="submit"
-            onClick={() => setValue("markID", props.focusedHighlight)}
-          >
-            Submit
-          </button>
-        </form>
+        <CommentEditor onChange={setEditorState} />
+        <button
+          type="submit"
+          onClick={() =>
+            postComment("api/comment", {
+              markID: props.focusedHighlight,
+              comment: editorState,
+            })
+          }
+        >
+          Submit
+        </button>
       </div>
     );
   }
