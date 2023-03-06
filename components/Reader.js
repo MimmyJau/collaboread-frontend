@@ -9,6 +9,8 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 
+import { useAddHighlight, useAddComment } from "../hooks";
+
 function applyHighlighter(
   selection = document.getSelection(),
   id = "markID-" + crypto.randomUUID(), // Each highlight has a unique ID so that we sync :hover behaviour.
@@ -123,11 +125,14 @@ function saveRange(props, range) {
 }
 
 const HighlightRangeButton = (props) => {
+  const addHighlight = useAddHighlight();
+
   return (
     <button
       onClick={() => {
         const range = highlightUserSelection(props);
         saveRange(props, range);
+        addHighlight(range.id, range);
       }}
     >
       Highlight Range!
@@ -202,29 +207,24 @@ const CommentEditor = (props) => {
   return <EditorContent editor={editor} />;
 };
 
-function postComment(route, body) {
-  console.log(route, body.markID, body.comment);
-  // POST
-}
-
 const Comments = (props) => {
   const [editorState, setEditorState] = useState();
+  const markID = props.focusedHighlight;
+  const addComment = useAddComment();
 
-  if (!props.focusedHighlight) {
+  if (!markID) {
     return;
   } else {
     return (
       <div>
-        <p>{props.focusedHighlight}</p>
+        <p>{markID}</p>
         <CommentEditor onChange={setEditorState} />
         <button
           type="submit"
-          onClick={() =>
-            postComment("api/comment", {
-              markID: props.focusedHighlight,
-              comment: editorState,
-            })
-          }
+          onClick={() => {
+            console.log(markID, editorState);
+            addComment.mutate(markID, editorState);
+          }}
         >
           Submit
         </button>
