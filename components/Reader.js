@@ -132,7 +132,7 @@ const HighlightRangeButton = (props) => {
       onClick={() => {
         const range = highlightUserSelection(props);
         saveRange(props, range);
-        addHighlight(range.id, range);
+        addHighlight.mutate(range.id, range);
       }}
     >
       Highlight Range!
