@@ -1,9 +1,12 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
+import BulletList from "@tiptap/extension-bullet-list";
+import ListItem from "@tiptap/extension-list-item";
 
 const printJSON = (editor) => {
   console.log(editor.getJSON());
+  console.log(JSON.stringify(editor.getJSON()));
 };
 
 const printHTML = (editor) => {
@@ -26,6 +29,9 @@ const MenuToolbar = ({ editor }) => {
       <button onClick={() => editor.chain().focus().toggleHighlight().run()}>
         Highlight
       </button>
+      <button onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        toggleBulletList
+      </button>
       <button onClick={() => printJSON(editor)}>JSON</button>
       <button onClick={() => printHTML(editor)}>HTML</button>
       <button onClick={() => printText(editor)}>Text</button>
@@ -35,13 +41,13 @@ const MenuToolbar = ({ editor }) => {
 
 const Tiptap = () => {
   const editor = useEditor({
-    extensions: [StarterKit, Highlight],
+    extensions: [StarterKit, Highlight, BulletList, ListItem],
     content:
-      "<p>Hello World! 🌎</p><p></p><p>and this</p><p></p><p>but that</p>",
+      "<p>Sup my dudes <strong>we are here</strong> in the dumbest <em>place</em> in the <strong><em>world</em></strong>. I'm so dumb lol.</p><ul><li><p>Because I'm smart</p></li><li><p>I'm not a genius</p></li><li><p>Third point.</p></li></ul><p>And that's the end of that lol.</p>",
   });
 
   return (
-    <div className="pl-2">
+    <div className="prose">
       <MenuToolbar editor={editor} />
       <EditorContent editor={editor} />
     </div>
