@@ -1,5 +1,18 @@
 import ky from "ky-universal";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+
+function fetchDocumentHTML(uuid) {
+  const route = "http://localhost:8000/api/documents/" + uuid;
+  return ky.get(route).json();
+}
+
+function useGetDocumentHTML(uuid) {
+  return useQuery({
+    enabled: !!uuid,
+    queryKey: ["document", "html", uuid],
+    queryFn: () => fetchDocumentHTML(uuid),
+  });
+}
 
 function useAddComment() {
   return useMutation({
@@ -25,4 +38,4 @@ function useAddHighlight() {
   });
 }
 
-export { useAddHighlight, useAddComment };
+export { useGetDocumentHTML, useAddHighlight, useAddComment };
