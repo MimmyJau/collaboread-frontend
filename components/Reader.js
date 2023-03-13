@@ -162,7 +162,7 @@ const Document = (props) => {
 
   return (
     <div>
-      <Interweave content={fetchedHTML} />
+      <Interweave content={props.html} />
       <div>
         <HighlightRangeButton
           highlights={highlights}
@@ -220,7 +220,7 @@ const Comments = (props) => {
   }
 };
 
-const Reader = () => {
+const Reader = (props) => {
   const [highlights, setHighlights] = useState({});
   const [focusedHighlightID, setFocusedHighlightID] = useState();
 
@@ -230,7 +230,11 @@ const Reader = () => {
       className="flex flex-row mt-2"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightID)}
     >
-      <Document highlights={highlights} setHighlights={setHighlights} />
+      <Document
+        html={props.documentHtml}
+        highlights={highlights}
+        setHighlights={setHighlights}
+      />
       <Comments focusedHighlightID={focusedHighlightID} />
     </div>
   );
