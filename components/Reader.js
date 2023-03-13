@@ -153,20 +153,7 @@ const InsertHighlightButton = (props) => {
 };
 
 const fetchedHTML = `
-  <div id="content-highlightable">
-    <h2>Welcome to the reader</h2>
-    <br />
-    <p>This is where we run tests on selection and annotation.</p>
-    <br />
-    <ul class="list-disc pl-5">
-      <li>The first point being made</li>
-      <li>The second point is <i>less important</i> than the first.</li>
-    </ul>
-    <br />
-    <div>
-      <span>This <b>is </b><b>span 1.</b> This is span 2.</span>
-    </div>
-  </div>
+  <div id="content-highlightable" class="prose"><p>Sup my dudes <strong>we are here</strong> in the dumbest <em>place</em> in the <strong><em>world</em></strong>. I'm so dumb lol.</p><ul><li><p>Because I'm smart</p></li><li><p>I'm not a genius</p></li><li><p>Third point.</p></li></ul><p>And that's the end of that lol.</p></div>
 `;
 
 const Text = (props) => {
