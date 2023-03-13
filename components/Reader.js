@@ -84,7 +84,7 @@ function removeHighlight(highlights, id) {
   });
 }
 
-function syncHoverBehavior(e, setFocusedHighlight) {
+function syncHoverBehavior(e, setFocusedHighlightID) {
   function removeHover() {
     // We use Array.from() since geElementsByClassName returns a live collection.
     // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
@@ -108,7 +108,7 @@ function syncHoverBehavior(e, setFocusedHighlight) {
   const markID = getMarkID(e);
 
   if (markID) {
-    setFocusedHighlight(markID);
+    setFocusedHighlightID(markID);
     const relatedMarks = document.getElementsByClassName(markID);
     for (const mark of relatedMarks) {
       mark.classList.add("bg-yellow-400");
@@ -156,7 +156,7 @@ const fetchedHTML = `
   <div id="content-highlightable" class="prose"><p>Sup my dudes <strong>we are here</strong> in the dumbest <em>place</em> in the <strong><em>world</em></strong>. I'm so dumb lol.</p><ul><li><p>Because I'm smart</p></li><li><p>I'm not a genius</p></li><li><p>Third point.</p></li></ul><p>And that's the end of that lol.</p></div>
 `;
 
-const Text = (props) => {
+const Document = (props) => {
   const highlights = props.highlights;
   const setHighlights = props.setHighlights;
 
@@ -196,7 +196,7 @@ const CommentEditor = (props) => {
 
 const Comments = (props) => {
   const [editorState, setEditorState] = useState();
-  const markID = props.focusedHighlight;
+  const markID = props.focusedHighlightID;
   const addComment = useAddComment();
 
   if (!markID) {
@@ -222,16 +222,16 @@ const Comments = (props) => {
 
 const Reader = () => {
   const [highlights, setHighlights] = useState({});
-  const [focusedHighlight, setFocusedHighlight] = useState();
+  const [focusedHighlightID, setFocusedHighlightID] = useState();
 
   return (
     <div
       id="reader"
       className="flex flex-row mt-2"
-      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlight)}
+      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightID)}
     >
-      <Text highlights={highlights} setHighlights={setHighlights} />
-      <Comments focusedHighlight={focusedHighlight} />
+      <Document highlights={highlights} setHighlights={setHighlights} />
+      <Comments focusedHighlightID={focusedHighlightID} />
     </div>
   );
 };
