@@ -9,7 +9,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 
-import { useAddHighlight, useAddComment } from "../hooks";
+import { useAddHighlight, useAddComment } from "hooks";
 
 function applyHighlighter(
   selection = document.getSelection(),
