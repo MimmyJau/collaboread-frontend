@@ -4,12 +4,12 @@ import Highlight from "@tiptap/extension-highlight";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 
-const printJSON = (editor) => {
+const printJson = (editor) => {
   console.log(editor.getJSON());
   console.log(JSON.stringify(editor.getJSON()));
 };
 
-const printHTML = (editor) => {
+const printHtml = (editor) => {
   console.log(editor.getHTML());
 };
 
@@ -32,8 +32,8 @@ const MenuToolbar = ({ editor }) => {
       <button onClick={() => editor.chain().focus().toggleBulletList().run()}>
         toggleBulletList
       </button>
-      <button onClick={() => printJSON(editor)}>JSON</button>
-      <button onClick={() => printHTML(editor)}>HTML</button>
+      <button onClick={() => printJson(editor)}>JSON</button>
+      <button onClick={() => printHtml(editor)}>HTML</button>
       <button onClick={() => printText(editor)}>Text</button>
     </>
   );
