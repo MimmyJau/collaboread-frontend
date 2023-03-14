@@ -29,7 +29,8 @@ function useAddComment() {
 function useAddHighlight() {
   return useMutation({
     mutationFn: ({ uuid, highlight, documentUuid }) => {
-      const route = "http://localhost:8000/api/annotations/" + documentUuid;
+      const route =
+        "http://localhost:8000/api/annotations/" + documentUuid + "/";
       return ky
         .post(route, {
           json: {
