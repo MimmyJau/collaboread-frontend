@@ -36,7 +36,8 @@ function useAddHighlight() {
           json: {
             uuid: uuid,
             highlight: highlight,
-            articleUuid: articleUuid,
+            article: articleUuid,
+            isPublic: "True",
           },
         })
         .json();
