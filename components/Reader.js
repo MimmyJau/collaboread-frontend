@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { Interweave } from "interweave";
@@ -127,13 +128,19 @@ function saveHighlight(props, range) {
 
 const HighlightRangeButton = (props) => {
   const addHighlight = useAddHighlight();
+  const { uuid } = useRouter().query;
+  const documentUuid = uuid;
 
   return (
     <button
       onClick={() => {
         const range = highlightUserSelection(props);
-        addHighlight.mutate(range.id, range);
         saveHighlight(props, range);
+        addHighlight.mutate({
+          uuid: range.id,
+          highlight: JSON.stringify(range),
+          documentUuid: documentUuid,
+        });
       }}
     >
       Highlight Range!
