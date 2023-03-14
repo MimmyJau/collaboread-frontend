@@ -1,16 +1,16 @@
 import ky from "ky-universal";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
-function fetchDocumentHtml(uuid) {
-  const route = "http://localhost:8000/api/documents/" + uuid;
+function fetchArticleHtml(uuid) {
+  const route = "http://localhost:8000/api/articles/" + uuid;
   return ky.get(route).json();
 }
 
-function useGetDocumentHtml(uuid) {
+function useGetArticleHtml(uuid) {
   return useQuery({
     enabled: !!uuid,
-    queryKey: ["document", "html", uuid],
-    queryFn: () => fetchDocumentHtml(uuid),
+    queryKey: ["article", "html", uuid],
+    queryFn: () => fetchArticleHtml(uuid),
   });
 }
 
@@ -28,15 +28,15 @@ function useAddComment() {
 
 function useAddHighlight() {
   return useMutation({
-    mutationFn: ({ uuid, highlight, documentUuid }) => {
+    mutationFn: ({ uuid, highlight, articleUuid }) => {
       const route =
-        "http://localhost:8000/api/annotations/" + documentUuid + "/";
+        "http://localhost:8000/api/annotations/" + articleUuid + "/";
       return ky
         .post(route, {
           json: {
             uuid: uuid,
             highlight: highlight,
-            documentUuid: documentUuid,
+            articleUuid: articleUuid,
           },
         })
         .json();
@@ -44,4 +44,4 @@ function useAddHighlight() {
   });
 }
 
-export { useGetDocumentHtml, useAddHighlight, useAddComment };
+export { useGetArticleHtml, useAddHighlight, useAddComment };

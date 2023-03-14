@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Reader from "components/Reader";
 
-import { useGetDocumentHtml } from "hooks";
+import { useGetArticleHtml } from "hooks";
 
 function wrapHtml(rawHtml) {
   if (!rawHtml) return;
@@ -11,7 +11,7 @@ function wrapHtml(rawHtml) {
 export default function Page() {
   const router = useRouter();
   const { uuid } = router.query;
-  const { isLoading, isError, data, error } = useGetDocumentHtml(uuid);
+  const { isLoading, isError, data, error } = useGetArticleHtml(uuid);
 
   if (isLoading) {
     return <span>Is Loading</span>;
@@ -19,5 +19,5 @@ export default function Page() {
   if (isError) {
     return <span>{error.message}</span>;
   }
-  return <Reader documentHtml={wrapHtml(data.documentHtml)} />;
+  return <Reader articleHtml={wrapHtml(data.articleHtml)} />;
 }

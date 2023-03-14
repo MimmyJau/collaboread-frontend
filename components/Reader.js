@@ -129,7 +129,7 @@ function saveHighlight(props, range) {
 const HighlightRangeButton = (props) => {
   const addHighlight = useAddHighlight();
   const { uuid } = useRouter().query;
-  const documentUuid = uuid;
+  const articleUuid = uuid;
 
   return (
     <button
@@ -139,7 +139,7 @@ const HighlightRangeButton = (props) => {
         addHighlight.mutate({
           uuid: range.id,
           highlight: JSON.stringify(range),
-          documentUuid: documentUuid,
+          articleUuid: articleUuid,
         });
       }}
     >
@@ -164,7 +164,7 @@ const fetchedHTML = `
   <div id="content-highlightable" class="prose"><p>Sup my dudes <strong>we are here</strong> in the dumbest <em>place</em> in the <strong><em>world</em></strong>. I'm so dumb lol.</p><ul><li><p>Because I'm smart</p></li><li><p>I'm not a genius</p></li><li><p>Third point.</p></li></ul><p>And that's the end of that lol.</p></div>
 `;
 
-const Document = (props) => {
+const Article = (props) => {
   const highlights = props.highlights;
   const setHighlights = props.setHighlights;
 
@@ -238,8 +238,8 @@ const Reader = (props) => {
       className="flex flex-row mt-2"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightID)}
     >
-      <Document
-        html={props.documentHtml}
+      <Article
+        html={props.articleHtml}
         highlights={highlights}
         setHighlights={setHighlights}
       />
