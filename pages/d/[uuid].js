@@ -4,7 +4,6 @@ import Reader from "components/Reader";
 import { useGetDocumentHtml } from "hooks";
 
 function wrapHtml(rawHtml) {
-  console.log(rawHtml);
   if (!rawHtml) return;
   return `<div id="content-highlightable" class="prose">` + rawHtml + `</div>`;
 }

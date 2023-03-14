@@ -45,6 +45,7 @@ function highlightUserSelection({ highlights }) {
     highlights
   );
   const highlightableRoot = getHighlightableRoot();
+  // saveCharacterRanges() saves range relative to normalized text
   const range = rangy.getSelection().saveCharacterRanges(highlightableRoot);
   range.id = id;
   return range;
@@ -116,7 +117,7 @@ function syncHoverBehavior(e, setFocusedHighlightID) {
   }
 }
 
-function saveRange(props, range) {
+function saveHighlight(props, range) {
   props.highlights[range.id] = range;
   props.setHighlights({
     ...props.highlights,
@@ -131,8 +132,8 @@ const HighlightRangeButton = (props) => {
     <button
       onClick={() => {
         const range = highlightUserSelection(props);
-        saveRange(props, range);
         addHighlight.mutate(range.id, range);
+        saveHighlight(props, range);
       }}
     >
       Highlight Range!
