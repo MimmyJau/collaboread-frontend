@@ -55,7 +55,7 @@ function highlightUserSelection({ highlights }) {
 function highlightFetchedSelection({ highlights }) {
   const highlightableRoot = getHighlightableRoot();
   for (const id in highlights) {
-    const highlight = highlights[id];
+    const highlight = JSON.parse(highlights[id]);
     const selection = rangy
       .getSelection()
       .restoreCharacterRanges(highlightableRoot, highlight);
@@ -70,7 +70,7 @@ function removeHighlight(highlights, id) {
   const highlightableRoot = getHighlightableRoot();
   const selection = rangy
     .getSelection()
-    .restoreCharacterRanges(highlightableRoot, highlights[id]);
+    .restoreCharacterRanges(highlightableRoot, JSON.parse(highlights[id]));
   highlighter.unhighlightSelection();
 
   // Remove remaining span tags
@@ -119,10 +119,10 @@ function syncHoverBehavior(e, setFocusedHighlightID) {
 }
 
 function saveHighlight(props, range) {
-  props.highlights[range.id] = range;
+  props.highlights[range.id] = JSON.stringify(range);
   props.setHighlights({
     ...props.highlights,
-    [range.id]: range,
+    [range.id]: JSON.stringify(range),
   });
 }
 
