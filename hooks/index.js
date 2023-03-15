@@ -14,6 +14,19 @@ function useGetArticleHtml(uuid) {
   });
 }
 
+function fetchAnnotations(articleUuid) {
+  const route = "http://localhost:8000/api/annotations/" + articleUuid;
+  return ky.get(route).json();
+}
+
+function useGetAnnotations(articleUuid) {
+  return useQuery({
+    enabled: !!articleUuid,
+    queryKey: ["annotations", "article", articleUuid],
+    queryFn: () => fetchAnnotations(articleUuid),
+  });
+}
+
 function useAddComment() {
   return useMutation({
     mutationFn: (id, comment) => {
@@ -45,4 +58,4 @@ function useAddHighlight() {
   });
 }
 
-export { useGetArticleHtml, useAddHighlight, useAddComment };
+export { useGetArticleHtml, useGetAnnotations, useAddHighlight, useAddComment };

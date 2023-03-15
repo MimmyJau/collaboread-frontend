@@ -14,8 +14,7 @@ import { useAddHighlight, useAddComment } from "hooks";
 
 function applyHighlighter(
   selection = document.getSelection(),
-  id = "markID-" + crypto.randomUUID(), // Each highlight has a unique ID so that we sync :hover behaviour.
-  highlights // Pass highlights state so we can delete highlight later.
+  id = "markID-" + crypto.randomUUID() // Each highlight has a unique ID so that we sync :hover behaviour.
 ) {
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   rangy.init();
@@ -25,7 +24,7 @@ function applyHighlighter(
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add(id);
-        el.onclick = () => removeHighlight(highlights, id);
+        el.onclick = () => removeHighlight(id);
       },
       tagNames: ["span", "a"],
     })
@@ -52,20 +51,21 @@ function highlightUserSelection({ highlights }) {
   return range;
 }
 
-function highlightFetchedSelection({ highlights }) {
+function highlightFetchedSelection(annotations) {
+  if (!annotations) return;
   const highlightableRoot = getHighlightableRoot();
-  for (const id in highlights) {
-    const highlight = JSON.parse(highlights[id]);
-    const selection = rangy
-      .getSelection()
-      .restoreCharacterRanges(highlightableRoot, highlight);
-    applyHighlighter(selection, id, highlights);
-  }
-
-  rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
+  // for (const annotation of annotations) {
+  annotations.forEach((annotation, index) => {
+    const highlight = annotation.highlight;
+    let selection = rangy.getSelection();
+    selection = selection.restoreCharacterRanges(highlightableRoot, highlight);
+    applyHighlighter(selection, annotations.uuid);
+    rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
+  });
 }
 
-function removeHighlight(highlights, id) {
+function removeHighlight(id) {
+  /*
   const highlighter = rangy.createHighlighter();
   const highlightableRoot = getHighlightableRoot();
   const selection = rangy
@@ -84,6 +84,8 @@ function removeHighlight(highlights, id) {
     }
     pa.removeChild(el);
   });
+  */
+  console.log("removing" + id + "!");
 }
 
 function syncHoverBehavior(e, setFocusedHighlightID) {
@@ -138,7 +140,7 @@ const HighlightRangeButton = (props) => {
         saveHighlight(props, range);
         addHighlight.mutate({
           uuid: range.id,
-          highlight: JSON.stringify(range),
+          highlight: range,
           articleUuid: articleUuid,
         });
       }}
@@ -152,7 +154,7 @@ const InsertHighlightButton = (props) => {
   return (
     <button
       onClick={() => {
-        highlightFetchedSelection(props);
+        highlightFetchedSelection(props.highlights);
       }}
     >
       Insert Highlight!
@@ -167,6 +169,9 @@ const fetchedHTML = `
 const Article = (props) => {
   const highlights = props.highlights;
   const setHighlights = props.setHighlights;
+  useEffect(() => {
+    highlightFetchedSelection(highlights);
+  }, [highlights]);
 
   return (
     <div>
@@ -231,6 +236,7 @@ const Comments = (props) => {
 const Reader = (props) => {
   const [highlights, setHighlights] = useState({});
   const [focusedHighlightID, setFocusedHighlightID] = useState();
+  const remoteHighlights = props.annotations;
 
   return (
     <div
@@ -240,7 +246,7 @@ const Reader = (props) => {
     >
       <Article
         html={props.articleHtml}
-        highlights={highlights}
+        highlights={remoteHighlights}
         setHighlights={setHighlights}
       />
       <Comments focusedHighlightID={focusedHighlightID} />
