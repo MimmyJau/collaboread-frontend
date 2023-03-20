@@ -59,7 +59,7 @@ function highlightFetchedSelection(annotations) {
     const highlight = annotation.highlight;
     let selection = rangy.getSelection();
     selection = selection.restoreCharacterRanges(highlightableRoot, highlight);
-    applyHighlighter(selection, annotations.uuid);
+    applyHighlighter(selection, annotation.uuid);
     rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
   });
 }
