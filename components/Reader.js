@@ -23,7 +23,8 @@ function applyHighlighter(
     rangy.createClassApplier("bg-yellow-300", {
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
-        el.classList.add(id);
+        el.classList.add("highlight");
+        el.dataset.annotationId = id;
         el.onclick = () => removeHighlight(id);
       },
       tagNames: ["span", "a"],
@@ -54,7 +55,6 @@ function highlightUserSelection({ highlights }) {
 function highlightFetchedSelection(annotations) {
   if (!annotations) return;
   const highlightableRoot = getHighlightableRoot();
-  // for (const annotation of annotations) {
   annotations.forEach((annotation, index) => {
     const highlight = annotation.highlight;
     let selection = rangy.getSelection();
@@ -99,13 +99,7 @@ function syncHoverBehavior(e, setFocusedHighlightID) {
   }
 
   function getMarkID(e) {
-    const classList = e.target.classList;
-    for (const className of classList) {
-      if (className.includes("markID")) {
-        return className;
-      }
-    }
-    return false;
+    return e.target.dataset.annotationId || false;
   }
 
   removeHover();
@@ -113,7 +107,9 @@ function syncHoverBehavior(e, setFocusedHighlightID) {
 
   if (markID) {
     setFocusedHighlightID(markID);
-    const relatedMarks = document.getElementsByClassName(markID);
+    const relatedMarks = document.querySelectorAll(
+      `[data-annotation-id="${markID}"]`
+    );
     for (const mark of relatedMarks) {
       mark.classList.add("bg-yellow-400");
     }

@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-mark {
-  background-color: #ffe066;
-}
-
 /* Source: https://tiptap.dev/api/extensions/placeholder */
 .ProseMirror p.is-editor-empty:first-child::before {
   color: #adb5bd;
