@@ -14,7 +14,7 @@ import { useAddHighlight, useAddComment } from "hooks";
 
 function applyHighlighter(
   selection = document.getSelection(),
-  id = "markID-" + crypto.randomUUID() // Each highlight has a unique ID so that we sync :hover behaviour.
+  id = crypto.randomUUID() // Each highlight has a unique ID so that we sync :hover behaviour.
 ) {
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   rangy.init();
@@ -42,7 +42,7 @@ function getHighlightableRoot() {
 function highlightUserSelection({ highlights }) {
   const id = applyHighlighter(
     document.getSelection(),
-    "markID-" + crypto.randomUUID(),
+    crypto.randomUUID(),
     highlights
   );
   const highlightableRoot = getHighlightableRoot();
@@ -92,25 +92,25 @@ function syncHoverBehavior(e, setFocusedHighlightID) {
   function removeHover() {
     // We use Array.from() since geElementsByClassName returns a live collection.
     // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
-    const relatedMarks = document.getElementsByClassName("bg-yellow-400");
-    for (const mark of Array.from(relatedMarks)) {
+    const relatedHighlights = document.getElementsByClassName("bg-yellow-400");
+    for (const mark of Array.from(relatedHighlights)) {
       mark.classList.remove("bg-yellow-400");
     }
   }
 
-  function getMarkID(e) {
+  function getAnnotationId(e) {
     return e.target.dataset.annotationId || false;
   }
 
   removeHover();
-  const markID = getMarkID(e);
+  const annotationId = getAnnotationId(e);
 
-  if (markID) {
-    setFocusedHighlightID(markID);
-    const relatedMarks = document.querySelectorAll(
-      `[data-annotation-id="${markID}"]`
+  if (annotationId) {
+    setFocusedHighlightID(annotationId);
+    const relatedHighlights = document.querySelectorAll(
+      `.highlight[data-annotation-id="${annotationId}"]`
     );
-    for (const mark of relatedMarks) {
+    for (const mark of relatedHighlights) {
       mark.classList.add("bg-yellow-400");
     }
   }
