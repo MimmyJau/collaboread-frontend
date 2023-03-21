@@ -85,6 +85,7 @@ function removeHighlight(id) {
     pa.removeChild(el);
   });
   */
+  // Remove highlight from DOM and send react-query mutate to delete from backend
   console.log("removing" + id + "!");
 }
 

@@ -19,11 +19,32 @@ function fetchAnnotations(articleUuid) {
   return ky.get(route).json();
 }
 
+function unflattenAnnotation(flatAnnotation) {
+  return {
+    uuid: flatAnnotation.uuid,
+    highlight: Array.of({
+      characterRange: {
+        start: flatAnnotation.highlightStart,
+        end: flatAnnotation.highlightEnd,
+      },
+      backward: flatAnnotation.highlightBackward,
+    }),
+    comment: flatAnnotation.comment,
+  };
+}
+
 function useGetAnnotations(articleUuid) {
   return useQuery({
     enabled: !!articleUuid,
     queryKey: ["annotations", "article", articleUuid],
-    queryFn: () => fetchAnnotations(articleUuid),
+    queryFn: async () => {
+      const flatAnnotations = await fetchAnnotations(articleUuid);
+      const annotations = [];
+      for (const flatAnnotation of flatAnnotations) {
+        annotations.push(unflattenAnnotation(flatAnnotation));
+      }
+      return annotations;
+    },
   });
 }
 
@@ -48,7 +69,9 @@ function useAddHighlight() {
         .post(route, {
           json: {
             uuid: uuid,
-            highlight: highlight,
+            highlightStart: highlight[0].characterRange.start,
+            highlightEnd: highlight[0].characterRange.end,
+            highlightBackward: highlight[0].backward,
             article: articleUuid,
             isPublic: "True",
           },
