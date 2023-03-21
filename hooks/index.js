@@ -15,7 +15,8 @@ function useGetArticleHtml(uuid) {
 }
 
 function fetchAnnotations(articleUuid) {
-  const route = "http://localhost:8000/api/annotations/" + articleUuid;
+  const route =
+    "http://localhost:8000/api/articles/" + articleUuid + "/annotations/";
   return ky.get(route).json();
 }
 
@@ -64,7 +65,7 @@ function useAddHighlight() {
   return useMutation({
     mutationFn: ({ uuid, highlight, articleUuid }) => {
       const route =
-        "http://localhost:8000/api/annotations/" + articleUuid + "/";
+        "http://localhost:8000/api/articles/" + articleUuid + "/annotations/";
       return ky
         .post(route, {
           json: {
@@ -81,4 +82,20 @@ function useAddHighlight() {
   });
 }
 
-export { useGetArticleHtml, useGetAnnotations, useAddHighlight, useAddComment };
+function useRemoveHighlight() {
+  return useMutation({
+    mutationFn: (annotationUuid) => {
+      return ky
+        .delete("http://localhost:8000/api/annotations/" + annotationUuid + "/")
+        .json();
+    },
+  });
+}
+
+export {
+  useGetArticleHtml,
+  useGetAnnotations,
+  useAddHighlight,
+  useAddComment,
+  useRemoveHighlight,
+};

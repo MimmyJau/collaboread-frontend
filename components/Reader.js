@@ -10,11 +10,13 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 
-import { useAddHighlight, useAddComment } from "hooks";
+import { useAddHighlight, useAddComment, useRemoveHighlight } from "hooks";
 
 function applyHighlighter(
   selection = document.getSelection(),
-  id = crypto.randomUUID() // Each highlight has a unique ID so that we sync :hover behaviour.
+  id = crypto.randomUUID(), // Each highlight has a unique ID so that we sync :hover behaviour.
+  removeHighlight,
+  highlights
 ) {
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   rangy.init();
@@ -25,7 +27,11 @@ function applyHighlighter(
       onElementCreate: (el) => {
         el.classList.add("highlight");
         el.dataset.annotationId = id;
-        el.onclick = () => removeHighlight(id);
+        el.onclick = () => {
+          removeHighlight.mutate(id);
+          console.log(highlights);
+          clearHighlight(id, highlights);
+        };
       },
       tagNames: ["span", "a"],
     })
@@ -39,10 +45,11 @@ function getHighlightableRoot() {
   return document.getElementById("content-highlightable");
 }
 
-function highlightUserSelection({ highlights }) {
+function highlightUserSelection({ highlights, removeHighlight }) {
   const id = applyHighlighter(
     document.getSelection(),
     crypto.randomUUID(),
+    removeHighlight,
     highlights
   );
   const highlightableRoot = getHighlightableRoot();
@@ -52,31 +59,35 @@ function highlightUserSelection({ highlights }) {
   return range;
 }
 
-function highlightFetchedSelection(annotations) {
+function highlightFetchedSelection(annotations, removeHighlight) {
   if (!annotations) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     const highlight = annotation.highlight;
     let selection = rangy.getSelection();
     selection = selection.restoreCharacterRanges(highlightableRoot, highlight);
-    applyHighlighter(selection, annotation.uuid);
+    applyHighlighter(selection, annotation.uuid, removeHighlight, annotations);
     rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
   });
 }
 
-function removeHighlight(id) {
-  /*
+function clearHighlight(id, highlights) {
   const highlighter = rangy.createHighlighter();
   const highlightableRoot = getHighlightableRoot();
   const selection = rangy
     .getSelection()
-    .restoreCharacterRanges(highlightableRoot, JSON.parse(highlights[id]));
+    .restoreCharacterRanges(
+      highlightableRoot,
+      highlights.filter((highlight) => highlight.uuid === id)[0]
+    );
   highlighter.unhighlightSelection();
 
   // Remove remaining span tags
   // Source 1: https://stackoverflow.com/a/9848612/
   // Source 2: https://stackoverflow.com/a/4232971/
-  const highlightFragments = document.querySelectorAll("." + id);
+  const highlightFragments = document.querySelectorAll(
+    `.highlight[data-annotation-id="${id}"]`
+  );
   highlightFragments.forEach((el) => {
     const pa = el.parentNode;
     while (el.firstChild) {
@@ -84,9 +95,6 @@ function removeHighlight(id) {
     }
     pa.removeChild(el);
   });
-  */
-  // Remove highlight from DOM and send react-query mutate to delete from backend
-  console.log("removing" + id + "!");
 }
 
 function syncHoverBehavior(e, setFocusedHighlightID) {
@@ -166,8 +174,9 @@ const fetchedHTML = `
 const Article = (props) => {
   const highlights = props.highlights;
   const setHighlights = props.setHighlights;
+  const removeHighlight = useRemoveHighlight();
   useEffect(() => {
-    highlightFetchedSelection(highlights);
+    highlightFetchedSelection(highlights, removeHighlight);
   }, [highlights]);
 
   return (
@@ -177,6 +186,7 @@ const Article = (props) => {
         <HighlightRangeButton
           highlights={highlights}
           setHighlights={setHighlights}
+          removeHighlight={removeHighlight}
         />
       </div>
       <div>
