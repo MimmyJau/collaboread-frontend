@@ -21,6 +21,8 @@ function applyHighlighter(
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   rangy.init();
   const highlighter = rangy.createHighlighter();
+  const highlightableRoot = getHighlightableRoot();
+  const range = rangy.getSelection().saveCharacterRanges(highlightableRoot);
   highlighter.addClassApplier(
     rangy.createClassApplier("bg-yellow-300", {
       ignoreWhiteSpace: true,
@@ -28,7 +30,7 @@ function applyHighlighter(
         el.classList.add("highlight");
         el.dataset.annotationId = id;
         el.onclick = () => {
-          clearHighlight(id, highlights);
+          clearHighlight(id, range);
           removeHighlight.mutate(id);
         };
       },
@@ -70,16 +72,13 @@ function highlightFetchedSelection(annotations, removeHighlight) {
   });
 }
 
-function clearHighlight(id, highlights) {
+function clearHighlight(id, range) {
   const highlighter = rangy.createHighlighter();
   const highlightableRoot = getHighlightableRoot();
   debugger;
   const selection = rangy
     .getSelection()
-    .restoreCharacterRanges(
-      highlightableRoot,
-      highlights.filter((highlight) => highlight.uuid === id)[0]
-    );
+    .restoreCharacterRanges(highlightableRoot, range);
   highlighter.unhighlightSelection();
 
   // Remove remaining span tags
@@ -125,14 +124,6 @@ function syncHoverBehavior(e, setFocusedHighlightID) {
   }
 }
 
-function saveHighlight(props, range) {
-  props.highlights[range.id] = JSON.stringify(range);
-  props.setHighlights({
-    ...props.highlights,
-    [range.id]: JSON.stringify(range),
-  });
-}
-
 const HighlightRangeButton = (props) => {
   const { uuid } = useRouter().query;
   const addHighlight = useAddHighlight(uuid);
@@ -142,7 +133,6 @@ const HighlightRangeButton = (props) => {
     <button
       onClick={() => {
         const range = highlightUserSelection(props);
-        // saveHighlight(props, range);
         addHighlight.mutate({
           uuid: range.id,
           highlight: range,
@@ -173,8 +163,9 @@ const fetchedHTML = `
 
 const Article = (props) => {
   const highlights = props.highlights;
-  const setHighlights = props.setHighlights;
-  const removeHighlight = useRemoveHighlight();
+  const { uuid } = useRouter().query;
+  const articleUuid = uuid;
+  const removeHighlight = useRemoveHighlight(articleUuid);
   useEffect(() => {
     highlightFetchedSelection(highlights, removeHighlight);
   }, [highlights]);
@@ -185,7 +176,6 @@ const Article = (props) => {
       <div>
         <HighlightRangeButton
           highlights={highlights}
-          setHighlights={setHighlights}
           removeHighlight={removeHighlight}
         />
       </div>
@@ -241,7 +231,6 @@ const Comments = (props) => {
 };
 
 const Reader = (props) => {
-  const [highlights, setHighlights] = useState({});
   const [focusedHighlightID, setFocusedHighlightID] = useState();
   const remoteHighlights = props.annotations;
 
@@ -251,11 +240,7 @@ const Reader = (props) => {
       className="flex flex-row mt-2"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightID)}
     >
-      <Article
-        html={props.articleHtml}
-        highlights={remoteHighlights}
-        setHighlights={setHighlights}
-      />
+      <Article html={props.articleHtml} highlights={remoteHighlights} />
       <Comments focusedHighlightID={focusedHighlightID} />
     </div>
   );

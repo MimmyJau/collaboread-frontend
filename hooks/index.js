@@ -87,7 +87,6 @@ function useAddHighlight(articleUuid) {
           const newAnnotation = unflattenAnnotation(newHighlight);
           const newData = structuredClone(oldData);
           newData.push(newAnnotation);
-          console.log(newData);
           return newData;
         }
       );
@@ -95,12 +94,18 @@ function useAddHighlight(articleUuid) {
   });
 }
 
-function useRemoveHighlight() {
+function useRemoveHighlight(articleUuid) {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (annotationUuid) => {
       return ky
         .delete("http://localhost:8000/api/annotations/" + annotationUuid + "/")
         .json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["annotations", "article", articleUuid],
+      });
     },
   });
 }
