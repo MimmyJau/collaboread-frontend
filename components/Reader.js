@@ -14,9 +14,8 @@ import { useAddHighlight, useAddComment, useRemoveHighlight } from "hooks";
 
 function applyHighlighter(
   selection = document.getSelection(),
-  id = crypto.randomUUID(), // Each highlight has a unique ID so that we sync :hover behaviour.
-  removeHighlight,
-  highlights
+  annotationUuid = crypto.randomUUID(), // Each highlight has a unique ID so that we sync :hover behaviour.
+  removeHighlight
 ) {
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   rangy.init();
@@ -28,10 +27,10 @@ function applyHighlighter(
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add("highlight");
-        el.dataset.annotationId = id;
+        el.dataset.annotationId = annotationUuid;
         el.onclick = () => {
-          clearHighlight(id, range);
-          removeHighlight.mutate(id);
+          clearHighlight(annotationUuid, range);
+          removeHighlight.mutate(annotationUuid);
         };
       },
       tagNames: ["span", "a"],
@@ -39,25 +38,24 @@ function applyHighlighter(
   );
   highlighter.highlightSelection("bg-yellow-300");
 
-  return id;
+  return { uuid: annotationUuid, highlight: range };
 }
 
 function getHighlightableRoot() {
   return document.getElementById("content-highlightable");
 }
 
-function highlightUserSelection({ highlights, removeHighlight }) {
-  const id = applyHighlighter(
+function highlightUserSelection({
+  articleUuid,
+  addHighlight,
+  removeHighlight,
+}) {
+  const annotationFragment = applyHighlighter(
     document.getSelection(),
     crypto.randomUUID(),
-    removeHighlight,
-    highlights
+    removeHighlight
   );
-  const highlightableRoot = getHighlightableRoot();
-  // saveCharacterRanges() saves range relative to normalized text
-  const range = rangy.getSelection().saveCharacterRanges(highlightableRoot);
-  range.id = id;
-  return range;
+  addHighlight.mutate({ ...annotationFragment, articleUuid: articleUuid });
 }
 
 function highlightFetchedSelection(annotations, removeHighlight) {
@@ -65,17 +63,17 @@ function highlightFetchedSelection(annotations, removeHighlight) {
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     const highlight = annotation.highlight;
-    let selection = rangy.getSelection();
-    selection = selection.restoreCharacterRanges(highlightableRoot, highlight);
-    applyHighlighter(selection, annotation.uuid, removeHighlight, annotations);
+    const selection = rangy
+      .getSelection()
+      .restoreCharacterRanges(highlightableRoot, highlight);
+    applyHighlighter(selection, annotation.uuid, removeHighlight);
     rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
   });
 }
 
-function clearHighlight(id, range) {
+function clearHighlight(annotationUuid, range) {
   const highlighter = rangy.createHighlighter();
   const highlightableRoot = getHighlightableRoot();
-  debugger;
   const selection = rangy
     .getSelection()
     .restoreCharacterRanges(highlightableRoot, range);
@@ -85,7 +83,7 @@ function clearHighlight(id, range) {
   // Source 1: https://stackoverflow.com/a/9848612/
   // Source 2: https://stackoverflow.com/a/4232971/
   const highlightFragments = document.querySelectorAll(
-    `.highlight[data-annotation-id="${id}"]`
+    `.highlight[data-annotation-id="${annotationUuid}"]`
   );
   highlightFragments.forEach((el) => {
     const pa = el.parentNode;
@@ -125,19 +123,10 @@ function syncHoverBehavior(e, setFocusedHighlightID) {
 }
 
 const HighlightRangeButton = (props) => {
-  const { uuid } = useRouter().query;
-  const addHighlight = useAddHighlight(uuid);
-  const articleUuid = uuid;
-
   return (
     <button
       onClick={() => {
         const range = highlightUserSelection(props);
-        addHighlight.mutate({
-          uuid: range.id,
-          highlight: range,
-          articleUuid: articleUuid,
-        });
       }}
     >
       Highlight Range!
@@ -145,27 +134,12 @@ const HighlightRangeButton = (props) => {
   );
 };
 
-const InsertHighlightButton = (props) => {
-  return (
-    <button
-      onClick={() => {
-        highlightFetchedSelection(props.highlights);
-      }}
-    >
-      Insert Highlight!
-    </button>
-  );
-};
-
-const fetchedHTML = `
-  <div id="content-highlightable" class="prose"><p>Sup my dudes <strong>we are here</strong> in the dumbest <em>place</em> in the <strong><em>world</em></strong>. I'm so dumb lol.</p><ul><li><p>Because I'm smart</p></li><li><p>I'm not a genius</p></li><li><p>Third point.</p></li></ul><p>And that's the end of that lol.</p></div>
-`;
-
 const Article = (props) => {
   const highlights = props.highlights;
-  const { uuid } = useRouter().query;
-  const articleUuid = uuid;
+  const { articleUuid } = useRouter().query;
+  const addHighlight = useAddHighlight(articleUuid);
   const removeHighlight = useRemoveHighlight(articleUuid);
+
   useEffect(() => {
     highlightFetchedSelection(highlights, removeHighlight);
   }, [highlights]);
@@ -175,12 +149,10 @@ const Article = (props) => {
       <Interweave content={props.html} />
       <div>
         <HighlightRangeButton
-          highlights={highlights}
+          articleUuid={articleUuid}
+          addHighlight={addHighlight}
           removeHighlight={removeHighlight}
         />
-      </div>
-      <div>
-        <InsertHighlightButton highlights={highlights} />
       </div>
     </div>
   );

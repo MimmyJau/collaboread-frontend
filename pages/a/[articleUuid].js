@@ -10,19 +10,19 @@ function wrapHtml(rawHtml) {
 
 export default function Page() {
   const router = useRouter();
-  const { uuid } = router.query;
+  const { articleUuid } = router.query;
   const {
     isLoading: isLoadingArticle,
     isError: isErrorArticle,
     data: dataArticle,
     error: errorArticle,
-  } = useGetArticleHtml(uuid);
+  } = useGetArticleHtml(articleUuid);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,
     data: dataAnnotations,
     error: errorAnnotations,
-  } = useGetAnnotations(uuid);
+  } = useGetAnnotations(articleUuid);
 
   if (isLoadingArticle) {
     return <span>Is Loading</span>;
