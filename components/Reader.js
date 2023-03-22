@@ -28,9 +28,8 @@ function applyHighlighter(
         el.classList.add("highlight");
         el.dataset.annotationId = id;
         el.onclick = () => {
-          removeHighlight.mutate(id);
-          console.log(highlights);
           clearHighlight(id, highlights);
+          removeHighlight.mutate(id);
         };
       },
       tagNames: ["span", "a"],
@@ -74,6 +73,7 @@ function highlightFetchedSelection(annotations, removeHighlight) {
 function clearHighlight(id, highlights) {
   const highlighter = rangy.createHighlighter();
   const highlightableRoot = getHighlightableRoot();
+  debugger;
   const selection = rangy
     .getSelection()
     .restoreCharacterRanges(
@@ -134,15 +134,15 @@ function saveHighlight(props, range) {
 }
 
 const HighlightRangeButton = (props) => {
-  const addHighlight = useAddHighlight();
   const { uuid } = useRouter().query;
+  const addHighlight = useAddHighlight(uuid);
   const articleUuid = uuid;
 
   return (
     <button
       onClick={() => {
         const range = highlightUserSelection(props);
-        saveHighlight(props, range);
+        // saveHighlight(props, range);
         addHighlight.mutate({
           uuid: range.id,
           highlight: range,

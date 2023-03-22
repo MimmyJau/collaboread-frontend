@@ -1,5 +1,5 @@
 import ky from "ky-universal";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function fetchArticleHtml(uuid) {
   const route = "http://localhost:8000/api/articles/" + uuid;
@@ -30,7 +30,7 @@ function unflattenAnnotation(flatAnnotation) {
       },
       backward: flatAnnotation.highlightBackward,
     }),
-    comment: flatAnnotation.comment,
+    comment: flatAnnotation.comment || "",
   };
 }
 
@@ -61,7 +61,8 @@ function useAddComment() {
   });
 }
 
-function useAddHighlight() {
+function useAddHighlight(articleUuid) {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ uuid, highlight, articleUuid }) => {
       const route =
@@ -78,6 +79,18 @@ function useAddHighlight() {
           },
         })
         .json();
+    },
+    onSuccess: (newHighlight) => {
+      queryClient.setQueryData(
+        ["annotations", "article", articleUuid],
+        (oldData) => {
+          const newAnnotation = unflattenAnnotation(newHighlight);
+          const newData = structuredClone(oldData);
+          newData.push(newAnnotation);
+          console.log(newData);
+          return newData;
+        }
+      );
     },
   });
 }
