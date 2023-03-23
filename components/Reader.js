@@ -7,31 +7,51 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Article from "components/Article.js";
 import { useAddComment } from "hooks";
 
-function syncHoverBehavior(e, setFocusedHighlightID) {
-  function removeHover() {
-    // We use Array.from() since geElementsByClassName returns a live collection.
-    // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
-    const relatedHighlights = document.getElementsByClassName("bg-yellow-400");
-    for (const mark of Array.from(relatedHighlights)) {
-      mark.classList.remove("bg-yellow-400");
-    }
+function addClassToElements(elements, className) {
+  for (const element of elements) {
+    element.classList.add(className);
   }
+}
 
-  function getAnnotationId(e) {
-    return e.target.dataset.annotationId || false;
+function removeClassFromElements(elements, className) {
+  for (const element of elements) {
+    element.classList.remove(className);
   }
+}
 
-  removeHover();
-  const annotationId = getAnnotationId(e);
+function getAllHoveredHighlights() {
+  return document.getElementsByClassName("bg-yellow-400");
+}
 
+function addHoverClassToRelatedHighlights(annotationId) {
+  const relatedHighlights = getRelatedHighlights(annotationId);
+  addClassToElements(relatedHighlights, "bg-yellow-400");
+}
+
+function removeAllHoverClasses() {
+  // We use Array.from() since geElementsByClassName returns a live collection.
+  // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
+  const hoveredHighlights = Array.from(getAllHoveredHighlights());
+  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
+}
+
+function extractAnnotationIdFromEvent(e) {
+  return e.target.dataset.annotationId || "";
+}
+
+function getRelatedHighlights(annotationId) {
+  return document.querySelectorAll(
+    `.highlight[data-annotation-id="${annotationId}"]`
+  );
+}
+
+function syncHoverBehavior(e, setFocusedHighlightId) {
+  removeAllHoverClasses();
+
+  const annotationId = extractAnnotationIdFromEvent(e);
   if (annotationId) {
-    setFocusedHighlightID(annotationId);
-    const relatedHighlights = document.querySelectorAll(
-      `.highlight[data-annotation-id="${annotationId}"]`
-    );
-    for (const mark of relatedHighlights) {
-      mark.classList.add("bg-yellow-400");
-    }
+    setFocusedHighlightId(annotationId);
+    addHoverClassToRelatedHighlights(annotationId);
   }
 }
 
@@ -55,7 +75,7 @@ const CommentEditor = (props) => {
 
 const Comments = (props) => {
   const [editorState, setEditorState] = useState();
-  const markID = props.focusedHighlightID;
+  const markID = props.focusedHighlightId;
   const addComment = useAddComment();
 
   if (!markID) {
@@ -80,20 +100,20 @@ const Comments = (props) => {
 };
 
 const Reader = (props) => {
-  const [focusedHighlightID, setFocusedHighlightID] = useState();
+  const [focusedHighlightId, setFocusedHighlightId] = useState();
   const fetchedAnnotations = props.annotations;
 
   return (
     <div
       id="reader"
       className="flex flex-row mt-2"
-      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightID)}
+      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
     >
       <Article
         html={props.articleHtml}
         fetchedAnnotations={fetchedAnnotations}
       />
-      <Comments focusedHighlightID={focusedHighlightID} />
+      <Comments focusedHighlightId={focusedHighlightId} />
     </div>
   );
 };
