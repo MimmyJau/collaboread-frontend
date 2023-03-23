@@ -1,11 +1,14 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
-
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-
+import {
+  useFetchArticleHtml,
+  useFetchAnnotations,
+  useUpdateAnnotation,
+} from "hooks";
 import Article from "components/Article.js";
-import { useUpdateAnnotation } from "hooks";
 
 function addClassToElements(elements, className) {
   for (const element of elements) {
@@ -55,6 +58,11 @@ function syncHoverBehavior(e, setFocusedHighlightId) {
   }
 }
 
+function wrapHtml(rawHtml) {
+  if (!rawHtml) return;
+  return `<div id="content-highlightable" class="prose">` + rawHtml + `</div>`;
+}
+
 const CommentEditor = (props) => {
   const editor = useEditor({
     extensions: [
@@ -100,9 +108,28 @@ const Comments = (props) => {
 };
 
 const Reader = (props) => {
+  const router = useRouter();
+  const { articleUuid } = router.query;
   const [focusedHighlightId, setFocusedHighlightId] = useState();
-  const fetchedAnnotations = props.annotations;
+  const {
+    isLoading: isLoadingArticle,
+    isError: isErrorArticle,
+    data: dataArticle,
+    error: errorArticle,
+  } = useFetchArticleHtml(articleUuid);
+  const {
+    isLoading: isLoadingAnnotations,
+    isError: isErrorAnnotations,
+    data: dataAnnotations,
+    error: errorAnnotations,
+  } = useFetchAnnotations(articleUuid);
 
+  if (isLoadingArticle) {
+    return <span>Is Loading</span>;
+  }
+  if (isErrorArticle) {
+    return <span>{error.message}</span>;
+  }
   return (
     <div
       id="reader"
@@ -110,8 +137,8 @@ const Reader = (props) => {
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
     >
       <Article
-        html={props.articleHtml}
-        fetchedAnnotations={fetchedAnnotations}
+        html={wrapHtml(dataArticle.articleHtml)}
+        fetchedAnnotations={dataAnnotations}
       />
       <Comments focusedHighlightId={focusedHighlightId} />
     </div>
