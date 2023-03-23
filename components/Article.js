@@ -7,22 +7,31 @@ import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 
-import { useAddHighlight, useRemoveHighlight } from "hooks";
+import { useSaveHighlight, useDeleteHighlight } from "hooks";
+
+function getHighlightableRoot() {
+  return document.getElementById("content-highlightable");
+}
 
 function getRangeFromSelection(selection) {
-  rangy.init();
   const highlightableRoot = getHighlightableRoot();
   return rangy.getSelection().saveCharacterRanges(highlightableRoot);
 }
 
-function onHighlightCreate(el) {}
+function setSelectionFromRange(range) {
+  const highlightableRoot = getHighlightableRoot();
+  return rangy.getSelection().restoreCharacterRanges(highlightableRoot, range);
+}
 
-function applyHighlighter(
-  selection = document.getSelection(),
+function unselectSelection() {
+  rangy.getSelection().collapseToEnd();
+}
+
+function highlightSelection(
   annotationUuid = crypto.randomUUID(),
-  removeHighlight
+  deleteHighlight
 ) {
-  const range = getRangeFromSelection(selection);
+  const range = getRangeFromSelection(document.getSelection());
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   const highlighter = rangy.createHighlighter();
   highlighter.addClassApplier(
@@ -33,7 +42,7 @@ function applyHighlighter(
         el.dataset.annotationId = annotationUuid;
         el.onclick = () => {
           clearHighlight(annotationUuid, range);
-          removeHighlight.mutate(annotationUuid);
+          deleteHighlight.mutate(annotationUuid);
         };
       },
       tagNames: ["span"],
@@ -44,47 +53,30 @@ function applyHighlighter(
   return { uuid: annotationUuid, highlight: range };
 }
 
-function getHighlightableRoot() {
-  return document.getElementById("content-highlightable");
+function unhighlightSelection() {
+  const highlighter = rangy.createHighlighter();
+  highlighter.unhighlightSelection();
 }
 
-function highlightUserSelection({
-  articleUuid,
-  addHighlight,
-  removeHighlight,
-}) {
-  const annotationFragment = applyHighlighter(
-    document.getSelection(),
-    crypto.randomUUID(),
-    removeHighlight
-  );
-  addHighlight.mutate({ ...annotationFragment, articleUuid: articleUuid });
-}
-
-function highlightFetchedSelection(annotations, removeHighlight) {
+function highlightFetchedAnnotations(annotations, deleteHighlight) {
   if (!annotations) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
-    const highlight = annotation.highlight;
-    const selection = rangy
-      .getSelection()
-      .restoreCharacterRanges(highlightableRoot, highlight);
-    applyHighlighter(selection, annotation.uuid, removeHighlight);
-    rangy.getSelection().collapseToEnd(); // To remove selection after adding highlight
+    setSelectionFromRange(annotation.highlight);
+    highlightSelection(annotation.uuid, deleteHighlight);
   });
+  unselectSelection();
 }
 
-function clearHighlight(annotationUuid, range) {
-  const highlighter = rangy.createHighlighter();
-  const highlightableRoot = getHighlightableRoot();
-  const selection = rangy
-    .getSelection()
-    .restoreCharacterRanges(highlightableRoot, range);
-  highlighter.unhighlightSelection();
-
-  // Remove remaining span tags
-  // Source 1: https://stackoverflow.com/a/9848612/
-  // Source 2: https://stackoverflow.com/a/4232971/
+/**
+ * Unhighlighting a selection leaves behind span tags that are not
+ *     associated with any highlights. This function removes those tags.
+ * - Source 1: https://stackoverflow.com/a/9848612/
+ * - Source 2: https://stackoverflow.com/a/4232971/
+ * @param {string} annotationUuid
+ * @returns {void}
+ */
+function removeHangingSpanTags(annotationUuid) {
   const highlightFragments = document.querySelectorAll(
     `.highlight[data-annotation-id="${annotationUuid}"]`
   );
@@ -97,37 +89,42 @@ function clearHighlight(annotationUuid, range) {
   });
 }
 
-const HighlightRangeButton = (props) => {
+function clearHighlight(annotationUuid, range) {
+  setSelectionFromRange(range);
+  unhighlightSelection();
+  removeHangingSpanTags(annotationUuid);
+}
+
+const HighlightRangeButton = () => {
+  const { articleUuid } = useRouter().query;
+  const saveHighlight = useSaveHighlight(articleUuid);
+  const deleteHighlight = useDeleteHighlight(articleUuid);
+
+  function highlightAndSaveSelection() {
+    const highlight = highlightSelection(crypto.randomUUID(), deleteHighlight);
+    saveHighlight.mutate(highlight);
+  }
+
   return (
-    <button
-      onClick={() => {
-        const range = highlightUserSelection(props);
-      }}
-    >
+    <button onClick={() => highlightAndSaveSelection()}>
       Highlight Range!
     </button>
   );
 };
 
 const Article = (props) => {
-  const highlights = props.highlights;
   const { articleUuid } = useRouter().query;
-  const addHighlight = useAddHighlight(articleUuid);
-  const removeHighlight = useRemoveHighlight(articleUuid);
+  const deleteHighlight = useDeleteHighlight(articleUuid);
 
   useEffect(() => {
-    highlightFetchedSelection(highlights, removeHighlight);
-  }, [highlights]);
+    highlightFetchedAnnotations(props.fetchedAnnotations, deleteHighlight);
+  }, [props.fetchedAnnotations]);
 
   return (
     <div>
       <Interweave content={props.html} />
       <div>
-        <HighlightRangeButton
-          articleUuid={articleUuid}
-          addHighlight={addHighlight}
-          removeHighlight={removeHighlight}
-        />
+        <HighlightRangeButton />
       </div>
     </div>
   );

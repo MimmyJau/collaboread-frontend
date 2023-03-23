@@ -81,7 +81,7 @@ const Comments = (props) => {
 
 const Reader = (props) => {
   const [focusedHighlightID, setFocusedHighlightID] = useState();
-  const remoteHighlights = props.annotations;
+  const fetchedAnnotations = props.annotations;
 
   return (
     <div
@@ -89,7 +89,10 @@ const Reader = (props) => {
       className="flex flex-row mt-2"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightID)}
     >
-      <Article html={props.articleHtml} highlights={remoteHighlights} />
+      <Article
+        html={props.articleHtml}
+        fetchedAnnotations={fetchedAnnotations}
+      />
       <Comments focusedHighlightID={focusedHighlightID} />
     </div>
   );

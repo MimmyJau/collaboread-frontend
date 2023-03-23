@@ -61,10 +61,10 @@ function useAddComment() {
   });
 }
 
-function useAddHighlight(articleUuid) {
+function useSaveHighlight(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ uuid, highlight, articleUuid }) => {
+    mutationFn: ({ uuid, highlight }) => {
       const route =
         "http://localhost:8000/api/articles/" + articleUuid + "/annotations/";
       return ky
@@ -94,7 +94,7 @@ function useAddHighlight(articleUuid) {
   });
 }
 
-function useRemoveHighlight(articleUuid) {
+function useDeleteHighlight(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (annotationUuid) => {
@@ -113,7 +113,7 @@ function useRemoveHighlight(articleUuid) {
 export {
   useGetArticleHtml,
   useGetAnnotations,
-  useAddHighlight,
+  useSaveHighlight,
   useAddComment,
-  useRemoveHighlight,
+  useDeleteHighlight,
 };
