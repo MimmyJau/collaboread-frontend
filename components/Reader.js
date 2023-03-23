@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 
 import Article from "components/Article.js";
-import { useAddComment } from "hooks";
+import { useUpdateAnnotation } from "hooks";
 
 function addClassToElements(elements, className) {
   for (const element of elements) {
@@ -76,7 +76,7 @@ const CommentEditor = (props) => {
 const Comments = (props) => {
   const [editorState, setEditorState] = useState();
   const markID = props.focusedHighlightId;
-  const addComment = useAddComment();
+  const addComment = useUpdateAnnotation();
 
   if (!markID) {
     return;

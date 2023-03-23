@@ -1,25 +1,38 @@
 import ky from "ky-universal";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-function fetchArticleHtml(uuid) {
-  const route = "http://localhost:8000/api/articles/" + uuid;
+// TODO: Move this to a config file / use environment variables
+const API_BASE_URL = "http://localhost:8000/api";
+
+// API Functions
+function fetchArticleHtml(articleUuid) {
+  const route = `${API_BASE_URL}/articles/${articleUuid}/`;
   return ky.get(route).json();
 }
 
-function useGetArticleHtml(uuid) {
-  return useQuery({
-    enabled: !!uuid,
-    queryKey: ["article", "html", uuid],
-    queryFn: () => fetchArticleHtml(uuid),
-  });
+function createAnnotation(articleUuid, highlightData) {
+  const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
+  return ky.post(route, { json: highlightData }).json();
 }
 
 function fetchAnnotations(articleUuid) {
-  const route =
-    "http://localhost:8000/api/articles/" + articleUuid + "/annotations/";
+  const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
   return ky.get(route).json();
 }
 
+function saveComment(annotationUuid, comment) {
+  const route = `${API_BASE_URL}/annotations/${annotationUuid}/`;
+  return ky
+    .put(route, { json: { id: annotationUuid, comment: comment } })
+    .json();
+}
+
+function deleteAnnotation(annotationUuid) {
+  const route = `${API_BASE_URL}/annotations/${annotationUuid}/`;
+  return ky.delete(route, { json: { id: annotationUuid } }).json();
+}
+
+// Helper Functions
 function unflattenAnnotation(flatAnnotation) {
   return {
     uuid: flatAnnotation.uuid,
@@ -34,51 +47,27 @@ function unflattenAnnotation(flatAnnotation) {
   };
 }
 
-function useGetAnnotations(articleUuid) {
+// React Query Hooks
+function useFetchArticleHtml(uuid) {
   return useQuery({
-    enabled: !!articleUuid,
-    queryKey: ["annotations", "article", articleUuid],
-    queryFn: async () => {
-      const flatAnnotations = await fetchAnnotations(articleUuid);
-      const annotations = [];
-      for (const flatAnnotation of flatAnnotations) {
-        annotations.push(unflattenAnnotation(flatAnnotation));
-      }
-      return annotations;
-    },
+    enabled: !!uuid,
+    queryKey: ["article", "html", uuid],
+    queryFn: () => fetchArticleHtml(uuid),
   });
 }
 
-function useAddComment() {
-  return useMutation({
-    mutationFn: (id, comment) => {
-      return ky
-        .put("localhost:8000/api/annotations", {
-          json: { id: id, comment: comment },
-        })
-        .json();
-    },
-  });
-}
-
-function useSaveHighlight(articleUuid) {
+function useCreateAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ uuid, highlight }) => {
-      const route =
-        "http://localhost:8000/api/articles/" + articleUuid + "/annotations/";
-      return ky
-        .post(route, {
-          json: {
-            uuid: uuid,
-            highlightStart: highlight[0].characterRange.start,
-            highlightEnd: highlight[0].characterRange.end,
-            highlightBackward: highlight[0].backward,
-            article: articleUuid,
-            isPublic: "True",
-          },
-        })
-        .json();
+      return createAnnotation(articleUuid, {
+        uuid: uuid,
+        highlightStart: highlight[0].characterRange.start,
+        highlightEnd: highlight[0].characterRange.end,
+        highlightBackward: highlight[0].backward,
+        article: articleUuid,
+        isPublic: "True",
+      });
     },
     onSuccess: (newHighlight) => {
       queryClient.setQueryData(
@@ -94,14 +83,27 @@ function useSaveHighlight(articleUuid) {
   });
 }
 
-function useDeleteHighlight(articleUuid) {
+function useFetchAnnotations(articleUuid) {
+  return useQuery({
+    enabled: !!articleUuid,
+    queryKey: ["annotations", "article", articleUuid],
+    queryFn: async () => {
+      const flatAnnotations = await fetchAnnotations(articleUuid);
+      return flatAnnotations.map(unflattenAnnotation);
+    },
+  });
+}
+
+function useUpdateAnnotation() {
+  return useMutation({
+    mutationFn: (id, comment) => saveComment(id, comment),
+  });
+}
+
+function useDeleteAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (annotationUuid) => {
-      return ky
-        .delete("http://localhost:8000/api/annotations/" + annotationUuid + "/")
-        .json();
-    },
+    mutationFn: (annotationUuid) => deleteAnnotation(annotationUuid),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["annotations", "article", articleUuid],
@@ -111,9 +113,9 @@ function useDeleteHighlight(articleUuid) {
 }
 
 export {
-  useGetArticleHtml,
-  useGetAnnotations,
-  useSaveHighlight,
-  useAddComment,
-  useDeleteHighlight,
+  useFetchArticleHtml,
+  useFetchAnnotations,
+  useCreateAnnotation,
+  useUpdateAnnotation,
+  useDeleteAnnotation,
 };

@@ -7,7 +7,7 @@ import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 
-import { useSaveHighlight, useDeleteHighlight } from "hooks";
+import { useCreateAnnotation, useDeleteAnnotation } from "hooks";
 
 function getHighlightableRoot() {
   return document.getElementById("content-highlightable");
@@ -29,7 +29,7 @@ function unselectSelection() {
 
 function highlightSelection(
   annotationUuid = crypto.randomUUID(),
-  deleteHighlight
+  deleteAnnotation
 ) {
   const range = getRangeFromSelection(document.getSelection());
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
@@ -42,7 +42,7 @@ function highlightSelection(
         el.dataset.annotationId = annotationUuid;
         el.onclick = () => {
           clearHighlight(annotationUuid, range);
-          deleteHighlight.mutate(annotationUuid);
+          deleteAnnotation.mutate(annotationUuid);
         };
       },
       tagNames: ["span"],
@@ -58,12 +58,12 @@ function unhighlightSelection() {
   highlighter.unhighlightSelection();
 }
 
-function highlightFetchedAnnotations(annotations, deleteHighlight) {
+function highlightFetchedAnnotations(annotations, deleteAnnotation) {
   if (!annotations) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     setSelectionFromRange(annotation.highlight);
-    highlightSelection(annotation.uuid, deleteHighlight);
+    highlightSelection(annotation.uuid, deleteAnnotation);
   });
   unselectSelection();
 }
@@ -97,12 +97,12 @@ function clearHighlight(annotationUuid, range) {
 
 const HighlightRangeButton = () => {
   const { articleUuid } = useRouter().query;
-  const saveHighlight = useSaveHighlight(articleUuid);
-  const deleteHighlight = useDeleteHighlight(articleUuid);
+  const createAnnotation = useCreateAnnotation(articleUuid);
+  const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
   function highlightAndSaveSelection() {
-    const highlight = highlightSelection(crypto.randomUUID(), deleteHighlight);
-    saveHighlight.mutate(highlight);
+    const highlight = highlightSelection(crypto.randomUUID(), deleteAnnotation);
+    createAnnotation.mutate(highlight);
   }
 
   return (
@@ -114,10 +114,10 @@ const HighlightRangeButton = () => {
 
 const Article = (props) => {
   const { articleUuid } = useRouter().query;
-  const deleteHighlight = useDeleteHighlight(articleUuid);
+  const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
   useEffect(() => {
-    highlightFetchedAnnotations(props.fetchedAnnotations, deleteHighlight);
+    highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
   }, [props.fetchedAnnotations]);
 
   return (

@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
 import Reader from "components/Reader";
-import { useGetArticleHtml, useGetAnnotations } from "hooks";
+import { useFetchArticleHtml, useFetchAnnotations } from "hooks";
 
 function wrapHtml(rawHtml) {
   if (!rawHtml) return;
@@ -16,13 +16,13 @@ export default function Page() {
     isError: isErrorArticle,
     data: dataArticle,
     error: errorArticle,
-  } = useGetArticleHtml(articleUuid);
+  } = useFetchArticleHtml(articleUuid);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,
     data: dataAnnotations,
     error: errorAnnotations,
-  } = useGetAnnotations(articleUuid);
+  } = useFetchAnnotations(articleUuid);
 
   if (isLoadingArticle) {
     return <span>Is Loading</span>;
