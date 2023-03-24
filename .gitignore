@@ -33,3 +33,6 @@ yarn-error.log*
 
 # vim
 *.swp
+
+# TypeScript
+next-env.d.ts

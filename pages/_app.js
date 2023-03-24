@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import "@/styles/globals.css";
+import "styles/globals.css";
 
 // Interweave requires DOM, so polyfill is required
 // for SSR (source: https://interweave.dev/docs/ssr)
