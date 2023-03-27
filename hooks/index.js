@@ -1,8 +1,7 @@
 import ky from "ky-universal";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// TODO: Move this to a config file / use environment variables
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = process.env.SERVER;
 
 // API Functions
 function fetchArticleHtml(articleUuid) {
