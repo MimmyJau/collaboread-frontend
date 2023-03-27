@@ -57,7 +57,7 @@ function unhighlightSelection() {
 }
 
 function highlightFetchedAnnotations(annotations, deleteAnnotation) {
-  if (!annotations) return;
+  if (!annotations || annotations.length === 0) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     setSelectionFromRange(annotation.highlight);
