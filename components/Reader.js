@@ -82,6 +82,7 @@ const CommentEditor = (props) => {
 };
 
 const Comments = (props) => {
+  return;
   const [editorState, setEditorState] = useState();
   const markID = props.focusedHighlightId;
   const addComment = useUpdateAnnotation();
