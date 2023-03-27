@@ -1,6 +1,7 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
+import Paragraph from "@tiptap/extension-paragraph";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 
@@ -38,6 +39,24 @@ const MenuToolbar = ({ editor }) => {
     </>
   );
 };
+
+const CustomParagraph = Paragraph.extend({
+  addKeyboardShortcuts() {
+    return {
+      Tab: () => {
+        this.editor
+          .chain()
+          .command(({ tr }) => {
+            tr.insertText("    ");
+            return true;
+          })
+          .focus()
+          .run();
+        return true;
+      },
+    };
+  },
+});
 
 const Tiptap = () => {
   const editor = useEditor({
