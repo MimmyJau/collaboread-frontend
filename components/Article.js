@@ -95,25 +95,20 @@ function clearHighlight(annotationUuid, range) {
 
 const Article = (props) => {
   const { articleUuid } = useRouter().query;
-  const createAnnotation = useCreateAnnotation(articleUuid);
   const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
   useEffect(() => {
     highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
   }, [props.fetchedAnnotations]);
 
-  function highlightAndSaveSelection() {
-    const highlight = highlightSelection(crypto.randomUUID(), deleteAnnotation);
-    createAnnotation.mutate(highlight);
-  }
-
   return (
     <>
-      <div className="prose" onMouseUp={() => highlightAndSaveSelection()}>
+      <div className="prose">
         <Interweave content={props.html} />
       </div>
     </>
   );
 };
 
+export { getRangeFromSelection, highlightSelection };
 export default Article;

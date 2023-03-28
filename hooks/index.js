@@ -19,6 +19,11 @@ function fetchAnnotations(articleUuid) {
   return ky.get(route).json();
 }
 
+function updateAnnotation(articleUuid, annotation) {
+  const route = `${API_BASE_URL}/annotations/${annotation.uuid}/`;
+  return ky.put(route, { json: annotation }).json();
+}
+
 function saveComment(annotationUuid, comment) {
   const route = `${API_BASE_URL}/annotations/${annotationUuid}/`;
   return ky
@@ -93,9 +98,26 @@ function useFetchAnnotations(articleUuid) {
   });
 }
 
-function useUpdateAnnotation() {
+function useUpdateAnnotation(articleUuid) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id, comment) => saveComment(id, comment),
+    mutationFn: (annotation) => {
+      const updatedAnnotation = {
+        uuid: annotation.uuid,
+        highlightStart: annotation.highlight[0].characterRange.start,
+        highlightEnd: annotation.highlight[0].characterRange.end,
+        highlightBackward: annotation.highlight[0].backward,
+        article: articleUuid,
+        isPublic: "True",
+      };
+      delete updatedAnnotation.highlight;
+      return updateAnnotation(articleUuid, updatedAnnotation);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["annotations", "article", articleUuid],
+      });
+    },
   });
 }
 
