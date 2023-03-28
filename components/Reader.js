@@ -60,7 +60,7 @@ function syncHoverBehavior(e, setFocusedHighlightId) {
 
 function wrapHtml(rawHtml) {
   if (!rawHtml) return;
-  return `<div id="content-highlightable" class="prose">` + rawHtml + `</div>`;
+  return `<div id="content-highlightable">` + rawHtml + `</div>`;
 }
 
 const CommentEditor = (props) => {
@@ -133,7 +133,6 @@ const Reader = (props) => {
   }
   return (
     <div
-      id="reader"
       className="flex flex-row mt-2"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
     >

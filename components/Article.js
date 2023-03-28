@@ -119,12 +119,12 @@ const Article = (props) => {
   }, [props.fetchedAnnotations]);
 
   return (
-    <div>
-      <Interweave content={props.html} />
-      <div>
-        <HighlightRangeButton />
+    <>
+      <div className="prose">
+        <Interweave content={props.html} />
       </div>
-    </div>
+      <HighlightRangeButton />
+    </>
   );
 };
 

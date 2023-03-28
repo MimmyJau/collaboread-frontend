@@ -1,3 +1,4 @@
+import { Open_Sans } from "next/font/google";
 import { useState } from "react";
 
 import { polyfill } from "interweave-ssr";
@@ -14,12 +15,19 @@ import "styles/globals.css";
 // for SSR (source: https://interweave.dev/docs/ssr)
 polyfill();
 
+const inter = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-open-sans",
+});
+
 export default function App({ Component, pageProps }) {
   const [queryClient] = useState(() => new QueryClient());
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
-        <Component {...pageProps} />
+        <main className={`${inter.variable} font-sans`}>
+          <Component {...pageProps} />
+        </main>
       </Hydrate>
       <ReactQueryDevtools />
     </QueryClientProvider>
