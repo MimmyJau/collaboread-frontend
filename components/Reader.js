@@ -6,9 +6,12 @@ import Placeholder from "@tiptap/extension-placeholder";
 import {
   useFetchArticleHtml,
   useFetchAnnotations,
+  useCreateAnnotation,
   useUpdateAnnotation,
+  useDeleteAnnotation,
 } from "hooks";
 import Article from "components/Article.js";
+import { highlightSelection } from "components/Article.js";
 
 function addClassToElements(elements, className) {
   for (const element of elements) {
@@ -108,9 +111,18 @@ const Comments = (props) => {
   }
 };
 
+function isSelectionInArticle() {
+  const selection = window.getSelection();
+  const selectionRange = selection.getRangeAt(0);
+  const content = document.getElementById("content-highlightable");
+  return content.contains(selectionRange.commonAncestorContainer);
+}
+
 const Reader = (props) => {
   const router = useRouter();
   const { articleUuid } = router.query;
+  const createAnnotation = useCreateAnnotation(articleUuid);
+  const deleteAnnotation = useDeleteAnnotation(articleUuid);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const {
     isLoading: isLoadingArticle,
@@ -125,16 +137,23 @@ const Reader = (props) => {
     error: errorAnnotations,
   } = useFetchAnnotations(articleUuid);
 
+  function highlightAndSaveSelection() {
+    if (!isSelectionInArticle()) return;
+    const highlight = highlightSelection(crypto.randomUUID(), deleteAnnotation);
+    createAnnotation.mutate(highlight);
+  }
+
   if (isLoadingArticle) {
-    return <span>Is Loading</span>;
+    return;
   }
   if (isErrorArticle) {
     return <span>{error.message}</span>;
   }
   return (
     <div
-      className="flex flex-row mt-2"
+      className="flex flex-row justify-center"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
+      onMouseUp={() => highlightAndSaveSelection()}
     >
       <Article
         html={wrapHtml(dataArticle.articleHtml)}
