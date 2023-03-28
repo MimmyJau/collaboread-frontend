@@ -110,5 +110,5 @@ const Article = (props) => {
   );
 };
 
-export { highlightSelection };
+export { getRangeFromSelection, highlightSelection };
 export default Article;

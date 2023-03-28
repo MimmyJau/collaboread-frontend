@@ -11,7 +11,10 @@ import {
   useDeleteAnnotation,
 } from "hooks";
 import Article from "components/Article.js";
-import { highlightSelection } from "components/Article.js";
+import {
+  getRangeFromSelection,
+  highlightSelection,
+} from "components/Article.js";
 
 function addClassToElements(elements, className) {
   for (const element of elements) {
@@ -112,16 +115,61 @@ const Comments = (props) => {
 };
 
 function isSelectionInArticle() {
-  const selection = window.getSelection();
+  const selection = document.getSelection();
   const selectionRange = selection.getRangeAt(0);
   const content = document.getElementById("content-highlightable");
   return content.contains(selectionRange.commonAncestorContainer);
+}
+
+function isXInBetweenYAndZ(x, y, z) {
+  return x >= y && x <= z;
+}
+
+function doHighlightsOverlap(h1, h2) {
+  const h1s = h1[0].characterRange.start;
+  const h1e = h1[0].characterRange.end;
+  const h2s = h2[0].characterRange.start;
+  const h2e = h2[0].characterRange.end;
+  return isXInBetweenYAndZ(h1s, h2s, h2e) || isXInBetweenYAndZ(h2s, h1s, h1e);
+}
+
+function doesHighlightOverlapWithAnnotations(newHighlight, annotations) {
+  for (const oldAnnotation of annotations) {
+    if (doHighlightsOverlap(newHighlight, oldAnnotation.highlight))
+      return oldAnnotation;
+  }
+  return false;
+}
+
+function mergeHighlights(newHighlight, oldAnnotation) {
+  const oldHighlight = oldAnnotation.highlight;
+  const highlightStart = Math.min(
+    newHighlight[0].characterRange.start,
+    oldHighlight[0].characterRange.start
+  );
+  const highlightEnd = Math.max(
+    newHighlight[0].characterRange.end,
+    oldHighlight[0].characterRange.end
+  );
+  return {
+    ...oldAnnotation,
+    highlight: [
+      {
+        ...oldAnnotation.highlight[0],
+        characterRange: {
+          start: highlightStart,
+          end: highlightEnd,
+        },
+      },
+    ],
+  };
 }
 
 const Reader = (props) => {
   const router = useRouter();
   const { articleUuid } = router.query;
   const createAnnotation = useCreateAnnotation(articleUuid);
+  const updateAnnotation = useUpdateAnnotation(articleUuid);
   const deleteAnnotation = useDeleteAnnotation(articleUuid);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const {
@@ -138,9 +186,26 @@ const Reader = (props) => {
   } = useFetchAnnotations(articleUuid);
 
   function highlightAndSaveSelection() {
+    if (document.getSelection().isCollapsed) return;
     if (!isSelectionInArticle()) return;
-    const highlight = highlightSelection(crypto.randomUUID(), deleteAnnotation);
-    createAnnotation.mutate(highlight);
+    const newHighlight = getRangeFromSelection(document.getSelection());
+    const overlappingAnnotation = doesHighlightOverlapWithAnnotations(
+      newHighlight,
+      dataAnnotations
+    );
+    if (overlappingAnnotation) {
+      const mergedHighlight = mergeHighlights(
+        newHighlight,
+        overlappingAnnotation
+      );
+      updateAnnotation.mutate(mergedHighlight);
+    } else {
+      const highlight = highlightSelection(
+        crypto.randomUUID(),
+        deleteAnnotation
+      );
+      createAnnotation.mutate(highlight);
+    }
   }
 
   if (isLoadingArticle) {
