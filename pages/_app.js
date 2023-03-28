@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { Open_Sans } from "next/font/google";
 import { useState } from "react";
 
@@ -15,7 +16,7 @@ import "styles/globals.css";
 // for SSR (source: https://interweave.dev/docs/ssr)
 polyfill();
 
-const inter = Open_Sans({
+const openSans = Open_Sans({
   subsets: ["latin"],
   variable: "--font-open-sans",
 });
@@ -25,7 +26,13 @@ export default function App({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
-        <main className={`${inter.variable} font-sans`}>
+        <Head>
+          <title>Collaboread</title>
+          <meta name="description" content="Read together" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <main className={`${openSans.variable} font-sans`}>
           <Component {...pageProps} />
         </main>
       </Hydrate>
