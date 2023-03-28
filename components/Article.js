@@ -93,10 +93,14 @@ function clearHighlight(annotationUuid, range) {
   removeHangingSpanTags(annotationUuid);
 }
 
-const HighlightRangeButton = () => {
+const Article = (props) => {
   const { articleUuid } = useRouter().query;
   const createAnnotation = useCreateAnnotation(articleUuid);
   const deleteAnnotation = useDeleteAnnotation(articleUuid);
+
+  useEffect(() => {
+    highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
+  }, [props.fetchedAnnotations]);
 
   function highlightAndSaveSelection() {
     const highlight = highlightSelection(crypto.randomUUID(), deleteAnnotation);
@@ -104,27 +108,11 @@ const HighlightRangeButton = () => {
   }
 
   return (
-    <button onClick={() => highlightAndSaveSelection()}>
-      Highlight Range!
-    </button>
-  );
-};
-
-const Article = (props) => {
-  const { articleUuid } = useRouter().query;
-  const deleteAnnotation = useDeleteAnnotation(articleUuid);
-
-  useEffect(() => {
-    highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
-  }, [props.fetchedAnnotations]);
-
-  return (
-    <div>
-      <Interweave content={props.html} />
-      <div>
-        <HighlightRangeButton />
+    <>
+      <div className="prose" onMouseUp={() => highlightAndSaveSelection()}>
+        <Interweave content={props.html} />
       </div>
-    </div>
+    </>
   );
 };
 
