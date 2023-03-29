@@ -1,8 +1,5 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
 import {
   useFetchArticleHtml,
   useFetchAnnotations,
@@ -15,6 +12,7 @@ import {
   getRangeFromSelection,
   highlightSelection,
 } from "components/Article.js";
+import Comments from "components/Comments.js";
 
 function addClassToElements(elements, className) {
   for (const element of elements) {
@@ -68,51 +66,6 @@ function wrapHtml(rawHtml) {
   if (!rawHtml) return;
   return `<div id="content-highlightable">` + rawHtml + `</div>`;
 }
-
-const CommentEditor = (props) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({
-        placeholder:
-          "This is interesting because... This isn't clear to me because...",
-      }),
-    ],
-    content: "",
-    onUpdate: ({ editor }) => {
-      props.onChange(editor.getHTML());
-    },
-  });
-
-  return <EditorContent editor={editor} />;
-};
-
-const Comments = (props) => {
-  return;
-  const [editorState, setEditorState] = useState();
-  const markID = props.focusedHighlightId;
-  const addComment = useUpdateAnnotation();
-
-  if (!markID) {
-    return;
-  } else {
-    return (
-      <div>
-        <p>{markID}</p>
-        <CommentEditor onChange={setEditorState} />
-        <button
-          type="submit"
-          onClick={() => {
-            console.log(markID, editorState);
-            addComment.mutate(markID, editorState);
-          }}
-        >
-          Submit
-        </button>
-      </div>
-    );
-  }
-};
 
 function isSelectionInArticle() {
   const selection = document.getSelection();
@@ -216,15 +169,19 @@ const Reader = (props) => {
   }
   return (
     <div
-      className="flex flex-row justify-center"
+      className="grid grid-cols-3 gap-1"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={() => highlightAndSaveSelection()}
     >
       <Article
+        className="col-start-1 col-span-2 place-self-end"
         html={wrapHtml(dataArticle.articleHtml)}
         fetchedAnnotations={dataAnnotations}
       />
-      <Comments focusedHighlightId={focusedHighlightId} />
+      <Comments
+        className="col-start-3"
+        focusedHighlightId={focusedHighlightId}
+      />
     </div>
   );
 };
