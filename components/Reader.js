@@ -181,6 +181,7 @@ const Reader = (props) => {
       <Comments
         className="col-start-3"
         focusedHighlightId={focusedHighlightId}
+        fetchedAnnotations={dataAnnotations}
       />
     </div>
   );

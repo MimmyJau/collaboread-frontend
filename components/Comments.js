@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -6,46 +7,83 @@ import Placeholder from "@tiptap/extension-placeholder";
 
 import { useUpdateAnnotation } from "hooks";
 
+const printJson = (editor) => {
+  return JSON.stringify(editor.getJSON());
+};
+
+const printHtml = (editor) => {
+  return editor.getHTML();
+};
+
 const CommentEditor = (props) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({
-        placeholder:
-          "This is interesting because... This isn't clear to me because...",
-      }),
-    ],
-    content: "",
-    onUpdate: ({ editor }) => {
-      props.onChange(editor.getHTML());
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit,
+        Placeholder.configure({
+          placeholder: "What is your interpretation of this passage?",
+        }),
+      ],
+      content: props.content || "",
+      onUpdate: ({ editor }) => {
+        props.onChange.html(editor.getHTML());
+        props.onChange.json(JSON.stringify(editor.getJSON()));
+      },
     },
-  });
+    [props.annotationUuid]
+  );
 
   return <EditorContent editor={editor} />;
 };
 
-const Comments = (props) => {
-  return;
-  const [editorState, setEditorState] = useState();
-  const markID = props.focusedHighlightId;
-  const addComment = useUpdateAnnotation();
+const Comment = (props) => {
+  const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
+  const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
+  const router = useRouter();
+  const { articleUuid } = router.query;
+  const updateAnnotation = useUpdateAnnotation(articleUuid);
 
-  if (!markID) {
+  function updateComment(annotationUuid, commentHtml, commentJson) {
+    const newAnnotation = {
+      ...props.annotation,
+      commentHtml: commentHtml,
+      commentJson: commentJson,
+    };
+    updateAnnotation.mutate(newAnnotation);
+  }
+
+  return (
+    <div>
+      <CommentEditor
+        annotationUuid={props.annotation.uuid}
+        content={props.annotation.commentHtml}
+        onChange={{ html: setEditorHtml, json: setEditorJson }}
+      />
+      <button
+        type="submit"
+        onClick={() => {
+          updateComment(props.annotation.uuid, editorHtml, editorJson);
+        }}
+      >
+        Submit
+      </button>
+    </div>
+  );
+};
+
+const Comments = (props) => {
+  const annotationUuid = props.focusedHighlightId;
+  const annotations = props.fetchedAnnotations;
+
+  if (!annotationUuid) {
     return;
   } else {
+    const focusedAnnotation = annotations.find(
+      (annotation) => annotation.uuid === annotationUuid
+    );
     return (
       <div className={`${props.className}`}>
-        <p>{markID}</p>
-        <CommentEditor onChange={setEditorState} />
-        <button
-          type="submit"
-          onClick={() => {
-            console.log(markID, editorState);
-            addComment.mutate(markID, editorState);
-          }}
-        >
-          Submit
-        </button>
+        <Comment annotation={focusedAnnotation} />
       </div>
     );
   }
