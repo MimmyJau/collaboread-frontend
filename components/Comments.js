@@ -72,15 +72,14 @@ const Comment = (props) => {
 };
 
 const Comments = (props) => {
+  if (!props.fetchedAnnotations) return;
   const annotationUuid = props.focusedHighlightId;
   const annotations = props.fetchedAnnotations;
 
-  if (!annotationUuid) {
-    return;
-  } else {
-    const focusedAnnotation = annotations.find(
-      (annotation) => annotation.uuid === annotationUuid
-    );
+  const focusedAnnotation = props.fetchedAnnotations.find(
+    (annotation) => annotation.uuid === annotationUuid
+  );
+  if (focusedAnnotation) {
     return (
       <div className={`${props.className}`}>
         <Comment annotation={focusedAnnotation} />
