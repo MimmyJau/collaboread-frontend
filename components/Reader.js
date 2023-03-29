@@ -155,7 +155,8 @@ const Reader = (props) => {
     } else {
       const highlight = highlightSelection(
         crypto.randomUUID(),
-        deleteAnnotation
+        deleteAnnotation,
+        setFocusedHighlightId
       );
       createAnnotation.mutate(highlight);
     }
@@ -173,10 +174,12 @@ const Reader = (props) => {
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={() => highlightAndSaveSelection()}
     >
+      <span>{focusedHighlightId}</span>
       <Article
         className="col-start-1 col-span-2 place-self-end"
         html={wrapHtml(dataArticle.articleHtml)}
         fetchedAnnotations={dataAnnotations}
+        setFocusedHighlightId={setFocusedHighlightId}
       />
       <Comments
         className="col-start-3"

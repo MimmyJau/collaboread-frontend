@@ -27,7 +27,8 @@ function unselectSelection() {
 
 function highlightSelection(
   annotationUuid = crypto.randomUUID(),
-  deleteAnnotation
+  deleteAnnotation,
+  setFocusedHighlightId
 ) {
   const range = getRangeFromSelection(document.getSelection());
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
@@ -41,6 +42,7 @@ function highlightSelection(
         el.onclick = () => {
           clearHighlight(annotationUuid, range);
           deleteAnnotation.mutate(annotationUuid);
+          setFocusedHighlightId(null);
         };
       },
       tagNames: ["span"],
@@ -56,12 +58,20 @@ function unhighlightSelection() {
   highlighter.unhighlightSelection();
 }
 
-function highlightFetchedAnnotations(annotations, deleteAnnotation) {
+function highlightFetchedAnnotations(
+  annotations,
+  deleteAnnotation,
+  setFocusedHighlightId
+) {
   if (!annotations || annotations.length === 0) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     setSelectionFromRange(annotation.highlight);
-    highlightSelection(annotation.uuid, deleteAnnotation);
+    highlightSelection(
+      annotation.uuid,
+      deleteAnnotation,
+      setFocusedHighlightId
+    );
   });
   unselectSelection();
 }
@@ -98,7 +108,11 @@ const Article = (props) => {
   const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
   useEffect(() => {
-    highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
+    highlightFetchedAnnotations(
+      props.fetchedAnnotations,
+      deleteAnnotation,
+      props.setFocusedHighlightId
+    );
   }, [props.fetchedAnnotations]);
 
   return (
