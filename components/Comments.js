@@ -42,6 +42,20 @@ const CommentEditor = (props) => {
   return <EditorContent editor={editor} />;
 };
 
+const SaveCommentButton = (props) => {
+  return (
+    <button
+      disabled={!props.enabled}
+      className="px-2 py-1 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
+      onClick={() => {
+        props.updateComment();
+      }}
+    >
+      {!props.enabled ? "Saved" : "Save"}
+    </button>
+  );
+};
+
 const Comment = (props) => {
   const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
   const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
@@ -76,14 +90,12 @@ const Comment = (props) => {
         onChange={{ html: setEditorHtml, json: setEditorJson }}
       />
       <div className="flex flex-row pt-2 justify-end">
-        <button
-          className="px-2 py-1 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700"
-          onClick={() => {
-            updateComment(props.annotation.uuid, editorHtml, editorJson);
-          }}
-        >
-          Save
-        </button>
+        <SaveCommentButton
+          enabled={editorHtml !== props.annotation.commentHtml}
+          updateComment={() =>
+            updateComment(props.annotation.uuid, editorHtml, editorJson)
+          }
+        />
       </div>
     </div>
   );
