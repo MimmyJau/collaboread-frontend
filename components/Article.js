@@ -116,7 +116,7 @@ const Article = (props) => {
   }, [props.fetchedAnnotations]);
 
   return (
-    <div className={`prose article ${props.className}`}>
+    <div id="article" className={`prose ${props.className}`}>
       <Interweave content={props.html} />
     </div>
   );

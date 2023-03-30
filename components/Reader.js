@@ -138,6 +138,15 @@ const Reader = (props) => {
     error: errorAnnotations,
   } = useFetchAnnotations(articleUuid);
 
+  function handleMouseUp(e) {
+    if (!document.getSelection().isCollapsed) highlightAndSaveSelection();
+    if (
+      document.getElementById("article").contains(e.target) &&
+      !e.target.classList.contains("highlight")
+    )
+      setFocusedHighlightId(null);
+  }
+
   function highlightAndSaveSelection() {
     if (document.getSelection().isCollapsed) return;
     if (!isSelectionInArticle()) return;
@@ -172,7 +181,7 @@ const Reader = (props) => {
     <div
       className="grid grid-cols-3 gap-1 h-screen overflow-hidden"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
-      onMouseUp={() => highlightAndSaveSelection()}
+      onMouseUp={(e) => handleMouseUp(e)}
     >
       <Article
         className="col-start-1 col-span-2 place-self-end overflow-y-auto h-full"
