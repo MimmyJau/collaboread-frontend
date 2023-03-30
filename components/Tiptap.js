@@ -27,6 +27,16 @@ const MenuToolbar = ({ editor }) => {
       <button onClick={() => editor.chain().focus().toggleItalic().run()}>
         Italics
       </button>
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+      >
+        Section (H2)
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+      >
+        Subsection (H3)
+      </button>
       <button onClick={() => editor.chain().focus().toggleHighlight().run()}>
         Highlight
       </button>

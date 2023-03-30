@@ -11,6 +11,6 @@
   pointer-events: none;
 }
 
-::selection {
+.article ::selection {
   @apply bg-yellow-300;
 }

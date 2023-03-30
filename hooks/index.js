@@ -47,7 +47,8 @@ function unflattenAnnotation(flatAnnotation) {
       },
       backward: flatAnnotation.highlightBackward,
     }),
-    comment: flatAnnotation.comment || "",
+    commentHtml: flatAnnotation.commentHtml,
+    commentJson: flatAnnotation.commentJson,
   };
 }
 
@@ -103,6 +104,7 @@ function useUpdateAnnotation(articleUuid) {
   return useMutation({
     mutationFn: (annotation) => {
       const updatedAnnotation = {
+        ...annotation,
         uuid: annotation.uuid,
         highlightStart: annotation.highlight[0].characterRange.start,
         highlightEnd: annotation.highlight[0].characterRange.end,
