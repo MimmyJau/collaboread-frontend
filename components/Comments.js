@@ -59,7 +59,17 @@ const Comment = (props) => {
   }
 
   return (
-    <div className="p-2 border rounded bg-gray-50 hover:bg-gray-100 focus-within:bg-gray-100">
+    <div
+      className="p-2 border rounded bg-gray-50 focus-within:bg-gray-100 focus:bg-gray-100"
+      tabIndex="0"
+      onClick={() => {
+        document
+          .querySelector(
+            `.highlight[data-annotation-id="${props.annotation.uuid}"]`
+          )
+          .scrollIntoView({ behavior: "smooth", block: "center" });
+      }}
+    >
       <CommentEditor
         annotationUuid={props.annotation.uuid}
         content={props.annotation.commentHtml}
@@ -67,7 +77,7 @@ const Comment = (props) => {
       />
       <div className="flex flex-row pt-2 justify-end">
         <button
-          className="px-2 py-1 text-sm font-semibold text-white bg-green-500 rounded hover:bg-green-700"
+          className="px-2 py-1 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700"
           onClick={() => {
             updateComment(props.annotation.uuid, editorHtml, editorJson);
           }}
