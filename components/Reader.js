@@ -170,19 +170,18 @@ const Reader = (props) => {
   }
   return (
     <div
-      className="grid grid-cols-3 gap-1"
+      className="grid grid-cols-3 gap-1 h-screen overflow-hidden"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={() => highlightAndSaveSelection()}
     >
-      <span>{focusedHighlightId}</span>
       <Article
-        className="col-start-1 col-span-2 place-self-end"
+        className="col-start-1 col-span-2 place-self-end overflow-y-auto h-full"
         html={wrapHtml(dataArticle.articleHtml)}
         fetchedAnnotations={dataAnnotations}
         setFocusedHighlightId={setFocusedHighlightId}
       />
       <Comments
-        className="col-start-3"
+        className="col-start-3 overflow-y-auto h-full"
         focusedHighlightId={focusedHighlightId}
         fetchedAnnotations={dataAnnotations}
       />
