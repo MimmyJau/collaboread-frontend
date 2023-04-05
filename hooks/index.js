@@ -93,7 +93,11 @@ function useFetchAnnotations(articleUuid) {
     enabled: !!articleUuid,
     queryKey: ["annotations", "article", articleUuid],
     queryFn: async () => {
-      const flatAnnotations = await fetchAnnotations(articleUuid);
+      const flatAnnotations = await fetchAnnotations(articleUuid).catch(
+        (error) => {
+          return [];
+        }
+      );
       return flatAnnotations.map(unflattenAnnotation);
     },
   });
