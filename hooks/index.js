@@ -1,7 +1,9 @@
 import ky from "ky-universal";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-const API_BASE_URL = process.env.SERVER;
+const BASE_URL = process.env.SERVER;
+const API_BASE_URL = `${BASE_URL}/api`;
+const AUTH_BASE_URL = `${BASE_URL}/auth`;
 
 // API Functions
 function fetchArticleHtml(articleUuid) {
@@ -34,6 +36,11 @@ function saveComment(annotationUuid, comment) {
 function deleteAnnotation(annotationUuid) {
   const route = `${API_BASE_URL}/annotations/${annotationUuid}/`;
   return ky.delete(route, { json: { id: annotationUuid } }).json();
+}
+
+function postLogin(username, password) {
+  const route = `${AUTH_BASE_URL}/login/`;
+  return ky.post(route, { json: { username, password } }).json();
 }
 
 // Helper Functions
@@ -139,10 +146,20 @@ function useDeleteAnnotation(articleUuid) {
   });
 }
 
+function usePostLogin() {
+  return useMutation({
+    mutationFn: ({ username, password }) => postLogin(username, password),
+    onSuccess: (data) => {
+      console.log(data);
+    },
+  });
+}
+
 export {
   useFetchArticleHtml,
   useFetchAnnotations,
   useCreateAnnotation,
   useUpdateAnnotation,
   useDeleteAnnotation,
+  usePostLogin,
 };
