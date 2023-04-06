@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { usePostLogin } from "hooks";
+import { usePostLogin } from "hooks/auth";
 
 const LoginForm = () => {
   const { register, handleSubmit, watch } = useForm();
