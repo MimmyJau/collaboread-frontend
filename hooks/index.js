@@ -1,40 +1,12 @@
-import ky from "ky-universal";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-const API_BASE_URL = process.env.SERVER;
-
-// API Functions
-function fetchArticleHtml(articleUuid) {
-  const route = `${API_BASE_URL}/articles/${articleUuid}/`;
-  return ky.get(route).json();
-}
-
-function createAnnotation(articleUuid, highlightData) {
-  const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
-  return ky.post(route, { json: highlightData }).json();
-}
-
-function fetchAnnotations(articleUuid) {
-  const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
-  return ky.get(route).json();
-}
-
-function updateAnnotation(articleUuid, annotation) {
-  const route = `${API_BASE_URL}/annotations/${annotation.uuid}/`;
-  return ky.put(route, { json: annotation }).json();
-}
-
-function saveComment(annotationUuid, comment) {
-  const route = `${API_BASE_URL}/annotations/${annotationUuid}/`;
-  return ky
-    .put(route, { json: { id: annotationUuid, comment: comment } })
-    .json();
-}
-
-function deleteAnnotation(annotationUuid) {
-  const route = `${API_BASE_URL}/annotations/${annotationUuid}/`;
-  return ky.delete(route, { json: { id: annotationUuid } }).json();
-}
+import {
+  fetchArticleHtml,
+  createAnnotation,
+  fetchAnnotations,
+  updateAnnotation,
+  deleteAnnotation,
+} from "api";
 
 // Helper Functions
 function unflattenAnnotation(flatAnnotation) {
@@ -93,7 +65,11 @@ function useFetchAnnotations(articleUuid) {
     enabled: !!articleUuid,
     queryKey: ["annotations", "article", articleUuid],
     queryFn: async () => {
-      const flatAnnotations = await fetchAnnotations(articleUuid);
+      const flatAnnotations = await fetchAnnotations(articleUuid).catch(
+        (error) => {
+          return [];
+        }
+      );
       return flatAnnotations.map(unflattenAnnotation);
     },
   });

@@ -11,6 +11,17 @@
   pointer-events: none;
 }
 
-.article ::selection {
-  @apply bg-yellow-300;
+#article ::selection {
+  @apply bg-yellow-400;
+}
+
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }

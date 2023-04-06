@@ -25,6 +25,12 @@ const CommentEditor = (props) => {
         }),
       ],
       content: props.content || "",
+      editorProps: {
+        attributes: {
+          class:
+            "py-2 px-1 bg-white rounded border border-gray-200 focus:outline-none focus:border focus:border-gray-400 hover:border hover:border-gray-300",
+        },
+      },
       onUpdate: ({ editor }) => {
         props.onChange.html(editor.getHTML());
         props.onChange.json(JSON.stringify(editor.getJSON()));
@@ -34,6 +40,20 @@ const CommentEditor = (props) => {
   );
 
   return <EditorContent editor={editor} />;
+};
+
+const SaveCommentButton = (props) => {
+  return (
+    <button
+      disabled={!props.enabled}
+      className="px-2 py-1 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
+      onClick={() => {
+        props.updateComment();
+      }}
+    >
+      {!props.enabled ? "Saved" : "Save"}
+    </button>
+  );
 };
 
 const Comment = (props) => {
@@ -53,20 +73,30 @@ const Comment = (props) => {
   }
 
   return (
-    <div>
+    <div
+      className="p-2 border rounded bg-gray-50 focus-within:bg-gray-100 focus:bg-gray-100"
+      tabIndex="0"
+      onClick={() => {
+        document
+          .querySelector(
+            `.highlight[data-annotation-id="${props.annotation.uuid}"]`
+          )
+          .scrollIntoView({ behavior: "smooth", block: "center" });
+      }}
+    >
       <CommentEditor
         annotationUuid={props.annotation.uuid}
         content={props.annotation.commentHtml}
         onChange={{ html: setEditorHtml, json: setEditorJson }}
       />
-      <button
-        type="submit"
-        onClick={() => {
-          updateComment(props.annotation.uuid, editorHtml, editorJson);
-        }}
-      >
-        Submit
-      </button>
+      <div className="flex flex-row pt-2 justify-end">
+        <SaveCommentButton
+          enabled={editorHtml !== props.annotation.commentHtml}
+          updateComment={() =>
+            updateComment(props.annotation.uuid, editorHtml, editorJson)
+          }
+        />
+      </div>
     </div>
   );
 };
@@ -81,7 +111,7 @@ const Comments = (props) => {
   );
   if (focusedAnnotation) {
     return (
-      <div className={`${props.className}`}>
+      <div className={`${props.className} p-2`}>
         <Comment annotation={focusedAnnotation} />
       </div>
     );
