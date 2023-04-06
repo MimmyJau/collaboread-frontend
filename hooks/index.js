@@ -151,6 +151,7 @@ function usePostLogin() {
     mutationFn: ({ username, password }) => postLogin(username, password),
     onSuccess: (data) => {
       console.log(data);
+      window.localStorage.setItem("token", data.key);
     },
   });
 }
