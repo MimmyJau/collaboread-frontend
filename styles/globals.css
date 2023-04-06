@@ -11,7 +11,7 @@
   pointer-events: none;
 }
 
-.article ::selection {
+#article ::selection {
   @apply bg-yellow-400;
 }
 
