@@ -1,17 +1,15 @@
 import { useForm } from "react-hook-form";
-import { usePostLogin } from "api/auth";
+import useAuth from "hooks/auth";
+import NavBar from "components/NavBar";
 
 const LoginForm = () => {
   const { register, handleSubmit, watch } = useForm();
-  const postLogin = usePostLogin();
+  const { user, login, logout } = useAuth();
 
   const onSuccess = (data) => console.log(data);
   // Will only run if form passes validation.
   const onSubmit = handleSubmit((data) => {
-    console.log(data);
-    postLogin.mutate(data, {
-      onSuccess: onSuccess,
-    });
+    login(data.username, data.password);
   });
 
   return (
@@ -96,6 +94,7 @@ const LoginForm = () => {
 const LoginPage = () => {
   return (
     <div>
+      <NavBar />
       <LoginForm />
     </div>
   );

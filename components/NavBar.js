@@ -2,7 +2,7 @@ import Link from "next/link";
 import useAuth from "hooks/auth";
 
 const NavUser = () => {
-  const [user, login, logout] = useAuth();
+  const { user, login, logout } = useAuth();
 
   if (!user) {
     return (
@@ -16,8 +16,13 @@ const NavUser = () => {
     );
   } else {
     return (
-      <div className="bg-gray-100 rounded-lg text-blue-500 px-3 py-2 hover:bg-yellow-300 hover:text-pink-600">
-        <span>Jimmy</span>
+      <div className="mr-2">
+        <button
+          onClick={() => logout()}
+          className="bg-gray-100 rounded-lg text-blue-500 px-3 py-2 hover:bg-yellow-300 hover:text-pink-600"
+        >
+          Log Out
+        </button>
       </div>
     );
   }
