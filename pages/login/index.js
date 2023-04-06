@@ -1,14 +1,17 @@
 import { useForm } from "react-hook-form";
-import { usePostLogin } from "hooks/auth";
+import { usePostLogin } from "api/auth";
 
 const LoginForm = () => {
   const { register, handleSubmit, watch } = useForm();
   const postLogin = usePostLogin();
 
+  const onSuccess = (data) => console.log(data);
   // Will only run if form passes validation.
   const onSubmit = handleSubmit((data) => {
     console.log(data);
-    postLogin.mutate(data);
+    postLogin.mutate(data, {
+      onSuccess: onSuccess,
+    });
   });
 
   return (

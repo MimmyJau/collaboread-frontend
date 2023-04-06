@@ -1,4 +1,5 @@
 import ky from "ky-universal";
+import { useMutation } from "@tanstack/react-query";
 
 const BASE_URL = process.env.SERVER;
 const AUTH_BASE_URL = `${BASE_URL}/auth`;
@@ -8,4 +9,10 @@ function postLogin(username, password) {
   return ky.post(route, { json: { username, password } }).json();
 }
 
-export { postLogin };
+function usePostLogin() {
+  return useMutation({
+    mutationFn: ({ username, password }) => postLogin(username, password),
+  });
+}
+
+export default usePostLogin;

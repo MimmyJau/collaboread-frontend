@@ -1,7 +1,10 @@
 import Link from "next/link";
+import useAuth from "hooks/auth";
 
-const NavUser = (props) => {
-  if (!props.user) {
+const NavUser = () => {
+  const [user, login, logout] = useAuth();
+
+  if (!user) {
     return (
       <div className="mr-2">
         <Link href="/login">

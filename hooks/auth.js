@@ -1,15 +1,13 @@
-import { useMutation } from "@tanstack/react-query";
+import { useContext } from "react";
 
-import { postLogin } from "api/auth";
+import AuthContext from "contexts/auth";
 
-function usePostLogin() {
-  return useMutation({
-    mutationFn: ({ username, password }) => postLogin(username, password),
-    onSuccess: (data) => {
-      console.log(data);
-      window.localStorage.setItem("token", data.key);
-    },
-  });
-}
+const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within a AuthProvider");
+  }
+  return context;
+};
 
-export { usePostLogin };
+export default useAuth;

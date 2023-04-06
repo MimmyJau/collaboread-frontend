@@ -10,7 +10,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "styles/globals.css";
 
-import Layout from "components/Layout.js";
+import AuthProvider from "components/AuthProvider";
+import Layout from "components/Layout";
 
 // Interweave requires DOM, so polyfill is required
 // for SSR (source: https://interweave.dev/docs/ssr)
@@ -21,9 +22,11 @@ export default function App({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <AuthProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </AuthProvider>
       </Hydrate>
       <ReactQueryDevtools />
     </QueryClientProvider>
