@@ -27,19 +27,25 @@ function removeClassFromElements(elements, className) {
 }
 
 function getAllHoveredHighlights() {
-  return document.getElementsByClassName("bg-yellow-400");
+  return document.getElementsByClassName("hovered");
 }
 
 function addHoverClassToRelatedHighlights(annotationId) {
   const relatedHighlights = getRelatedHighlights(annotationId);
-  addClassToElements(relatedHighlights, "bg-yellow-400");
+  relatedHighlights.forEach((element, index) => {
+    element.classList.add("hovered");
+    element.style.animation = `highlightAnimation 2s ${index * 2}s forwards`;
+  });
 }
 
 function removeAllHoverClasses() {
   // We use Array.from() since geElementsByClassName returns a live collection.
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
   const hoveredHighlights = Array.from(getAllHoveredHighlights());
-  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
+  removeClassFromElements(hoveredHighlights, "hovered");
+  hoveredHighlights.forEach((element) => {
+    element.style.animation = "";
+  });
 }
 
 function extractAnnotationIdFromEvent(e) {
@@ -53,10 +59,9 @@ function getRelatedHighlights(annotationId) {
 }
 
 function syncHoverBehavior(e, setFocusedHighlightId) {
-  removeAllHoverClasses();
-
   const annotationId = extractAnnotationIdFromEvent(e);
   if (annotationId) {
+    removeAllHoverClasses();
     setFocusedHighlightId(annotationId);
     addHoverClassToRelatedHighlights(annotationId);
   }
@@ -143,8 +148,10 @@ const Reader = (props) => {
     if (
       document.getElementById("article").contains(e.target) &&
       !e.target.classList.contains("highlight")
-    )
+    ) {
       setFocusedHighlightId(null);
+      removeAllHoverClasses();
+    }
   }
 
   function highlightAndSaveSelection() {
