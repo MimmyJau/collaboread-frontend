@@ -82,7 +82,7 @@ const LoginForm = () => {
                 href="/signup"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
-                Don't yet have an account? Sign up here.
+                Don&apos;t yet have an account? Sign up here.
               </Link>
             </div>
           </div>
