@@ -5,12 +5,16 @@ import NavBar from "components/NavBar";
 
 const SignupForm = () => {
   const { register, handleSubmit, watch } = useForm();
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, signup } = useAuth();
 
-  const onSuccess = (data) => console.log(data);
   // Will only run if form passes validation.
   const onSubmit = handleSubmit((data) => {
-    login(data.username, data.password);
+    signup({
+      username: data.username,
+      email: data.email,
+      password1: data.password1,
+      password2: data.password2,
+    });
   });
 
   return (
@@ -65,7 +69,7 @@ const SignupForm = () => {
                 required
                 className="relative block w-full border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 placeholder="Password"
-                {...register("password")}
+                {...register("password1")}
               />
             </div>
             <div>
