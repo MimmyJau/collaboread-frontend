@@ -48,24 +48,39 @@ const SignupForm = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                className="relative block w-full border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 placeholder="Email address"
                 {...register("email")}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password1" className="sr-only">
                 Password
               </label>
               <input
-                id="password"
-                name="password"
+                id="password1"
+                name="password1"
+                type="password"
+                autoComplete="current-password"
+                required
+                className="relative block w-full border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                placeholder="Password"
+                {...register("password")}
+              />
+            </div>
+            <div>
+              <label htmlFor="password2" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password2"
+                name="password2"
                 type="password"
                 autoComplete="current-password"
                 required
                 className="relative block w-full rounded-b-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                placeholder="Password"
-                {...register("password")}
+                placeholder="Confirm Password"
+                {...register("password2")}
               />
             </div>
           </div>
