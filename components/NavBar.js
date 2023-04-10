@@ -18,12 +18,21 @@ const NavUser = () => {
 
   if (!user) {
     return (
-      <div className="mr-2">
-        <Link href="/login">
-          <button className="bg-gray-100 rounded-lg text-blue-500 px-3 py-2 hover:bg-yellow-300 hover:text-pink-600">
-            <h1 className="font-semibold text-xl">Log in</h1>
-          </button>
-        </Link>
+      <div className="flex flex-row">
+        <div className="mr-2">
+          <Link href="/signup">
+            <button className="bg-gray-100 rounded-lg text-blue-500 px-3 py-2 hover:bg-yellow-300 hover:text-pink-600">
+              <h1 className="font-semibold text-xl">Sign up</h1>
+            </button>
+          </Link>
+        </div>
+        <div className="mr-2">
+          <Link href="/login">
+            <button className="bg-gray-100 rounded-lg text-blue-500 px-3 py-2 hover:bg-yellow-300 hover:text-pink-600">
+              <h1 className="font-semibold text-xl">Log in</h1>
+            </button>
+          </Link>
+        </div>
       </div>
     );
   } else {

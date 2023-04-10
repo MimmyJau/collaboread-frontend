@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import useAuth from "hooks/auth";
 import NavBar from "components/NavBar";
 
-const LoginForm = () => {
+const SignupForm = () => {
   const { register, handleSubmit, watch } = useForm();
   const { user, login, logout } = useAuth();
 
@@ -18,7 +18,7 @@ const LoginForm = () => {
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Log in to your account
+            Sign up for an account
           </h2>
         </div>
         <form className="mt-8 space-y-6" action="#" onSubmit={onSubmit}>
@@ -32,11 +32,25 @@ const LoginForm = () => {
                 id="username"
                 name="username"
                 type="text"
+                required
+                className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                placeholder="Username"
+                {...register("username")}
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
                 autoComplete="email"
                 required
                 className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                placeholder="Username or Email address"
-                {...register("username")}
+                placeholder="Email address"
+                {...register("email")}
               />
             </div>
             <div>
@@ -72,17 +86,17 @@ const LoginForm = () => {
                   />
                 </svg>
               </span>
-              Log in
+              Sign up
             </button>
           </div>
 
           <div className="flex items-center justify-end">
             <div className="text-sm">
               <Link
-                href="/signup"
+                href="/login"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
-                Don't yet have an account? Sign up here.
+                Already have an account?
               </Link>
             </div>
           </div>
@@ -92,13 +106,13 @@ const LoginForm = () => {
   );
 };
 
-const LoginPage = () => {
+const SignupPage = () => {
   return (
     <div>
       <NavBar />
-      <LoginForm />
+      <SignupForm />
     </div>
   );
 };
 
-export default LoginPage;
+export default SignupPage;
