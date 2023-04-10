@@ -2,6 +2,7 @@
 const nextConfig = {
   env: {
     SERVER: process.env.SERVER,
+    SLUG: process.env.SLUG,
   },
   reactStrictMode: true,
 };
