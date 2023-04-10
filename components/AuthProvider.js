@@ -1,6 +1,12 @@
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import AuthContext from "contexts/auth";
-import { useGetUser, usePostLogin, usePostLogout } from "api/auth.js";
+import {
+  useGetUser,
+  usePostLogin,
+  usePostLogout,
+  usePostSignup,
+} from "api/auth.js";
 
 function setTokenLocalStorage(token) {
   window.localStorage.setItem("token", token);
@@ -19,6 +25,8 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const postLogin = usePostLogin();
   const postLogout = usePostLogout();
+  const postSignup = usePostSignup();
+  const router = useRouter();
 
   // Wait for React to finish loading in browser before checking for token
   useEffect(() => {
@@ -59,8 +67,27 @@ const AuthProvider = ({ children }) => {
     });
   };
 
+  const signup = ({ username, email, password1, password2 }) => {
+    postSignup.mutate(
+      {
+        username,
+        email,
+        password1,
+        password2,
+      },
+      {
+        onSuccess: () => {
+          router.push("/signup/successful");
+        },
+        onError: () => {
+          router.push("/signup/error");
+        },
+      }
+    );
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );

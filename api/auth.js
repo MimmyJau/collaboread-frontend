@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 const BASE_URL = process.env.SERVER;
 const AUTH_BASE_URL = `${BASE_URL}/auth`;
 
+// API calls
 function postLogin(username, password) {
   const route = `${AUTH_BASE_URL}/login/`;
   return ky.post(route, { json: { username, password } }).json();
@@ -21,6 +22,21 @@ function getUser(token) {
   return ky.get(route, { headers: { Authorization: `Token ${token}` } }).json();
 }
 
+function postSignup({ username, email, password1, password2 }) {
+  const route = `${AUTH_BASE_URL}/registration/`;
+  return ky
+    .post(route, {
+      json: {
+        username,
+        email,
+        password1,
+        password2,
+      },
+    })
+    .json();
+}
+
+// React Query hooks
 function usePostLogin() {
   return useMutation({
     mutationFn: ({ username, password }) => postLogin(username, password),
@@ -41,4 +57,11 @@ function useGetUser(token) {
   });
 }
 
-export { useGetUser, usePostLogin, usePostLogout };
+function usePostSignup() {
+  return useMutation({
+    mutationFn: ({ username, email, password1, password2 }) =>
+      postSignup({ username, email, password1, password2 }),
+  });
+}
+
+export { useGetUser, usePostLogin, usePostLogout, usePostSignup };
