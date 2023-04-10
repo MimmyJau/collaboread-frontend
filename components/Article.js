@@ -2,9 +2,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Interweave } from "interweave";
 import rangy from "rangy";
-import "rangy/lib/rangy-highlighter";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
+import "rangy/lib/rangy-highlighter";
 import { useCreateAnnotation, useDeleteAnnotation } from "hooks";
 
 function getHighlightableRoot() {
