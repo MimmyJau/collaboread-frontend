@@ -15,6 +15,22 @@
   @apply bg-yellow-400;
 }
 
+.highlight {
+  background-image: linear-gradient(rgba(251, 191, 36, var(--tw-bg-opacity)), rgba(251, 191, 36, var(--tw-bg-opacity)));
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+}
+
+@keyframes highlightAnimation {
+  0% {
+    background-size: 0% 100%;
+  }
+  100% {
+    background-size: 100% 100%;
+  }
+}
+
 /* For Webkit-based browsers (Chrome, Safari and Opera) */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
