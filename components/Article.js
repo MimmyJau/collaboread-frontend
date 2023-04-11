@@ -5,7 +5,7 @@ import rangy from "rangy";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 import "rangy/lib/rangy-highlighter";
-import { useCreateAnnotation, useDeleteAnnotation } from "hooks";
+import { useDeleteAnnotation } from "hooks";
 
 function getHighlightableRoot() {
   return document.getElementById("content-highlightable");

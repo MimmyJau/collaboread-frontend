@@ -74,7 +74,11 @@ const Comment = (props) => {
   const updateAnnotation = useUpdateAnnotation(articleUuid);
 
   useEffect(() => {
-    setIsEditing(false);
+    if (props.annotation.commentHtml) {
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
   }, [props.annotation.uuid]);
 
   function updateComment(annotationUuid, commentHtml, commentJson) {
