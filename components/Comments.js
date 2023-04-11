@@ -57,6 +57,14 @@ const PostCommentButton = (props) => {
   );
 };
 
+const UserInfo = (props) => {
+  return (
+    <div>
+      <span className="font-semibold">{props.user.username}</span>
+    </div>
+  );
+};
+
 const Comment = (props) => {
   const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
   const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
@@ -94,6 +102,7 @@ const Comment = (props) => {
           .scrollIntoView({ behavior: "smooth", block: "center" });
       }}
     >
+      <UserInfo user={props.annotation.user} />
       {isEditing ? (
         <>
           <CommentEditor

@@ -7,8 +7,14 @@ export interface Highlight {
     backward: boolean;
 }
 
+export interface User {
+    uuid: string;
+    username: string;
+}
+
 export interface Annotation {
     uuid: string;
+    user: User;
     highlight: Array<Highlight>
     commentHtml: string;
     commentJson: string;
@@ -16,6 +22,8 @@ export interface Annotation {
 
 export interface FlatAnnotation {
     uuid: string;
+    user: string;
+    username: string;
     highlightStart: number;
     highlightEnd: number;
     highlightBackward: boolean;
