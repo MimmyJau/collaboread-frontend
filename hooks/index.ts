@@ -8,7 +8,7 @@ import {
   deleteAnnotation,
 } from "api";
 
-import {Annotation, FlatAnnotation } from "types";
+import {Annotation, FlatAnnotation, Highlight } from "types";
 
 // Helper Functions
 function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
@@ -39,7 +39,7 @@ function useFetchArticleHtml(uuid) {
 function useCreateAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ uuid, highlight }) => {
+    mutationFn: ({ uuid, highlight }: { uuid: string; highlight: Highlight } ) => {
       return createAnnotation(articleUuid, {
         uuid: uuid,
         highlightStart: highlight[0].characterRange.start,
@@ -81,7 +81,7 @@ function useFetchAnnotations(articleUuid) {
 function useUpdateAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (annotation) => {
+    mutationFn: (annotation: Annotation) => {
       const updatedAnnotation = {
         ...annotation,
         uuid: annotation.uuid,
