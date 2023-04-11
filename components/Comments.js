@@ -59,8 +59,8 @@ const PostCommentButton = (props) => {
 
 const UserInfo = (props) => {
   return (
-    <div>
-      <span className="font-semibold">{props.user.username}</span>
+    <div className="p-2">
+      <span className="text-sm font-semibold">{props.user.username}</span>
     </div>
   );
 };
@@ -92,7 +92,7 @@ const Comment = (props) => {
 
   return (
     <div
-      className="p-2 border rounded bg-gray-50 focus-within:bg-gray-100 focus:bg-gray-100"
+      className="p-2 pr-5 border-b hover:bg-gray-50"
       tabIndex="0"
       onClick={() => {
         document
@@ -128,7 +128,7 @@ const Comment = (props) => {
       ) : (
         <div className="p-2">
           <Interweave content={props.annotation.commentHtml} />
-          <div className="flex flex-row pt-2 justify-end">
+          <div className="flex flex-row pt-4 justify-end">
             <button
               onClick={() => setIsEditing(true)}
               className="text-blue-500 hover:text-blue-700"
@@ -152,7 +152,7 @@ const Comments = (props) => {
   );
   if (focusedAnnotation) {
     return (
-      <div className={`${props.className} p-2`}>
+      <div className={`${props.className} shadow`}>
         <Comment annotation={focusedAnnotation} />
       </div>
     );
