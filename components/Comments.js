@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { Interweave } from "interweave";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -42,7 +43,7 @@ const CommentEditor = (props) => {
   return <EditorContent editor={editor} />;
 };
 
-const SaveCommentButton = (props) => {
+const PostCommentButton = (props) => {
   return (
     <button
       disabled={!props.enabled}
@@ -51,7 +52,7 @@ const SaveCommentButton = (props) => {
         props.updateComment();
       }}
     >
-      {!props.enabled ? "Saved" : "Save"}
+      {!props.enabled ? "Posted" : "Post"}
     </button>
   );
 };
@@ -59,9 +60,14 @@ const SaveCommentButton = (props) => {
 const Comment = (props) => {
   const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
   const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
+  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const { articleUuid } = router.query;
   const updateAnnotation = useUpdateAnnotation(articleUuid);
+
+  useEffect(() => {
+    setIsEditing(false);
+  }, [props.annotation.uuid]);
 
   function updateComment(annotationUuid, commentHtml, commentJson) {
     const newAnnotation = {
@@ -69,7 +75,11 @@ const Comment = (props) => {
       commentHtml: commentHtml,
       commentJson: commentJson,
     };
-    updateAnnotation.mutate(newAnnotation);
+    updateAnnotation.mutate(newAnnotation, {
+      onSuccess: () => {
+        setIsEditing(false);
+      },
+    });
   }
 
   return (
@@ -84,19 +94,30 @@ const Comment = (props) => {
           .scrollIntoView({ behavior: "smooth", block: "center" });
       }}
     >
-      <CommentEditor
-        annotationUuid={props.annotation.uuid}
-        content={props.annotation.commentHtml}
-        onChange={{ html: setEditorHtml, json: setEditorJson }}
-      />
-      <div className="flex flex-row pt-2 justify-end">
-        <SaveCommentButton
-          enabled={editorHtml !== props.annotation.commentHtml}
-          updateComment={() =>
-            updateComment(props.annotation.uuid, editorHtml, editorJson)
-          }
-        />
-      </div>
+      {isEditing ? (
+        <>
+          <CommentEditor
+            annotationUuid={props.annotation.uuid}
+            content={props.annotation.commentHtml}
+            onChange={{ html: setEditorHtml, json: setEditorJson }}
+          />
+          <div className="flex flex-row pt-2 justify-end">
+            <PostCommentButton
+              enabled={editorHtml !== props.annotation.commentHtml}
+              updateComment={() => {
+                updateComment(props.annotation.uuid, editorHtml, editorJson);
+              }}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="p-2">
+          <Interweave content={props.annotation.commentHtml} />
+          <button onClick={() => setIsEditing(true)} className="text-blue-500">
+            Edit
+          </button>
+        </div>
+      )}
     </div>
   );
 };
