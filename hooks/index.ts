@@ -8,8 +8,10 @@ import {
   deleteAnnotation,
 } from "api";
 
+import {Annotation, FlatAnnotation } from "types";
+
 // Helper Functions
-function unflattenAnnotation(flatAnnotation) {
+function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
   return {
     uuid: flatAnnotation.uuid,
     highlight: Array.of({
@@ -46,10 +48,10 @@ function useCreateAnnotation(articleUuid) {
         isPublic: "True",
       });
     },
-    onSuccess: (newHighlight) => {
+    onSuccess: (newHighlight: FlatAnnotation) => {
       queryClient.setQueryData(
         ["annotations", "article", articleUuid],
-        (oldData) => {
+        (oldData: Array<Annotation>): Array<Annotation> => {
           const newAnnotation = unflattenAnnotation(newHighlight);
           const newData = structuredClone(oldData);
           newData.push(newAnnotation);
@@ -64,7 +66,7 @@ function useFetchAnnotations(articleUuid) {
   return useQuery({
     enabled: !!articleUuid,
     queryKey: ["annotations", "article", articleUuid],
-    queryFn: async () => {
+    queryFn: async (): Promise<Array<Annotation>> => {
       const flatAnnotations = await fetchAnnotations(articleUuid).catch(
         (error) => {
           return [];
