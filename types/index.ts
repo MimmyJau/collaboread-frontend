@@ -22,8 +22,7 @@ export interface Annotation {
 
 export interface FlatAnnotation {
     uuid: string;
-    user: string;
-    username: string;
+    user: User;
     highlightStart: number;
     highlightEnd: number;
     highlightBackward: boolean;

@@ -14,10 +14,7 @@ import {Annotation, FlatAnnotation } from "types";
 function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
   return {
     uuid: flatAnnotation.uuid,
-    user: {
-        uuid: flatAnnotation.user,
-        username: flatAnnotation.username
-    },
+    user: flatAnnotation.user,
     highlight: Array.of({
       characterRange: {
         start: flatAnnotation.highlightStart,
