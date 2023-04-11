@@ -27,6 +27,10 @@ function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
   };
 }
 
+function getTokenLocalStorage() {
+    return localStorage.getItem("token");
+}
+
 // React Query Hooks
 function useFetchArticleHtml(uuid) {
   return useQuery({
@@ -47,7 +51,7 @@ function useCreateAnnotation(articleUuid) {
         highlightBackward: highlight[0].backward,
         article: articleUuid,
         isPublic: "True",
-      });
+      }, getTokenLocalStorage());
     },
     onSuccess: (newHighlight: FlatAnnotation) => {
       queryClient.setQueryData(
@@ -92,7 +96,7 @@ function useUpdateAnnotation(articleUuid) {
         isPublic: "True",
       };
       delete updatedAnnotation.highlight;
-      return updateAnnotation(articleUuid, updatedAnnotation);
+      return updateAnnotation(articleUuid, updatedAnnotation, getTokenLocalStorage());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -105,7 +109,7 @@ function useUpdateAnnotation(articleUuid) {
 function useDeleteAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (annotationUuid) => deleteAnnotation(annotationUuid),
+    mutationFn: (annotationUuid) => deleteAnnotation(annotationUuid, getTokenLocalStorage()),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["annotations", "article", articleUuid],

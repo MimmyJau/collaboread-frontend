@@ -10,9 +10,9 @@ function fetchArticleHtml(articleUuid) {
   return ky.get(route).json();
 }
 
-function createAnnotation(articleUuid, highlightData) {
+function createAnnotation(articleUuid, highlightData, token) {
   const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
-  return ky.post(route, { json: highlightData }).json();
+  return ky.post(route, { headers: {Authorization: `Token ${token}`}, json: highlightData }).json();
 }
 
 function fetchAnnotations(articleUuid): Promise<Array<FlatAnnotation>> {
@@ -20,14 +20,14 @@ function fetchAnnotations(articleUuid): Promise<Array<FlatAnnotation>> {
   return ky.get(route).json();
 }
 
-function updateAnnotation(articleUuid, annotation) {
+function updateAnnotation(articleUuid, annotation, token) {
   const route = `${API_BASE_URL}/annotations/${annotation.uuid}/`;
-  return ky.put(route, { json: annotation }).json();
+  return ky.put(route, { headers: {Authorization: `Token ${token}`}, json: annotation }).json();
 }
 
-function deleteAnnotation(annotationUuid) {
+function deleteAnnotation(annotationUuid, token) {
   const route = `${API_BASE_URL}/annotations/${annotationUuid}/`;
-  return ky.delete(route, { json: { id: annotationUuid } }).json();
+  return ky.delete(route, { headers: {Authorization: `Token ${token}`}, json: { id: annotationUuid } }).json();
 }
 
 export {
