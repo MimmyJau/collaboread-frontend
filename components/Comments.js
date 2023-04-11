@@ -102,6 +102,12 @@ const Comment = (props) => {
             onChange={{ html: setEditorHtml, json: setEditorJson }}
           />
           <div className="flex flex-row pt-2 justify-end">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="text-blue-500 hover:text-blue-700 mr-2"
+            >
+              Cancel
+            </button>
             <PostCommentButton
               enabled={editorHtml !== props.annotation.commentHtml}
               updateComment={() => {
@@ -113,9 +119,14 @@ const Comment = (props) => {
       ) : (
         <div className="p-2">
           <Interweave content={props.annotation.commentHtml} />
-          <button onClick={() => setIsEditing(true)} className="text-blue-500">
-            Edit
-          </button>
+          <div className="flex flex-row pt-2 justify-end">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              Edit
+            </button>
+          </div>
         </div>
       )}
     </div>
