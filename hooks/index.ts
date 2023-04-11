@@ -8,10 +8,13 @@ import {
   deleteAnnotation,
 } from "api";
 
+import {Annotation, FlatAnnotation, Highlight } from "types";
+
 // Helper Functions
-function unflattenAnnotation(flatAnnotation) {
+function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
   return {
     uuid: flatAnnotation.uuid,
+    user: flatAnnotation.user,
     highlight: Array.of({
       characterRange: {
         start: flatAnnotation.highlightStart,
@@ -36,7 +39,7 @@ function useFetchArticleHtml(uuid) {
 function useCreateAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ uuid, highlight }) => {
+    mutationFn: ({ uuid, highlight }: { uuid: string; highlight: Highlight } ) => {
       return createAnnotation(articleUuid, {
         uuid: uuid,
         highlightStart: highlight[0].characterRange.start,
@@ -46,10 +49,10 @@ function useCreateAnnotation(articleUuid) {
         isPublic: "True",
       });
     },
-    onSuccess: (newHighlight) => {
+    onSuccess: (newHighlight: FlatAnnotation) => {
       queryClient.setQueryData(
         ["annotations", "article", articleUuid],
-        (oldData) => {
+        (oldData: Array<Annotation>): Array<Annotation> => {
           const newAnnotation = unflattenAnnotation(newHighlight);
           const newData = structuredClone(oldData);
           newData.push(newAnnotation);
@@ -64,7 +67,7 @@ function useFetchAnnotations(articleUuid) {
   return useQuery({
     enabled: !!articleUuid,
     queryKey: ["annotations", "article", articleUuid],
-    queryFn: async () => {
+    queryFn: async (): Promise<Array<Annotation>> => {
       const flatAnnotations = await fetchAnnotations(articleUuid).catch(
         (error) => {
           return [];
@@ -78,7 +81,7 @@ function useFetchAnnotations(articleUuid) {
 function useUpdateAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (annotation) => {
+    mutationFn: (annotation: Annotation) => {
       const updatedAnnotation = {
         ...annotation,
         uuid: annotation.uuid,

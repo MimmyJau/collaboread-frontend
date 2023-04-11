@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { Interweave } from "interweave";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -42,7 +43,7 @@ const CommentEditor = (props) => {
   return <EditorContent editor={editor} />;
 };
 
-const SaveCommentButton = (props) => {
+const PostCommentButton = (props) => {
   return (
     <button
       disabled={!props.enabled}
@@ -51,17 +52,34 @@ const SaveCommentButton = (props) => {
         props.updateComment();
       }}
     >
-      {!props.enabled ? "Saved" : "Save"}
+      {!props.enabled ? "Posted" : "Post"}
     </button>
+  );
+};
+
+const UserInfo = (props) => {
+  return (
+    <div className="p-2">
+      <span className="text-sm font-semibold">{props.user.username}</span>
+    </div>
   );
 };
 
 const Comment = (props) => {
   const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
   const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
+  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const { articleUuid } = router.query;
   const updateAnnotation = useUpdateAnnotation(articleUuid);
+
+  useEffect(() => {
+    if (props.annotation.commentHtml) {
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
+  }, [props.annotation.uuid]);
 
   function updateComment(annotationUuid, commentHtml, commentJson) {
     const newAnnotation = {
@@ -69,12 +87,16 @@ const Comment = (props) => {
       commentHtml: commentHtml,
       commentJson: commentJson,
     };
-    updateAnnotation.mutate(newAnnotation);
+    updateAnnotation.mutate(newAnnotation, {
+      onSuccess: () => {
+        setIsEditing(false);
+      },
+    });
   }
 
   return (
     <div
-      className="p-2 border rounded bg-gray-50 focus-within:bg-gray-100 focus:bg-gray-100"
+      className="p-2 pr-5 border-b hover:bg-gray-50"
       tabIndex="0"
       onClick={() => {
         document
@@ -84,19 +106,42 @@ const Comment = (props) => {
           .scrollIntoView({ behavior: "smooth", block: "center" });
       }}
     >
-      <CommentEditor
-        annotationUuid={props.annotation.uuid}
-        content={props.annotation.commentHtml}
-        onChange={{ html: setEditorHtml, json: setEditorJson }}
-      />
-      <div className="flex flex-row pt-2 justify-end">
-        <SaveCommentButton
-          enabled={editorHtml !== props.annotation.commentHtml}
-          updateComment={() =>
-            updateComment(props.annotation.uuid, editorHtml, editorJson)
-          }
-        />
-      </div>
+      <UserInfo user={props.annotation.user} />
+      {isEditing ? (
+        <>
+          <CommentEditor
+            annotationUuid={props.annotation.uuid}
+            content={props.annotation.commentHtml}
+            onChange={{ html: setEditorHtml, json: setEditorJson }}
+          />
+          <div className="flex flex-row pt-2 justify-end">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="text-blue-500 hover:text-blue-700 mr-2"
+            >
+              Cancel
+            </button>
+            <PostCommentButton
+              enabled={editorHtml !== props.annotation.commentHtml}
+              updateComment={() => {
+                updateComment(props.annotation.uuid, editorHtml, editorJson);
+              }}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="p-2">
+          <Interweave content={props.annotation.commentHtml} />
+          <div className="flex flex-row pt-4 justify-end">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              Edit
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -111,7 +156,7 @@ const Comments = (props) => {
   );
   if (focusedAnnotation) {
     return (
-      <div className={`${props.className} p-2`}>
+      <div className={`${props.className} shadow`}>
         <Comment annotation={focusedAnnotation} />
       </div>
     );

@@ -7,7 +7,6 @@ const LoginForm = () => {
   const { register, handleSubmit, watch } = useForm();
   const { user, login, logout } = useAuth();
 
-  const onSuccess = (data) => console.log(data);
   // Will only run if form passes validation.
   const onSubmit = handleSubmit((data) => {
     login(data.username, data.password);

@@ -52,7 +52,7 @@ const NavUser = () => {
 const NavBar = (props) => {
   return (
     <nav className="">
-      <div className="flex flex-row justify-between items-center p-2 border border-black">
+      <div className="flex flex-row justify-between items-center p-2 shadow">
         <NavHome />
         <NavUser user={props.user} />
       </div>

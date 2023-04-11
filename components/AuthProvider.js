@@ -53,6 +53,7 @@ const AuthProvider = ({ children }) => {
         onSuccess: (data) => {
           setTokenLocalStorage(data.key);
           setUser(username);
+          router.push("/");
         },
       }
     );

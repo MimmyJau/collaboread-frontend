@@ -1,5 +1,7 @@
 import ky from "ky-universal";
 
+import { FlatAnnotation } from "types";
+
 const BASE_URL = process.env.SERVER;
 const API_BASE_URL = `${BASE_URL}/api`;
 
@@ -13,7 +15,7 @@ function createAnnotation(articleUuid, highlightData) {
   return ky.post(route, { json: highlightData }).json();
 }
 
-function fetchAnnotations(articleUuid) {
+function fetchAnnotations(articleUuid): Promise<Array<FlatAnnotation>> {
   const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
   return ky.get(route).json();
 }
