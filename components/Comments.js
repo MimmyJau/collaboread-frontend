@@ -223,6 +223,14 @@ const Comment = (props) => {
   );
 };
 
+const SignUpMessage = () => {
+  return (
+    <div className="p-2 pr-5 border-b hover:bg-gray-50 text-center">
+      Sign up to leave comments.
+    </div>
+  );
+};
+
 const Comments = (props) => {
   if (!props.fetchedAnnotations) return;
   const annotationUuid = props.focusedHighlightId;
@@ -231,13 +239,14 @@ const Comments = (props) => {
   const focusedAnnotation = props.fetchedAnnotations.find(
     (annotation) => annotation.uuid === annotationUuid
   );
-  if (focusedAnnotation) {
-    return (
-      <div className={`${props.className} shadow`}>
-        <Comment annotation={focusedAnnotation} />
-      </div>
-    );
-  }
+  return (
+    <div className={`${props.className} shadow`}>
+      {focusedAnnotation ? <Comment annotation={focusedAnnotation} /> : null}
+      {props.unauthorizedSelection && !focusedAnnotation ? (
+        <SignUpMessage />
+      ) : null}
+    </div>
+  );
 };
 
 export default Comments;

@@ -7,6 +7,7 @@ import {
   useUpdateAnnotation,
   useDeleteAnnotation,
 } from "hooks";
+import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import { getRangeFromSelection, highlightSelection } from "utils";
 import Comments from "components/Comments.js";
@@ -139,9 +140,17 @@ const Reader = (props) => {
     data: dataAnnotations,
     error: errorAnnotations,
   } = useFetchAnnotations(articleUuid);
+  const { user } = useAuth();
+  const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 
   function handleMouseUp(e) {
-    if (!document.getSelection().isCollapsed) highlightAndSaveSelection();
+    setUnauthorizedSelection(false);
+    if (user && !document.getSelection().isCollapsed)
+      highlightAndSaveSelection();
+    if (!user && !document.getSelection().isCollapsed) {
+      // alert("Please sign up to save highlights.");
+      setUnauthorizedSelection(true);
+    }
     if (
       document.getElementById("article").contains(e.target) &&
       !e.target.classList.contains("highlight")
@@ -194,6 +203,7 @@ const Reader = (props) => {
         setFocusedHighlightId={setFocusedHighlightId}
       />
       <Comments
+        unauthorizedSelection={unauthorizedSelection}
         className="col-start-5 col-span-2 overflow-y-auto h-full"
         focusedHighlightId={focusedHighlightId}
         fetchedAnnotations={dataAnnotations}
