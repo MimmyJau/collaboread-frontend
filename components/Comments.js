@@ -8,7 +8,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 
-import { useUpdateAnnotation } from "hooks";
+import { useUpdateAnnotation, useDeleteAnnotation } from "hooks";
 import useAuth from "hooks/auth";
 
 const printJson = (editor) => {
@@ -50,7 +50,10 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function Dropdown() {
+const Dropdown = (props) => {
+  const { articleUuid } = useRouter().query;
+  const deleteAnnotation = useDeleteAnnotation(articleUuid);
+
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
@@ -77,6 +80,9 @@ function Dropdown() {
               {({ active }) => (
                 <a
                   href="#"
+                  onClick={() => {
+                    deleteAnnotation.mutate(props.annotationUuid);
+                  }}
                   className={classNames(
                     active ? "bg-gray-100 text-red-500" : "text-red-500",
                     "block px-4 py-2 text-sm font-semibold"
@@ -91,7 +97,7 @@ function Dropdown() {
       </Transition>
     </Menu>
   );
-}
+};
 
 const PostCommentButton = (props) => {
   return (
@@ -166,7 +172,7 @@ const Comment = (props) => {
     >
       <div className="flex flex-row justify-between items-center">
         <UserInfo user={props.annotation.user} />
-        {isOwner ? <Dropdown /> : null}
+        {isOwner ? <Dropdown annotationUuid={props.annotation.uuid} /> : null}
       </div>
       {isEditing && isOwner ? (
         <>
