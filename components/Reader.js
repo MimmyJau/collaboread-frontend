@@ -8,10 +8,7 @@ import {
   useDeleteAnnotation,
 } from "hooks";
 import Article from "components/Article.js";
-import {
-  getRangeFromSelection,
-  highlightSelection,
-} from "components/Article.js";
+import { getRangeFromSelection, highlightSelection } from "utils";
 import Comments from "components/Comments.js";
 
 function addClassToElements(elements, className) {
