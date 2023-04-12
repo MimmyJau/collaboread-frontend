@@ -1,6 +1,8 @@
 import ky from "ky-universal";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
+import { User } from "types";
+
 const BASE_URL = process.env.SERVER;
 const AUTH_BASE_URL = `${BASE_URL}/auth`;
 
@@ -17,7 +19,7 @@ function postLogout(token) {
     .json();
 }
 
-function getUser(token) {
+function getUser(token: string): Promise<User> {
   const route = `${AUTH_BASE_URL}/user/`;
   return ky.get(route, { headers: { Authorization: `Token ${token}` } }).json();
 }
@@ -53,7 +55,7 @@ function useGetUser(token) {
   return useQuery({
     enabled: !!token,
     queryKey: ["user", token],
-    queryFn: (queryContext) => getUser(token),
+    queryFn: (queryContext): Promise<User> => getUser(token),
   });
 }
 

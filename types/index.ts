@@ -29,3 +29,11 @@ export interface FlatAnnotation {
     commentHtml: string;
     commentJson: string;
 }
+
+export interface User {
+    id: number;
+    uuid: string;
+    username: string;
+    email: string;
+    dateJoined: string;
+}

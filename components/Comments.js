@@ -7,6 +7,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 
 import { useUpdateAnnotation } from "hooks";
+import useAuth from "hooks/auth";
 
 const printJson = (editor) => {
   return JSON.stringify(editor.getJSON());
@@ -69,15 +70,23 @@ const Comment = (props) => {
   const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
   const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
   const [isEditing, setIsEditing] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const router = useRouter();
   const { articleUuid } = router.query;
   const updateAnnotation = useUpdateAnnotation(articleUuid);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (props.annotation.commentHtml) {
       setIsEditing(false);
     } else {
       setIsEditing(true);
+    }
+
+    if (props.annotation.user?.uuid === user?.uuid) {
+      setIsOwner(true);
+    } else {
+      setIsOwner(false);
     }
   }, [props.annotation.uuid]);
 
@@ -107,7 +116,7 @@ const Comment = (props) => {
       }}
     >
       <UserInfo user={props.annotation.user} />
-      {isEditing ? (
+      {isEditing && isOwner ? (
         <>
           <CommentEditor
             annotationUuid={props.annotation.uuid}
@@ -132,14 +141,16 @@ const Comment = (props) => {
       ) : (
         <div className="p-2">
           <Interweave content={props.annotation.commentHtml} />
-          <div className="flex flex-row pt-4 justify-end">
-            <button
-              onClick={() => setIsEditing(true)}
-              className="text-blue-500 hover:text-blue-700"
-            >
-              Edit
-            </button>
-          </div>
+          {isOwner ? (
+            <div className="flex flex-row pt-4 justify-end">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                Edit
+              </button>
+            </div>
+          ) : null}
         </div>
       )}
     </div>
