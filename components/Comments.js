@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
 
@@ -226,7 +227,13 @@ const Comment = (props) => {
 const SignUpMessage = () => {
   return (
     <div className="p-2 pr-5 border-b hover:bg-gray-50 text-center">
-      Sign up to leave comments.
+      <Link
+        href="/signup"
+        className="font-medium text-blue-600 hover:text-blue-500"
+      >
+        Sign up
+      </Link>
+      &nbsp;to leave comments.
     </div>
   );
 };
