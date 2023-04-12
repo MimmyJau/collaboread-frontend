@@ -58,7 +58,7 @@ const Dropdown = (props) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
-        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm">
+        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md px-3 py-2 text-sm font-semibold text-gray-900">
           <EllipsisVerticalIcon
             className="-ml-1 -mr-1 h-5 w-5 text-gray-400"
             aria-hidden="true"
