@@ -7,7 +7,10 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Menu, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import {
+  EllipsisVerticalIcon,
+  ChatBubbleBottomCenterIcon,
+} from "@heroicons/react/20/solid";
 
 import { useUpdateAnnotation, useDeleteAnnotation } from "hooks";
 import { clearHighlight } from "utils";
@@ -238,6 +241,57 @@ const SignUpMessage = () => {
   );
 };
 
+const ReplyEditor = (props) => {
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit,
+        Placeholder.configure({
+          placeholder: "Leave a thoughtful reply...",
+        }),
+      ],
+      content: props.content || "",
+      editorProps: {
+        attributes: {
+          class:
+            "py-2 px-1 bg-white rounded border border-gray-200 focus:outline-none focus:border focus:border-gray-400 hover:border hover:border-gray-300",
+        },
+      },
+      onUpdate: ({ editor }) => {
+        props.onChange.html(editor.getHTML());
+        props.onChange.json(JSON.stringify(editor.getJSON()));
+      },
+    },
+    [props.annotationUuid]
+  );
+
+  return <EditorContent editor={editor} />;
+};
+
+const ReplyBox = (props) => {
+  const [editorHtml, setEditorHtml] = useState("");
+  const [editorJson, setEditorJson] = useState("");
+  return (
+    <div className="p-2 flex flex-row border border-green-500">
+      <div className="flex-grow mr-1">
+        <ReplyEditor onChange={{ html: setEditorHtml, json: setEditorJson }} />
+      </div>
+      <button
+        disabled={!props.enabled}
+        className="text-base px-2 py-2 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
+        onClick={() => {
+          console.log("reply button clicked!");
+        }}
+      >
+        <ChatBubbleBottomCenterIcon
+          className="h-5 w-5 text-green-200"
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  );
+};
+
 const Comments = (props) => {
   if (!props.fetchedAnnotations) return;
   const annotationUuid = props.focusedHighlightId;
@@ -252,6 +306,7 @@ const Comments = (props) => {
       {props.unauthorizedSelection && !focusedAnnotation ? (
         <SignUpMessage />
       ) : null}
+      <ReplyBox />
     </div>
   );
 };
