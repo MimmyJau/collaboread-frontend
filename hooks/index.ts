@@ -53,16 +53,10 @@ function useCreateAnnotation(articleUuid) {
         isPublic: "True",
       }, getTokenLocalStorage());
     },
-    onSuccess: (newHighlight: FlatAnnotation) => {
-      queryClient.setQueryData(
-        ["annotations", "article", articleUuid],
-        (oldData: Array<Annotation>): Array<Annotation> => {
-          const newAnnotation = unflattenAnnotation(newHighlight);
-          const newData = structuredClone(oldData);
-          newData.push(newAnnotation);
-          return newData;
-        }
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["annotations", "article", articleUuid],
+      });
     },
   });
 }
