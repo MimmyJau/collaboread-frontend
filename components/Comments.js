@@ -9,6 +9,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 
 import { useUpdateAnnotation, useDeleteAnnotation } from "hooks";
+import { clearHighlight } from "utils";
 import useAuth from "hooks/auth";
 
 const printJson = (editor) => {
@@ -81,7 +82,14 @@ const Dropdown = (props) => {
                 <a
                   href="#"
                   onClick={() => {
-                    deleteAnnotation.mutate(props.annotationUuid);
+                    deleteAnnotation.mutate(props.annotation.uuid, {
+                      onSuccess: () => {
+                        clearHighlight(
+                          props.annotation.uuid,
+                          props.annotation.highlight
+                        );
+                      },
+                    });
                   }}
                   className={classNames(
                     active ? "bg-gray-100 text-red-500" : "text-red-500",
@@ -172,7 +180,7 @@ const Comment = (props) => {
     >
       <div className="flex flex-row justify-between items-center">
         <UserInfo user={props.annotation.user} />
-        {isOwner ? <Dropdown annotationUuid={props.annotation.uuid} /> : null}
+        {isOwner ? <Dropdown annotation={props.annotation} /> : null}
       </div>
       {isEditing && isOwner ? (
         <>
