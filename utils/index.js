@@ -35,11 +35,6 @@ export function highlightSelection(
       onElementCreate: (el) => {
         el.classList.add("highlight");
         el.dataset.annotationId = annotationUuid;
-        el.onclick = () => {
-          clearHighlight(annotationUuid, range);
-          deleteAnnotation.mutate(annotationUuid);
-          setFocusedHighlightId(null);
-        };
       },
       tagNames: ["span"],
     })
