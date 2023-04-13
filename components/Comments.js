@@ -124,7 +124,17 @@ const Comment = (props) => {
           ) : null}
         </div>
       )}
-      {user && editorHtml ? <ReplyBox /> : null}
+    </div>
+  );
+};
+
+const Thread = (props) => {
+  const { user } = useAuth();
+
+  return (
+    <div>
+      <Comment annotation={props.annotation} />
+      {user && props.annotation.commentHtml ? <ReplyBox /> : null}
     </div>
   );
 };
@@ -182,7 +192,7 @@ const Comments = (props) => {
 
   return (
     <div className={`${props.className} shadow`}>
-      {focusedAnnotation ? <Comment annotation={focusedAnnotation} /> : null}
+      {focusedAnnotation ? <Thread annotation={focusedAnnotation} /> : null}
       {showSignUpMessage ? <SignUpMessage /> : null}
     </div>
   );
