@@ -16,7 +16,7 @@ const PostCommentButton = (props) => {
       disabled={!props.enabled}
       className="px-2 py-1 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
       onClick={() => {
-        props.updateComment();
+        props.postComment();
       }}
     >
       {!props.enabled ? "Posted" : "Post"}
@@ -43,12 +43,13 @@ const Comment = (props) => {
   const { user } = useAuth();
 
   useEffect(() => {
+    // Check if we're in read-only mode or edit mode
     if (props.annotation.commentHtml) {
       setIsEditing(false);
     } else {
       setIsEditing(true);
     }
-
+    // Check if we're the owner of this comment
     if (props.annotation.user?.uuid === user?.uuid) {
       setIsOwner(true);
     } else {
@@ -56,7 +57,7 @@ const Comment = (props) => {
     }
   }, [props.annotation.uuid]);
 
-  function updateComment(annotationUuid, commentHtml, commentJson) {
+  function postComment(annotationUuid, commentHtml, commentJson) {
     const newAnnotation = {
       ...props.annotation,
       commentHtml: commentHtml,
@@ -102,8 +103,8 @@ const Comment = (props) => {
             </button>
             <PostCommentButton
               enabled={editorHtml !== props.annotation.commentHtml}
-              updateComment={() => {
-                updateComment(props.annotation.uuid, editorHtml, editorJson);
+              postComment={() => {
+                postComment(props.annotation.uuid, editorHtml, editorJson);
               }}
             />
           </div>
