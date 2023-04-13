@@ -128,31 +128,6 @@ const Comment = (props) => {
   );
 };
 
-const Thread = (props) => {
-  const { user } = useAuth();
-
-  return (
-    <div>
-      <Comment annotation={props.annotation} />
-      {user && props.annotation.commentHtml ? <ReplyBox /> : null}
-    </div>
-  );
-};
-
-const SignUpMessage = () => {
-  return (
-    <div className="p-2 pr-5 border-b hover:bg-gray-50 text-center">
-      <Link
-        href="/signup"
-        className="font-medium text-blue-600 hover:text-blue-500"
-      >
-        Sign up
-      </Link>
-      &nbsp;to leave comments.
-    </div>
-  );
-};
-
 const ReplyBox = (props) => {
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
@@ -176,6 +151,31 @@ const ReplyBox = (props) => {
           aria-hidden="true"
         />
       </button>
+    </div>
+  );
+};
+
+const Thread = (props) => {
+  const { user } = useAuth();
+
+  return (
+    <div>
+      <Comment annotation={props.annotation} />
+      {user && props.annotation.commentHtml ? <ReplyBox /> : null}
+    </div>
+  );
+};
+
+const SignUpMessage = () => {
+  return (
+    <div className="p-2 pr-5 border-b hover:bg-gray-50 text-center">
+      <Link
+        href="/signup"
+        className="font-medium text-blue-600 hover:text-blue-500"
+      >
+        Sign up
+      </Link>
+      &nbsp;to leave comments.
     </div>
   );
 };
