@@ -235,13 +235,13 @@ const Comments = (props) => {
   const focusedAnnotation = props.fetchedAnnotations.find(
     (annotation) => annotation.uuid === annotationUuid
   );
+  const showSignUpMessage = props.unauthorizedSelection && !focusedAnnotation;
+
   return (
     <div className={`${props.className} shadow`}>
       {focusedAnnotation ? <Comment annotation={focusedAnnotation} /> : null}
-      {props.unauthorizedSelection && !focusedAnnotation ? (
-        <SignUpMessage />
-      ) : null}
       <ReplyBox />
+      {showSignUpMessage ? <SignUpMessage /> : null}
     </div>
   );
 };
