@@ -3,49 +3,13 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { Interweave } from "interweave";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
 import { ChatBubbleBottomCenterIcon } from "@heroicons/react/20/solid";
 
 import Dropdown from "components/Dropdown";
+import Editor from "components/Editor";
 import { useUpdateAnnotation, useDeleteAnnotation } from "hooks";
 import useAuth from "hooks/auth";
 
-const printJson = (editor) => {
-  return JSON.stringify(editor.getJSON());
-};
-
-const printHtml = (editor) => {
-  return editor.getHTML();
-};
-
-const CommentEditor = (props) => {
-  const editor = useEditor(
-    {
-      extensions: [
-        StarterKit,
-        Placeholder.configure({
-          placeholder: "What is your interpretation of this passage?",
-        }),
-      ],
-      content: props.content || "",
-      editorProps: {
-        attributes: {
-          class:
-            "py-2 px-1 bg-white rounded border border-gray-200 focus:outline-none focus:border focus:border-gray-400 hover:border hover:border-gray-300",
-        },
-      },
-      onUpdate: ({ editor }) => {
-        props.onChange.html(editor.getHTML());
-        props.onChange.json(JSON.stringify(editor.getJSON()));
-      },
-    },
-    [props.annotationUuid]
-  );
-
-  return <EditorContent editor={editor} />;
-};
 const PostCommentButton = (props) => {
   return (
     <button
@@ -123,8 +87,9 @@ const Comment = (props) => {
       </div>
       {isEditing && isOwner ? (
         <>
-          <CommentEditor
+          <Editor
             annotationUuid={props.annotation.uuid}
+            placeholder={"What is your interpretation of this passage?"}
             content={props.annotation.commentHtml}
             onChange={{ html: setEditorHtml, json: setEditorJson }}
           />
@@ -158,6 +123,7 @@ const Comment = (props) => {
           ) : null}
         </div>
       )}
+      {user && editorHtml ? <ReplyBox /> : null}
     </div>
   );
 };
@@ -176,40 +142,16 @@ const SignUpMessage = () => {
   );
 };
 
-const ReplyEditor = (props) => {
-  const editor = useEditor(
-    {
-      extensions: [
-        StarterKit,
-        Placeholder.configure({
-          placeholder: "Leave a thoughtful reply...",
-        }),
-      ],
-      content: props.content || "",
-      editorProps: {
-        attributes: {
-          class:
-            "py-2 px-1 bg-white rounded border border-gray-200 focus:outline-none focus:border focus:border-gray-400 hover:border hover:border-gray-300",
-        },
-      },
-      onUpdate: ({ editor }) => {
-        props.onChange.html(editor.getHTML());
-        props.onChange.json(JSON.stringify(editor.getJSON()));
-      },
-    },
-    [props.annotationUuid]
-  );
-
-  return <EditorContent editor={editor} />;
-};
-
 const ReplyBox = (props) => {
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
   return (
     <div className="p-2 flex flex-row border border-green-500">
       <div className="flex-grow mr-1">
-        <ReplyEditor onChange={{ html: setEditorHtml, json: setEditorJson }} />
+        <Editor
+          placeholder={"Leave a reply..."}
+          onChange={{ html: setEditorHtml, json: setEditorJson }}
+        />
       </div>
       <button
         disabled={!props.enabled}
@@ -240,7 +182,6 @@ const Comments = (props) => {
   return (
     <div className={`${props.className} shadow`}>
       {focusedAnnotation ? <Comment annotation={focusedAnnotation} /> : null}
-      <ReplyBox />
       {showSignUpMessage ? <SignUpMessage /> : null}
     </div>
   );
