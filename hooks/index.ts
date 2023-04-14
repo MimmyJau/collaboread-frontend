@@ -15,6 +15,7 @@ function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
   return {
     uuid: flatAnnotation.uuid,
     user: flatAnnotation.user,
+    article: flatAnnotation.article,
     highlight: Array.of({
       characterRange: {
         start: flatAnnotation.highlightStart,
@@ -22,8 +23,7 @@ function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
       },
       backward: flatAnnotation.highlightBackward,
     }),
-    commentHtml: flatAnnotation.commentHtml,
-    commentJson: flatAnnotation.commentJson,
+    comments: flatAnnotation.comments,
   };
 }
 
