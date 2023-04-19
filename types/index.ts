@@ -9,11 +9,12 @@ export interface Highlight {
 
 export interface Comment {
     uuid: string;
-    user: User;
+    user?: User;
     annotation: string;
-    replyTo: string;
+    parent: string;
     commentHtml: string;
     commentJson: string;
+    commentText: string;
 }
 
 export interface User {

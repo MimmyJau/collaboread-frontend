@@ -7,7 +7,7 @@ import { ChatBubbleBottomCenterIcon } from "@heroicons/react/20/solid";
 
 import Dropdown from "components/Dropdown";
 import Editor from "components/Editor";
-import { useUpdateAnnotation, useDeleteAnnotation } from "hooks";
+import { useDeleteAnnotation, useCreateComment } from "hooks";
 import useAuth from "hooks/auth";
 
 const PostCommentButton = (props) => {
@@ -35,11 +35,12 @@ const UserInfo = (props) => {
 const Comment = (props) => {
   const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
   const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
+  const [editorText, setEditorText] = useState(props.annotation.commentText);
   const [isEditing, setIsEditing] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const router = useRouter();
   const { articleUuid } = router.query;
-  const updateAnnotation = useUpdateAnnotation(articleUuid);
+  const createComment = useCreateComment(articleUuid);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -57,13 +58,21 @@ const Comment = (props) => {
     }
   }, [props.annotation.uuid]);
 
-  function postComment(annotationUuid, commentHtml, commentJson) {
-    const newAnnotation = {
-      ...props.annotation,
+  function postComment({
+    annotationUuid,
+    commentHtml,
+    commentJson,
+    commentText,
+  }) {
+    const newComment = {
+      uuid: crypto.randomUUID(),
+      article: articleUuid,
+      annotation: annotationUuid,
       commentHtml: commentHtml,
       commentJson: commentJson,
+      commentText: commentText,
     };
-    updateAnnotation.mutate(newAnnotation, {
+    createComment.mutate(newComment, {
       onSuccess: () => {
         setIsEditing(false);
       },
@@ -104,7 +113,12 @@ const Comment = (props) => {
             <PostCommentButton
               enabled={editorHtml !== props.annotation.commentHtml}
               postComment={() => {
-                postComment(props.annotation.uuid, editorHtml, editorJson);
+                postComment({
+                  annotationUuid: props.annotation.uuid,
+                  commentHtml: editorHtml,
+                  commentJson: editorJson,
+                  commentText: editorText,
+                });
               }}
             />
           </div>

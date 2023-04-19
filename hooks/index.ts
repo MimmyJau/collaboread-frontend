@@ -6,6 +6,7 @@ import {
   fetchAnnotations,
   updateAnnotation,
   deleteAnnotation,
+  createComment,
 } from "api";
 
 import {Annotation, FlatAnnotation, Highlight } from "types";
@@ -112,10 +113,26 @@ function useDeleteAnnotation(articleUuid) {
   });
 }
 
+function useCreateComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (comment: Comment) => {
+      return createComment(comment, getTokenLocalStorage());
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [],
+      });
+    },
+  });
+}
+
+
 export {
   useFetchArticleHtml,
   useFetchAnnotations,
   useCreateAnnotation,
   useUpdateAnnotation,
   useDeleteAnnotation,
+  useCreateComment,
 };
