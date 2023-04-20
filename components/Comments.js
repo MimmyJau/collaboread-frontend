@@ -33,9 +33,9 @@ const UserInfo = (props) => {
 };
 
 const Comment = (props) => {
-  const [editorHtml, setEditorHtml] = useState(props.annotation.commentHtml);
-  const [editorJson, setEditorJson] = useState(props.annotation.commentJson);
-  const [editorText, setEditorText] = useState(props.annotation.commentText);
+  const [editorHtml, setEditorHtml] = useState(props.comment.commentHtml);
+  const [editorJson, setEditorJson] = useState(props.comment.commentJson);
+  const [editorText, setEditorText] = useState(props.comment.commentText);
   const [isEditing, setIsEditing] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const router = useRouter();
@@ -45,18 +45,18 @@ const Comment = (props) => {
 
   useEffect(() => {
     // Check if we're in read-only mode or edit mode
-    if (props.annotation.commentHtml) {
+    if (props.comment.commentHtml) {
       setIsEditing(false);
     } else {
       setIsEditing(true);
     }
     // Check if we're the owner of this comment
-    if (props.annotation.user?.uuid === user?.uuid) {
+    if (props.comment.user?.uuid === user?.uuid) {
       setIsOwner(true);
     } else {
       setIsOwner(false);
     }
-  }, [props.annotation.uuid]);
+  }, [props.comment.uuid]);
 
   function postComment({
     annotationUuid,
@@ -86,21 +86,21 @@ const Comment = (props) => {
       onClick={() => {
         document
           .querySelector(
-            `.highlight[data-annotation-id="${props.annotation.uuid}"]`
+            `.highlight[data-annotation-id="${props.comment.annotation}"]`
           )
           .scrollIntoView({ behavior: "smooth", block: "center" });
       }}
     >
       <div className="flex flex-row justify-between items-center">
-        <UserInfo user={props.annotation.user} />
-        {isOwner ? <Dropdown annotation={props.annotation} /> : null}
+        <UserInfo user={props.comment.user} />
+        {isOwner ? <Dropdown annotation={props.comment} /> : null}
       </div>
       {isEditing && isOwner ? (
         <>
           <Editor
-            annotationUuid={props.annotation.uuid}
+            annotationUuid={props.comment.uuid}
             placeholder={"What is your interpretation of this passage?"}
-            content={props.annotation.commentHtml}
+            content={props.comment.commentHtml}
             onChange={{ html: setEditorHtml, json: setEditorJson }}
           />
           <div className="flex flex-row pt-2 justify-end">
@@ -111,10 +111,10 @@ const Comment = (props) => {
               Cancel
             </button>
             <PostCommentButton
-              enabled={editorHtml !== props.annotation.commentHtml}
+              enabled={editorHtml !== props.comment.commentHtml}
               postComment={() => {
                 postComment({
-                  annotationUuid: props.annotation.uuid,
+                  annotationUuid: props.comment.uuid,
                   commentHtml: editorHtml,
                   commentJson: editorJson,
                   commentText: editorText,
@@ -125,7 +125,7 @@ const Comment = (props) => {
         </>
       ) : (
         <div className="p-2">
-          <Interweave content={props.annotation.commentHtml} />
+          <Interweave content={props.comment.commentHtml} />
           {isOwner ? (
             <div className="flex flex-row pt-4 justify-end">
               <button
@@ -174,8 +174,8 @@ const Thread = (props) => {
 
   return (
     <div>
-      <Comment annotation={props.annotation} />
-      {user && props.annotation.commentHtml ? <ReplyBox /> : null}
+      <Comment comment={props.comments} />
+      {user && props.comments.commentHtml ? <ReplyBox /> : null}
     </div>
   );
 };
@@ -206,7 +206,9 @@ const Comments = (props) => {
 
   return (
     <div className={`${props.className} shadow`}>
-      {focusedAnnotation ? <Thread annotation={focusedAnnotation} /> : null}
+      {focusedAnnotation ? (
+        <Thread comments={focusedAnnotation.comments[0]} />
+      ) : null}
       {showSignUpMessage ? <SignUpMessage /> : null}
     </div>
   );

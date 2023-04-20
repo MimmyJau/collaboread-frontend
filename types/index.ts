@@ -10,6 +10,7 @@ export interface Highlight {
 export interface Comment {
     uuid: string;
     user?: User;
+    article: string;
     annotation: string;
     parent: string;
     commentHtml: string;
