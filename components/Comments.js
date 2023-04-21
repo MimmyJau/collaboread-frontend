@@ -10,6 +10,17 @@ import Editor from "components/Editor";
 import { useDeleteAnnotation, useCreateComment, useUpdateComment } from "hooks";
 import useAuth from "hooks/auth";
 
+const TextButton = (props) => {
+  return (
+    <button
+      onClick={() => props.onClick()}
+      className="text-blue-500 hover:text-blue-700 mr-2"
+    >
+      {props.text}
+    </button>
+  );
+};
+
 const PostCommentButton = (props) => {
   return (
     <button
@@ -40,7 +51,7 @@ const UserInfo = ({ user, isOwner, annotation }) => {
   );
 };
 
-const CommentContainer = (props) => {
+const CommentClickable = (props) => {
   return (
     <div
       className="p-2 pr-5 border-b hover:bg-gray-50"
@@ -75,17 +86,6 @@ const CommentBody = (props) => {
   } else {
     return <Interweave content={props.content} />;
   }
-};
-
-const TextButton = (props) => {
-  return (
-    <button
-      onClick={() => props.onClick()}
-      className="text-blue-500 hover:text-blue-700 mr-2"
-    >
-      {props.text}
-    </button>
-  );
 };
 
 const CommentButtons = (props) => {
@@ -150,7 +150,7 @@ const Comment = (props) => {
   }, [props.annotationUuid]);
 
   return (
-    <CommentContainer annotationUuid={props.annotationUuid}>
+    <CommentClickable annotationUuid={props.annotationUuid}>
       <UserInfo
         user={props.user}
         isOwner={isOwner}
@@ -177,7 +177,7 @@ const Comment = (props) => {
         editorJson={editorJson}
         editorText={editorText}
       />
-    </CommentContainer>
+    </CommentClickable>
   );
 };
 
