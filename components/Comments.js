@@ -107,6 +107,7 @@ const CommentButtons = (props) => {
               uuid: commentUuid,
               article: articleUuid,
               annotation: props.annotationUuid,
+              parentUuid: props.parentUuid,
               commentHtml: props.editorHtml,
               commentJson: props.editorJson,
               commentText: props.editorText,
@@ -130,6 +131,7 @@ const CommentButtons = (props) => {
 };
 
 const Comment = (props) => {
+  const [parentUuid, setParentUuid] = useState(null);
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
   const [editorText, setEditorText] = useState("");
@@ -146,6 +148,10 @@ const Comment = (props) => {
       setEditorText(props.comment.commentText);
     } else if (isOwner) {
       setIsEditing(true);
+    }
+
+    if (props.parentUuid) {
+      setParentUuid(props.parentUuid);
     }
   }, [props.annotationUuid]);
 
@@ -171,6 +177,7 @@ const Comment = (props) => {
         setIsEditing={setIsEditing}
         isOwner={isOwner}
         annotationUuid={props.annotationUuid}
+        parentUuid={parentUuid}
         commentUuid={props.comment ? props.comment.uuid : ""}
         content={props.comment ? props.comment.commentHtml : "<p></p>"}
         editorHtml={editorHtml}
