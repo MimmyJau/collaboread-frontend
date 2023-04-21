@@ -53,7 +53,7 @@ const UserInfo = ({ user, isOwner, annotationUuid, annotationHighlight }) => {
 const CommentClickable = (props) => {
   return (
     <div
-      className="p-2 pr-5 border-b hover:bg-gray-50"
+      className="p-2 pr-5 hover:bg-gray-50"
       tabIndex="0"
       onClick={() => {
         document
@@ -138,7 +138,7 @@ const Comment = (props) => {
   const { user } = useAuth();
 
   const thereExistsComment = !!props.comment?.commentText;
-  const isOwner = props.user.uuid === user.uuid;
+  const isOwner = props.user.username === user?.username;
 
   useEffect(() => {
     if (thereExistsComment) {
@@ -191,21 +191,30 @@ const Comment = (props) => {
 
 const Reply = ({ comment }) => {
   return (
-    <div>
-      <Interweave content={comment.commentHtml} />
+    <div className="flex flex-row">
+      <div className="basis-5 border-r-4"></div>
+      <div className="basis-5"></div>
+      <Comment
+        comment={comment}
+        user={{ username: comment.user }}
+        annotationUuid={comment.annotation}
+        annotationHighlight={null}
+      />
     </div>
   );
 };
 
 const Replies = (props) => {
-  return (
-    <div>
-      {props.replies.map((comment) => {
-        console.log(comment);
-        return <Reply comment={comment} />;
-      })}
-    </div>
-  );
+  if (props.replies.length) {
+    return (
+      <div>
+        <hr className="my-3" />
+        {props.replies.map((comment, index) => {
+          return <Reply key={index} comment={comment} />;
+        })}
+      </div>
+    );
+  }
 };
 
 const ReplyEditor = (props) => {
