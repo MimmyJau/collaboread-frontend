@@ -297,17 +297,51 @@ const CommentOld = (props) => {
   );
 };
 
-const ReplyBox = (props) => {
+const Reply = (props) => {
+  const [parentUuid, setParentUuid] = useState(null);
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
+  const [editorText, setEditorText] = useState("");
+  const { articleUuid } = useRouter().query;
+  const createComment = useCreateComment(articleUuid);
+
+  const commentUuid = props.commentUuid || crypto.randomUUID();
+
+  useEffect(() => {
+    if (props.parentUuid) {
+      setParentUuid(props.parentUuid);
+    }
+  }, [props.annotationUuid]);
+
   return (
     <div className="p-2 flex flex-row border border-green-500">
       <div className="flex-grow mr-1">
         <Editor
           placeholder={"Leave a reply..."}
-          onChange={{ html: setEditorHtml, json: setEditorJson }}
+          onChange={{
+            html: setEditorHtml,
+            json: setEditorJson,
+            text: setEditorText,
+          }}
         />
       </div>
+      <PostCommentButton
+        enabled={!!editorText}
+        onClick={() => {
+          const newComment = {
+            uuid: commentUuid,
+            article: articleUuid,
+            annotation: props.annotationUuid,
+            parentUuid: props.parentUuid,
+            commentHtml: editorHtml,
+            commentJson: editorJson,
+            commentText: editorText,
+          };
+          createComment.mutate(newComment, {
+            onSuccess: () => {},
+          });
+        }}
+      />
       <button
         disabled={!props.enabled}
         className="text-base px-2 py-2 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
@@ -327,6 +361,8 @@ const ReplyBox = (props) => {
 const Thread = (props) => {
   const { user } = useAuth();
 
+  const showReply = user && props.comments;
+
   return (
     <div>
       <Comment
@@ -335,7 +371,13 @@ const Thread = (props) => {
         annotationUuid={props.annotationUuid}
         annotationHighlight={props.annotationHighlight}
       />
-      {user && props.comments?.commentHtml ? <ReplyBox /> : null}
+      {showReply ? (
+        <Reply
+          user={props.user}
+          parentUuid={props.comments.uuid}
+          annotationUuid={props.annotationUuid}
+        />
+      ) : null}
     </div>
   );
 };
