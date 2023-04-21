@@ -7,7 +7,7 @@ import { ChatBubbleBottomCenterIcon } from "@heroicons/react/20/solid";
 
 import Dropdown from "components/Dropdown";
 import Editor from "components/Editor";
-import { useDeleteAnnotation, useCreateComment } from "hooks";
+import { useDeleteAnnotation, useCreateComment, useUpdateComment } from "hooks";
 import useAuth from "hooks/auth";
 
 const PostCommentButton = (props) => {
@@ -77,37 +77,53 @@ const CommentBody = (props) => {
   }
 };
 
+const TextButton = (props) => {
+  return (
+    <button
+      onClick={() => props.onClick()}
+      className="text-blue-500 hover:text-blue-700 mr-2"
+    >
+      {props.text}
+    </button>
+  );
+};
+
 const CommentButtons = (props) => {
   const { articleUuid } = useRouter().query;
   const createComment = useCreateComment(articleUuid);
+  const updateComment = useUpdateComment(articleUuid);
+
+  const postComment = props.commentUuid ? updateComment : createComment;
+  const commentUuid = props.commentUuid || crypto.randomUUID();
 
   if (props.isEditing) {
     return (
       <div className="flex flex-row pt-2 justify-end">
-        <button
-          onClick={() => setIsEditing(false)}
-          className="text-blue-500 hover:text-blue-700 mr-2"
-        >
-          Cancel
-        </button>
+        <TextButton onClick={() => props.setIsEditing(false)} text="Cancel" />
         <PostCommentButton
           enabled={props.editorHtml !== props.content}
           onClick={() => {
             const newComment = {
-              uuid: crypto.randomUUID(),
+              uuid: commentUuid,
               article: articleUuid,
               annotation: props.annotationUuid,
               commentHtml: props.editorHtml,
               commentJson: props.editorJson,
               commentText: props.editorText,
             };
-            createComment.mutate(newComment, {
+            postComment.mutate(newComment, {
               onSuccess: () => {
                 props.setIsEditing(false);
               },
             });
           }}
         />
+      </div>
+    );
+  } else if (props.isOwner) {
+    return (
+      <div className="flex flex-row pt-4 justify-end">
+        <TextButton onClick={() => props.setIsEditing(true)} text="Edit" />
       </div>
     );
   }
@@ -152,12 +168,14 @@ const Comment = (props) => {
       />
       <CommentButtons
         isEditing={isEditing}
+        setIsEditing={setIsEditing}
+        isOwner={isOwner}
         annotationUuid={props.annotationUuid}
+        commentUuid={props.comment ? props.comment.uuid : ""}
         content={props.comment ? props.comment.commentHtml : "<p></p>"}
         editorHtml={editorHtml}
         editorJson={editorJson}
         editorText={editorText}
-        setIsEditing={setIsEditing}
       />
     </CommentContainer>
   );
