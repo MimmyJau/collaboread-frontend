@@ -37,9 +37,7 @@ const PostCommentButton = (props) => {
 const UserInfo = ({ user, isOwner, annotationUuid, annotationHighlight }) => {
   return (
     <div className="flex flex-row justify-between items-center">
-      <div className="p-2">
-        <span className="text-sm font-semibold">{user.username}</span>
-      </div>
+      <span className="text-sm font-semibold">{user.username}</span>
       {isOwner ? (
         <Dropdown
           annotationUuid={annotationUuid}
@@ -155,7 +153,7 @@ const Comment = (props) => {
   }, [props.annotationUuid]);
 
   return (
-    <CommentClickable annotationUuid={props.annotationUuid}>
+    <div className="flex-grow pl-2">
       <UserInfo
         user={props.user}
         isOwner={isOwner}
@@ -185,13 +183,13 @@ const Comment = (props) => {
         editorText={editorText}
       />
       <Replies replies={props.comment.children} />
-    </CommentClickable>
+    </div>
   );
 };
 
 const Reply = ({ comment }) => {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row my-2">
       <div className="basis-5 border-r-4"></div>
       <div className="basis-5"></div>
       <Comment
@@ -210,7 +208,11 @@ const Replies = (props) => {
       <div>
         <hr className="my-3" />
         {props.replies.map((comment, index) => {
-          return <Reply key={index} comment={comment} />;
+          return (
+            <>
+              <Reply key={index} comment={comment} />
+            </>
+          );
         })}
       </div>
     );
@@ -234,7 +236,7 @@ const ReplyEditor = (props) => {
   }, [props.annotationUuid]);
 
   return (
-    <div className="p-2 flex flex-row border border-green-500">
+    <div className="p-2 flex flex-row">
       <div className="flex-grow mr-1">
         <Editor
           placeholder={"Leave a reply..."}
@@ -273,12 +275,14 @@ const Thread = (props) => {
 
   return (
     <div>
-      <Comment
-        comment={props.comments}
-        user={props.user}
-        annotationUuid={props.annotationUuid}
-        annotationHighlight={props.annotationHighlight}
-      />
+      <CommentClickable annotationUuid={props.annotationUuid}>
+        <Comment
+          comment={props.comments}
+          user={props.user}
+          annotationUuid={props.annotationUuid}
+          annotationHighlight={props.annotationHighlight}
+        />
+      </CommentClickable>
       {showReply ? (
         <ReplyEditor
           user={props.user}
