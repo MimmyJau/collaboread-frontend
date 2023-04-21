@@ -184,11 +184,31 @@ const Comment = (props) => {
         editorJson={editorJson}
         editorText={editorText}
       />
+      <Replies replies={props.comment.children} />
     </CommentClickable>
   );
 };
 
-const Reply = (props) => {
+const Reply = ({ comment }) => {
+  return (
+    <div>
+      <Interweave content={comment.commentHtml} />
+    </div>
+  );
+};
+
+const Replies = (props) => {
+  return (
+    <div>
+      {props.replies.map((comment) => {
+        console.log(comment);
+        return <Reply comment={comment} />;
+      })}
+    </div>
+  );
+};
+
+const ReplyEditor = (props) => {
   const [parentUuid, setParentUuid] = useState(null);
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
@@ -251,7 +271,7 @@ const Thread = (props) => {
         annotationHighlight={props.annotationHighlight}
       />
       {showReply ? (
-        <Reply
+        <ReplyEditor
           user={props.user}
           parentUuid={props.comments.uuid}
           annotationUuid={props.annotationUuid}
