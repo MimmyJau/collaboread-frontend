@@ -22,6 +22,7 @@ const Editor = (props) => {
       onUpdate: ({ editor }) => {
         props.onChange.html(editor.getHTML());
         props.onChange.json(JSON.stringify(editor.getJSON()));
+        props.onChange.text(editor.getText());
       },
     },
     [props.annotationUuid]

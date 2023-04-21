@@ -11,7 +11,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Dropdown(props) {
+export default function Dropdown({ annotationUuid, highlight }) {
   const { articleUuid } = useRouter().query;
   const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
@@ -42,12 +42,9 @@ export default function Dropdown(props) {
                 <a
                   href="#"
                   onClick={() => {
-                    deleteAnnotation.mutate(props.annotation.uuid, {
+                    deleteAnnotation.mutate(annotationUuid, {
                       onSuccess: () => {
-                        clearHighlight(
-                          props.annotation.uuid,
-                          props.annotation.highlight
-                        );
+                        clearHighlight(annotationUuid, highlight);
                       },
                     });
                   }}
