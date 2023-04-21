@@ -16,7 +16,7 @@ const PostCommentButton = (props) => {
       disabled={!props.enabled}
       className="px-2 py-1 text-sm font-semibold text-white bg-green-600 rounded hover:bg-green-700 disabled:opacity-50"
       onClick={() => {
-        props.postComment();
+        props.onClick();
       }}
     >
       {!props.enabled ? "Posted" : "Post"}
@@ -59,8 +59,8 @@ const CommentContainer = (props) => {
 };
 
 const CommentBody = (props) => {
-  return (
-    <>
+  if (props.isEditing) {
+    return (
       <Editor
         annotationUuid={props.annotationUuid}
         placeholder={"What is your interpretation of this passage?"}
@@ -71,30 +71,16 @@ const CommentBody = (props) => {
           text: props.onChange.text,
         }}
       />
-      <div className="flex flex-row pt-2 justify-end">
-        <button
-          onClick={() => setIsEditing(false)}
-          className="text-blue-500 hover:text-blue-700 mr-2"
-        >
-          Cancel
-        </button>
-        <PostCommentButton
-          enabled={props.editorHtml !== props.content}
-          postComment={() => {
-            postComment({
-              annotationUuid: props.comment.uuid,
-              commentHtml: editorHtml,
-              commentJson: editorJson,
-              commentText: editorText,
-            });
-          }}
-        />
-      </div>
-    </>
-  );
+    );
+  } else {
+    return <Interweave content={props.content} />;
+  }
 };
 
 const CommentButtons = (props) => {
+  const { articleUuid } = useRouter().query;
+  const createComment = useCreateComment(articleUuid);
+
   if (props.isEditing) {
     return (
       <div className="flex flex-row pt-2 justify-end">
@@ -106,12 +92,19 @@ const CommentButtons = (props) => {
         </button>
         <PostCommentButton
           enabled={props.editorHtml !== props.content}
-          postComment={() => {
-            postComment({
-              annotationUuid: props.comment.uuid,
-              commentHtml: editorHtml,
-              commentJson: editorJson,
-              commentText: editorText,
+          onClick={() => {
+            const newComment = {
+              uuid: crypto.randomUUID(),
+              article: articleUuid,
+              annotation: props.annotationUuid,
+              commentHtml: props.editorHtml,
+              commentJson: props.editorJson,
+              commentText: props.editorText,
+            };
+            createComment.mutate(newComment, {
+              onSuccess: () => {
+                props.setIsEditing(false);
+              },
             });
           }}
         />
@@ -127,13 +120,14 @@ const Comment = (props) => {
   const [isEditing, setIsEditing] = useState(false);
   const { user } = useAuth();
 
-  const isComment = !!props.comment;
+  const thereExistsComment = !!props.comment?.commentText;
   const isOwner = props.user.uuid === user.uuid;
 
   useEffect(() => {
-    if (isComment) {
+    if (thereExistsComment) {
       setEditorHtml(props.comment.commentHtml);
       setEditorJson(props.comment.commentJson);
+      setEditorText(props.comment.commentText);
     } else if (isOwner) {
       setIsEditing(true);
     }
@@ -146,20 +140,25 @@ const Comment = (props) => {
         isOwner={isOwner}
         annotation={props.annotation}
       />
-      {isEditing ? (
-        <CommentBody
-          annotationUuid={props.annotationUuid}
-          content={props.comment ? props.comment.commentHtml : "<p></p>"}
-          editorHtml={editorHtml}
-          onChange={{
-            html: setEditorHtml,
-            json: setEditorJson,
-            text: setEditorText,
-          }}
-        />
-      ) : (
-        <Interweave content={editorHtml} />
-      )}
+      <CommentBody
+        isEditing={isEditing}
+        annotationUuid={props.annotationUuid}
+        content={props.comment ? props.comment.commentHtml : "<p></p>"}
+        onChange={{
+          html: setEditorHtml,
+          json: setEditorJson,
+          text: setEditorText,
+        }}
+      />
+      <CommentButtons
+        isEditing={isEditing}
+        annotationUuid={props.annotationUuid}
+        content={props.comment ? props.comment.commentHtml : "<p></p>"}
+        editorHtml={editorHtml}
+        editorJson={editorJson}
+        editorText={editorText}
+        setIsEditing={setIsEditing}
+      />
     </CommentContainer>
   );
 };
