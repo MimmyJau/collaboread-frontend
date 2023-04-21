@@ -8,6 +8,7 @@ import {
   deleteAnnotation,
   createComment,
   updateComment,
+  deleteComment,
 } from "api";
 
 import {Annotation, FlatAnnotation, Highlight } from "types";
@@ -142,6 +143,20 @@ function useUpdateComment() {
   });
 }
 
+function useDeleteComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (comment: Comment) => {
+      return deleteComment(comment, getTokenLocalStorage());
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [],
+      });
+    },
+  });
+}
+
 export {
   useFetchArticleHtml,
   useFetchAnnotations,
@@ -150,4 +165,5 @@ export {
   useDeleteAnnotation,
   useCreateComment,
   useUpdateComment,
+  useDeleteComment,
 };

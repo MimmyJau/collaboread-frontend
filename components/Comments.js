@@ -6,7 +6,12 @@ import { Interweave } from "interweave";
 
 import Dropdown from "components/Dropdown";
 import Editor from "components/Editor";
-import { useDeleteAnnotation, useCreateComment, useUpdateComment } from "hooks";
+import {
+  useDeleteAnnotation,
+  useCreateComment,
+  useUpdateComment,
+  useDeleteComment,
+} from "hooks";
 import useAuth from "hooks/auth";
 import { clearHighlight } from "utils";
 
@@ -179,12 +184,16 @@ const Comment = (props) => {
 };
 
 const Reply = ({ comment }) => {
+  const deleteComment = useDeleteComment();
   return (
     <div className="flex flex-row my-2">
       <div className="basis-5 border-r-4"></div>
       <div className="basis-5"></div>
       <Comment
         comment={comment}
+        onDelete={() => {
+          deleteComment.mutate(comment);
+        }}
         user={{ username: comment.user }}
         annotationUuid={comment.annotation}
         annotationHighlight={null}
