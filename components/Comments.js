@@ -35,7 +35,7 @@ const PostCommentButton = (props) => {
   );
 };
 
-const UserInfo = ({ user, isOwner, annotation }) => {
+const UserInfo = ({ user, isOwner, annotationUuid, annotationHighlight }) => {
   return (
     <div className="flex flex-row justify-between items-center">
       <div className="p-2">
@@ -43,8 +43,8 @@ const UserInfo = ({ user, isOwner, annotation }) => {
       </div>
       {isOwner ? (
         <Dropdown
-          annotationUuid={annotation.uuid}
-          highlight={annotation.highlight}
+          annotationUuid={annotationUuid}
+          highlight={annotationHighlight}
         />
       ) : null}
     </div>
@@ -160,7 +160,8 @@ const Comment = (props) => {
       <UserInfo
         user={props.user}
         isOwner={isOwner}
-        annotation={props.annotation}
+        annotationUuid={props.annotationUuid}
+        annotationHighlight={props.annotationHighlight}
       />
       <CommentBody
         isEditing={isEditing}
@@ -332,7 +333,7 @@ const Thread = (props) => {
         comment={props.comments}
         user={props.user}
         annotationUuid={props.annotationUuid}
-        annotation={props.annotation}
+        annotationHighlight={props.annotationHighlight}
       />
       {user && props.comments?.commentHtml ? <ReplyBox /> : null}
     </div>
@@ -370,7 +371,7 @@ const Comments = (props) => {
           comments={focusedAnnotation.comments[0]}
           user={focusedAnnotation.user}
           annotationUuid={focusedAnnotation.uuid}
-          annotation={focusedAnnotation}
+          annotationHighlight={focusedAnnotation.highlight}
         />
       ) : null}
       {showSignUpMessage ? <SignUpMessage /> : null}
