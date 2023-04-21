@@ -182,7 +182,7 @@ const Comment = (props) => {
         editorJson={editorJson}
         editorText={editorText}
       />
-      <Replies replies={props.comment.children} />
+      <Replies replies={props.comment?.children} />
     </div>
   );
 };
@@ -203,7 +203,7 @@ const Reply = ({ comment }) => {
 };
 
 const Replies = (props) => {
-  if (props.replies.length) {
+  if (props.replies?.length) {
     return (
       <div>
         <hr className="my-3" />
