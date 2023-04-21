@@ -5,16 +5,12 @@ import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 
 import { useDeleteAnnotation } from "hooks";
-import { clearHighlight } from "utils";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Dropdown({ annotationUuid, highlight }) {
-  const { articleUuid } = useRouter().query;
-  const deleteAnnotation = useDeleteAnnotation(articleUuid);
-
+export default function Dropdown({ onDelete }) {
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
@@ -41,13 +37,7 @@ export default function Dropdown({ annotationUuid, highlight }) {
               {({ active }) => (
                 <a
                   href="#"
-                  onClick={() => {
-                    deleteAnnotation.mutate(annotationUuid, {
-                      onSuccess: () => {
-                        clearHighlight(annotationUuid, highlight);
-                      },
-                    });
-                  }}
+                  onClick={() => onDelete()}
                   className={classNames(
                     active ? "bg-gray-100 text-red-500" : "text-red-500",
                     "block px-4 py-2 text-sm font-semibold"

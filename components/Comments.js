@@ -8,6 +8,7 @@ import Dropdown from "components/Dropdown";
 import Editor from "components/Editor";
 import { useDeleteAnnotation, useCreateComment, useUpdateComment } from "hooks";
 import useAuth from "hooks/auth";
+import { clearHighlight } from "utils";
 
 const TextButton = (props) => {
   return (
@@ -34,16 +35,11 @@ const PostCommentButton = (props) => {
   );
 };
 
-const UserInfo = ({ user, isOwner, annotationUuid, annotationHighlight }) => {
+const UserInfo = ({ user, isOwner, onDelete }) => {
   return (
     <div className="flex flex-row justify-between items-center">
       <span className="text-sm font-semibold">{user.username}</span>
-      {isOwner ? (
-        <Dropdown
-          annotationUuid={annotationUuid}
-          highlight={annotationHighlight}
-        />
-      ) : null}
+      {isOwner ? <Dropdown onDelete={() => onDelete()} /> : null}
     </div>
   );
 };
@@ -154,12 +150,7 @@ const Comment = (props) => {
 
   return (
     <div className="flex-grow pl-2">
-      <UserInfo
-        user={props.user}
-        isOwner={isOwner}
-        annotationUuid={props.annotationUuid}
-        annotationHighlight={props.annotationHighlight}
-      />
+      <UserInfo user={props.user} isOwner={isOwner} onDelete={props.onDelete} />
       <CommentBody
         isEditing={isEditing}
         annotationUuid={props.annotationUuid}
@@ -270,6 +261,8 @@ const ReplyEditor = (props) => {
 
 const Thread = (props) => {
   const { user } = useAuth();
+  const { articleUuid } = useRouter().query;
+  const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
   const showReply = user && props.comments;
 
@@ -280,7 +273,13 @@ const Thread = (props) => {
           comment={props.comments}
           user={props.user}
           annotationUuid={props.annotationUuid}
-          annotationHighlight={props.annotationHighlight}
+          onDelete={() => {
+            deleteAnnotation.mutate(props.annotationUuid, {
+              onSuccess: () => {
+                clearHighlight(props.annotationUuid, props.annotationHighlight);
+              },
+            });
+          }}
         />
       </CommentClickable>
       {showReply ? (
