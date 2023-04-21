@@ -182,9 +182,9 @@ const Comment = (props) => {
 };
 
 const CommentOld = (props) => {
-  const [editorHtml, setEditorHtml] = useState(props.comment.commentHtml || "");
-  const [editorJson, setEditorJson] = useState(props.comment.commentJson || "");
-  const [editorText, setEditorText] = useState(props.comment.commentText || "");
+  const [editorHtml, setEditorHtml] = useState(props.comment.commentHtml);
+  const [editorJson, setEditorJson] = useState(props.comment.commentJson);
+  const [editorText, setEditorText] = useState(props.comment.commentText);
   const [isEditing, setIsEditing] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const router = useRouter();
@@ -194,7 +194,7 @@ const CommentOld = (props) => {
 
   useEffect(() => {
     // Check if we're in read-only mode or edit mode
-    if (props.comment.commentHtml || "") {
+    if (props.comment.commentHtml) {
       setIsEditing(false);
     } else {
       setIsEditing(true);
@@ -258,7 +258,7 @@ const CommentOld = (props) => {
               Cancel
             </button>
             <PostCommentButton
-              enabled={editorHtml !== props.comment.commentHtml || ""}
+              enabled={editorHtml !== props.comment.commentHtml}
               postComment={() => {
                 postComment({
                   annotationUuid: props.comment.uuid,
