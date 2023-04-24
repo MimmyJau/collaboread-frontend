@@ -7,11 +7,9 @@ import {
   useUpdateAnnotation,
   useDeleteAnnotation,
 } from "hooks";
+import useAuth from "hooks/auth";
 import Article from "components/Article.js";
-import {
-  getRangeFromSelection,
-  highlightSelection,
-} from "components/Article.js";
+import { getRangeFromSelection, highlightSelection } from "utils";
 import Comments from "components/Comments.js";
 
 function addClassToElements(elements, className) {
@@ -27,25 +25,19 @@ function removeClassFromElements(elements, className) {
 }
 
 function getAllHoveredHighlights() {
-  return document.getElementsByClassName("hovered");
+  return document.getElementsByClassName("bg-yellow-400");
 }
 
 function addHoverClassToRelatedHighlights(annotationId) {
   const relatedHighlights = getRelatedHighlights(annotationId);
-  relatedHighlights.forEach((element, index) => {
-    element.classList.add("hovered");
-    element.style.animation = `highlightAnimation 2s ${index * 2}s forwards`;
-  });
+  addClassToElements(relatedHighlights, "bg-yellow-400");
 }
 
 function removeAllHoverClasses() {
   // We use Array.from() since geElementsByClassName returns a live collection.
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
   const hoveredHighlights = Array.from(getAllHoveredHighlights());
-  removeClassFromElements(hoveredHighlights, "hovered");
-  hoveredHighlights.forEach((element) => {
-    element.style.animation = "";
-  });
+  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
 }
 
 function extractAnnotationIdFromEvent(e) {
@@ -142,9 +134,17 @@ const Reader = (props) => {
     data: dataAnnotations,
     error: errorAnnotations,
   } = useFetchAnnotations(articleUuid);
+  const { user } = useAuth();
+  const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 
   function handleMouseUp(e) {
-    if (!document.getSelection().isCollapsed) highlightAndSaveSelection();
+    setUnauthorizedSelection(false);
+    if (user && !document.getSelection().isCollapsed)
+      highlightAndSaveSelection();
+    if (!user && !document.getSelection().isCollapsed) {
+      // alert("Please sign up to save highlights.");
+      setUnauthorizedSelection(true);
+    }
     if (
       document.getElementById("article").contains(e.target) &&
       !e.target.classList.contains("highlight")
@@ -197,6 +197,7 @@ const Reader = (props) => {
         setFocusedHighlightId={setFocusedHighlightId}
       />
       <Comments
+        unauthorizedSelection={unauthorizedSelection}
         className="col-start-5 col-span-2 overflow-y-auto h-full"
         focusedHighlightId={focusedHighlightId}
         fetchedAnnotations={dataAnnotations}

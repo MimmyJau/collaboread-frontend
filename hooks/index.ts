@@ -6,6 +6,9 @@ import {
   fetchAnnotations,
   updateAnnotation,
   deleteAnnotation,
+  createComment,
+  updateComment,
+  deleteComment,
 } from "api";
 
 import {Annotation, FlatAnnotation, Highlight } from "types";
@@ -15,6 +18,7 @@ function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
   return {
     uuid: flatAnnotation.uuid,
     user: flatAnnotation.user,
+    article: flatAnnotation.article,
     highlight: Array.of({
       characterRange: {
         start: flatAnnotation.highlightStart,
@@ -22,8 +26,7 @@ function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
       },
       backward: flatAnnotation.highlightBackward,
     }),
-    commentHtml: flatAnnotation.commentHtml,
-    commentJson: flatAnnotation.commentJson,
+    comments: flatAnnotation.comments,
   };
 }
 
@@ -53,16 +56,10 @@ function useCreateAnnotation(articleUuid) {
         isPublic: "True",
       }, getTokenLocalStorage());
     },
-    onSuccess: (newHighlight: FlatAnnotation) => {
-      queryClient.setQueryData(
-        ["annotations", "article", articleUuid],
-        (oldData: Array<Annotation>): Array<Annotation> => {
-          const newAnnotation = unflattenAnnotation(newHighlight);
-          const newData = structuredClone(oldData);
-          newData.push(newAnnotation);
-          return newData;
-        }
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["annotations", "article", articleUuid],
+      });
     },
   });
 }
@@ -118,10 +115,55 @@ function useDeleteAnnotation(articleUuid) {
   });
 }
 
+function useCreateComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (comment: Comment) => {
+      return createComment(comment, getTokenLocalStorage());
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [],
+      });
+    },
+  });
+}
+
+function useUpdateComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (comment: Comment) => {
+      return updateComment(comment, getTokenLocalStorage());
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [],
+      });
+    },
+  });
+}
+
+function useDeleteComment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (comment: Comment) => {
+      return deleteComment(comment, getTokenLocalStorage());
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [],
+      });
+    },
+  });
+}
+
 export {
   useFetchArticleHtml,
   useFetchAnnotations,
   useCreateAnnotation,
   useUpdateAnnotation,
   useDeleteAnnotation,
+  useCreateComment,
+  useUpdateComment,
+  useDeleteComment,
 };

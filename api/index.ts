@@ -30,10 +30,28 @@ function deleteAnnotation(annotationUuid, token) {
   return ky.delete(route, { headers: {Authorization: `Token ${token}`}, json: { id: annotationUuid } }).json();
 }
 
+function createComment(comment, token) {
+  const route = `${API_BASE_URL}/comments/`;
+  return ky.post(route, { headers: {Authorization: `Token ${token}`}, json: comment }).json();
+}
+
+function updateComment(comment, token) {
+  const route = `${API_BASE_URL}/comments/${comment.uuid}/`;
+  return ky.put(route, { headers: {Authorization: `Token ${token}`}, json: comment }).json();
+}
+
+function deleteComment(comment, token) {
+  const route = `${API_BASE_URL}/comments/${comment.uuid}/`;
+  return ky.delete(route, { headers: {Authorization: `Token ${token}`}, json: comment }).json();
+}
+
 export {
   fetchArticleHtml,
   createAnnotation,
   fetchAnnotations,
   updateAnnotation,
   deleteAnnotation,
+  createComment,
+  updateComment,
+  deleteComment,
 };

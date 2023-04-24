@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import AuthContext from "contexts/auth";
 import {
   useGetUser,
   usePostLogin,
   usePostLogout,
   usePostSignup,
-} from "api/auth.js";
+} from "api/auth";
 
 function setTokenLocalStorage(token) {
   window.localStorage.setItem("token", token);
@@ -27,6 +28,7 @@ const AuthProvider = ({ children }) => {
   const postLogout = usePostLogout();
   const postSignup = usePostSignup();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // Wait for React to finish loading in browser before checking for token
   useEffect(() => {
@@ -34,17 +36,21 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   // Using token, check it token is valid
-  const { data: userData, isSuccess, isError } = useGetUser(token);
+  const {
+    data: userData,
+    isSuccess: isSuccessGetUser,
+    isError: isErrorGetUser,
+  } = useGetUser(token);
 
   // Set whether we're logged in or not
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccessGetUser) {
       setUser(userData);
-    } else if (isError) {
+    } else if (isErrorGetUser) {
       setUser(null);
       removeTokenLocalStorage();
     }
-  }, [userData, isSuccess, isError]);
+  }, [userData, isSuccessGetUser, isErrorGetUser]);
 
   const login = (username, password) => {
     postLogin.mutate(
@@ -52,7 +58,8 @@ const AuthProvider = ({ children }) => {
       {
         onSuccess: (data) => {
           setTokenLocalStorage(data.key);
-          setUser(username);
+          setToken(data.key);
+          queryClient.invalidateQueries({ queryKey: "user", exact: false });
           router.push("/");
         },
       }
