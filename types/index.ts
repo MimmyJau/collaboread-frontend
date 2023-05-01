@@ -1,3 +1,10 @@
+export interface Article {
+    uuid: string;
+    user: string;
+    title: string;
+    articleHtml: string;
+    articleJson: string;
+}
 
 export interface Highlight {
     characterRange: {

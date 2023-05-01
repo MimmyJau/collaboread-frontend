@@ -10,6 +10,11 @@ function fetchArticleHtml(articleUuid) {
   return ky.get(route).json();
 }
 
+function updateArticle(article, token) {
+  const route = `${API_BASE_URL}/articles/${article.uuid}/`;
+  return ky.put(route, {headers: {Authorization: `Token ${token}`}, json: article }).json();
+}
+
 function createAnnotation(articleUuid, highlightData, token) {
   const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
   return ky.post(route, { headers: {Authorization: `Token ${token}`}, json: highlightData }).json();
@@ -47,6 +52,7 @@ function deleteComment(comment, token) {
 
 export {
   fetchArticleHtml,
+  updateArticle,
   createAnnotation,
   fetchAnnotations,
   updateAnnotation,

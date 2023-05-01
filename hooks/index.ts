@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   fetchArticleHtml,
+  updateArticle,
   createAnnotation,
   fetchAnnotations,
   updateAnnotation,
@@ -11,7 +12,7 @@ import {
   deleteComment,
 } from "api";
 
-import {Annotation, FlatAnnotation, Highlight } from "types";
+import {Article, Annotation, FlatAnnotation, Highlight } from "types";
 
 // Helper Functions
 function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
@@ -38,9 +39,27 @@ function getTokenLocalStorage() {
 function useFetchArticleHtml(uuid) {
   return useQuery({
     enabled: !!uuid,
-    queryKey: ["article", "html", uuid],
+    queryKey: ["article", uuid],
     queryFn: () => fetchArticleHtml(uuid),
   });
+}
+
+function useUpdateArticle(articleUuid) {
+    const queryClient = useQueryClient();
+    const article = queryClient.getQueryData(["article", articleUuid]) as Article
+    return useMutation({
+        mutationFn: ({ html, json } : { html: string, json: string }) => {
+            article.articleHtml = html;
+            article.articleJson = json;
+            console.log(article)
+            return updateArticle(article, getTokenLocalStorage())
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["article", articleUuid],
+            })
+        }
+    })
 }
 
 function useCreateAnnotation(articleUuid) {
@@ -159,6 +178,7 @@ function useDeleteComment() {
 
 export {
   useFetchArticleHtml,
+  useUpdateArticle,
   useFetchAnnotations,
   useCreateAnnotation,
   useUpdateAnnotation,

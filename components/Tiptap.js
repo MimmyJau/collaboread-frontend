@@ -1,9 +1,12 @@
+import { useRouter } from "next/router";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Highlight from "@tiptap/extension-highlight";
 import Paragraph from "@tiptap/extension-paragraph";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
+
+import { useUpdateArticle } from "hooks";
 
 const printJson = (editor) => {
   console.log(editor.getJSON());
@@ -30,6 +33,8 @@ const MenuButton = ({ name, onClick }) => {
 };
 
 const MenuToolbar = ({ editor }) => {
+  const { articleUuid } = useRouter().query;
+  const updateArticle = useUpdateArticle(articleUuid);
   return (
     <div className="sticky z-10 top-0 bg-white">
       <MenuButton
@@ -67,6 +72,15 @@ const MenuToolbar = ({ editor }) => {
       <MenuButton name="JSON" onClick={() => printJson(editor)} />
       <MenuButton name="HTML" onClick={() => printHtml(editor)} />
       <MenuButton name="Text" onClick={() => printText(editor)} />
+      <MenuButton
+        name="Save"
+        onClick={() =>
+          updateArticle.mutate({
+            html: editor.getHTML(),
+            json: editor.getJSON(),
+          })
+        }
+      />
     </div>
   );
 };
