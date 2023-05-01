@@ -71,24 +71,6 @@ const MenuToolbar = ({ editor }) => {
   );
 };
 
-const CustomParagraph = Paragraph.extend({
-  addKeyboardShortcuts() {
-    return {
-      Tab: () => {
-        this.editor
-          .chain()
-          .command(({ tr }) => {
-            tr.insertText("    ");
-            return true;
-          })
-          .focus()
-          .run();
-        return true;
-      },
-    };
-  },
-});
-
 const Tiptap = (props) => {
   const editor = useEditor({
     extensions: [StarterKit, Highlight, BulletList, ListItem],
