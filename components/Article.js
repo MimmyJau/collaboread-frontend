@@ -18,7 +18,7 @@ const Article = (props) => {
   }, [props.fetchedAnnotations]);
 
   return (
-    <div id="article" className={`prose scrollbar-hide ${props.className}`}>
+    <div id="article" className={`prose ${props.className}`}>
       <Interweave content={props.html} />
     </div>
   );
