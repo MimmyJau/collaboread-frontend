@@ -51,7 +51,6 @@ function useUpdateArticle(articleUuid) {
         mutationFn: ({ html, json } : { html: string, json: string }) => {
             article.articleHtml = html;
             article.articleJson = json;
-            console.log(article)
             return updateArticle(article, getTokenLocalStorage())
         },
         onSuccess: () => {

@@ -101,9 +101,11 @@ const Tiptap = (props) => {
   });
 
   return (
-    <div className="">
-      <MenuToolbar editor={editor} />
-      <EditorContent editor={editor} />
+    <div className="flex w-screen">
+      <div className="">
+        <MenuToolbar editor={editor} />
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 };
