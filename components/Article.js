@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { Interweave } from "interweave";
 
 import { useDeleteAnnotation } from "hooks";
 import { highlightFetchedAnnotations } from "utils";
+
+const MemoInterweave = memo(Interweave);
 
 const Article = (props) => {
   const { articleUuid } = useRouter().query;
@@ -18,8 +20,8 @@ const Article = (props) => {
   }, [props.fetchedAnnotations]);
 
   return (
-    <div id="article" className={`prose ${props.className}`}>
-      <Interweave content={props.html} />
+    <div id="article" className={`prose scrollbar-hide ${props.className}`}>
+      <MemoInterweave content={props.html} />
     </div>
   );
 };

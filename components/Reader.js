@@ -139,8 +139,9 @@ const Reader = (props) => {
 
   function handleMouseUp(e) {
     setUnauthorizedSelection(false);
-    if (user && !document.getSelection().isCollapsed)
+    if (user && !document.getSelection().isCollapsed) {
       highlightAndSaveSelection();
+    }
     if (!user && !document.getSelection().isCollapsed) {
       // alert("Please sign up to save highlights.");
       setUnauthorizedSelection(true);
