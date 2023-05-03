@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
+  fetchArticles,
   fetchArticle,
   updateArticle,
   createAnnotation,
@@ -36,6 +37,13 @@ function getTokenLocalStorage() {
 }
 
 // React Query Hooks
+function useFetchArticles() {
+  return useQuery({
+    queryKey: ["articles"],
+    queryFn: () => fetchArticles(),
+  });
+}
+
 function useFetchArticle(uuid) {
   return useQuery({
     enabled: !!uuid,
@@ -176,6 +184,7 @@ function useDeleteComment() {
 }
 
 export {
+  useFetchArticles,
   useFetchArticle,
   useUpdateArticle,
   useFetchAnnotations,

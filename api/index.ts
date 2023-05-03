@@ -5,6 +5,11 @@ import { FlatAnnotation } from "types";
 const BASE_URL = process.env.SERVER;
 const API_BASE_URL = `${BASE_URL}/api`;
 
+function fetchArticles() {
+  const route = `${API_BASE_URL}/articles/`;
+  return ky.get(route).json();
+}
+
 function fetchArticle(articleUuid) {
   const route = `${API_BASE_URL}/articles/${articleUuid}/`;
   return ky.get(route).json();
@@ -51,6 +56,7 @@ function deleteComment(comment, token) {
 }
 
 export {
+  fetchArticles,
   fetchArticle,
   updateArticle,
   createAnnotation,
