@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 import {
-  useFetchArticleHtml,
+  useFetchArticle,
   useFetchAnnotations,
   useCreateAnnotation,
   useUpdateAnnotation,
@@ -127,7 +127,7 @@ const Reader = (props) => {
     isError: isErrorArticle,
     data: dataArticle,
     error: errorArticle,
-  } = useFetchArticleHtml(articleUuid);
+  } = useFetchArticle(articleUuid);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,

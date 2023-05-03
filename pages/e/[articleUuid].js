@@ -1,18 +1,17 @@
 import { useRouter } from "next/router";
 import Tiptap from "components/Tiptap";
 import NavBar from "components/NavBar";
-import { useFetchArticleHtml } from "hooks";
-import { fetchArticleHtml } from "@/api";
+import { useFetchArticle } from "hooks";
 
 export default function Page() {
   const { articleUuid } = useRouter().query;
-  const fetchArticleHtml = useFetchArticleHtml(articleUuid);
+  const fetchArticle = useFetchArticle(articleUuid);
   const {
     isLoading: isLoadingArticle,
     isError: isErrorArticle,
     data: dataArticle,
     error: errorArticle,
-  } = useFetchArticleHtml(articleUuid);
+  } = useFetchArticle(articleUuid);
 
   if (isLoadingArticle) {
     return;
