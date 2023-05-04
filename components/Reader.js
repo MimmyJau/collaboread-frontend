@@ -9,6 +9,7 @@ import {
 } from "hooks";
 import useAuth from "hooks/auth";
 import Article from "components/Article.js";
+import TableOfContents from "components/TableOfContents.js";
 import { getRangeFromSelection, highlightSelection } from "utils";
 import Comments from "components/Comments.js";
 
@@ -183,7 +184,7 @@ const Reader = (props) => {
     return;
   }
   if (isErrorArticle) {
-    return <span>{error.message}</span>;
+    return;
   }
   return (
     <div
@@ -191,6 +192,7 @@ const Reader = (props) => {
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={(e) => handleMouseUp(e)}
     >
+      <TableOfContents className="col-start-1 col-span-1" />
       <Article
         className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full"
         html={wrapHtml(dataArticle.articleHtml)}

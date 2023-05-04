@@ -4,6 +4,7 @@ export interface Article {
     title: string;
     articleHtml: string;
     articleJson: string;
+    children: Array<Article>;
 }
 
 export interface Highlight {
