@@ -2,44 +2,64 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useFetchArticle } from "hooks";
 
-const SectionLink = ({ title, level, uuid }) => {
-  console.log("rendering section link");
-  console.log(title, level, uuid);
-  const tabDistance = level - 1;
+const ROOT_LEVEL = 1;
+
+function preOrderTraversal(tree, callback) {
+  function traverse(tree, callback, prevSlugs = []) {
+    for (const node of tree) {
+      callback(node, prevSlugs);
+      if (node.children) {
+        prevSlugs.push(node.uuid);
+        traverse(node.children, callback, prevSlugs);
+        prevSlugs.pop();
+      }
+    }
+  }
+  const prevSlugs = [];
+  traverse(tree.children, callback, prevSlugs);
+}
+
+// I want the section link to be able to pass the middleSlugs to the SectionLink component
+// but in order to do that I need to keep track of the path of slugs in the preOrderTraversal
+// function. I'm not sure how to do that.
+
+const SectionLink = ({ title, level, sectionSlug, rootSlug, prevSlugs }) => {
+  const leftMarginSize = level - ROOT_LEVEL;
+  const route =
+    rootSlug === sectionSlug
+      ? `/a/${rootSlug}/`
+      : `/a/${rootSlug}/${prevSlugs.join("/")}/${sectionSlug}/`;
+
   return (
-    <div className={`pl-${tabDistance}`}>
-      <Link href={`/a/${uuid}`}>{title}</Link>
+    <div className={`pl-${leftMarginSize}`}>
+      <Link href={route}>{title}</Link>
     </div>
   );
 };
 
 const TableOfContents = (props) => {
-  const { articleUuid } = useRouter().query;
-  const { isLoading, isError, data, error } = useFetchArticle(articleUuid);
-
-  function preOrderTraversal(tree, callback) {
-    const stack = [];
-    function traverse(tree, callback) {
-      for (const node of tree) {
-        stack.push(
-          <SectionLink title={node.title} level={node.level} uuid={node.uuid} />
-        );
-        if (node.children) {
-          traverse(node.children, callback);
-        }
-      }
-    }
-    traverse(tree.children, callback);
-    return stack;
-  }
+  const slug = useRouter().query.slug || [];
+  const rootSlug = slug[0];
+  const { isLoading, isError, data, error } = useFetchArticle(rootSlug);
 
   if (isLoading) return;
   if (isError) return;
-  return (
-    <div id="TOC" className={props.className}>
-      {preOrderTraversal(data, (node) => traversalCallback(node))}
-    </div>
-  );
+
+  const listOfSections = [];
+  preOrderTraversal(data, (node, prevSlugs) => {
+    console.log(node.uuid, prevSlugs);
+    listOfSections.push(
+      <SectionLink
+        title={node.title}
+        level={node.level}
+        sectionSlug={node.uuid}
+        rootSlug={rootSlug}
+        prevSlugs={[...prevSlugs]}
+      />
+    );
+  });
+
+  return <div className={props.className}>{listOfSections}</div>;
 };
 
 export default TableOfContents;

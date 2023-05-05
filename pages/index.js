@@ -8,7 +8,7 @@ const zarathustraSlug = process.env.SLUG;
 const Card = ({ title, uuid }) => {
   return (
     <div className="bg-yellow-50 rounded-lg hover:bg-yellow-100 hover:rounded-lg">
-      <Link href={`/a/${uuid}`}>
+      <Link href={`/a/${uuid}/`}>
         <div className="p-5">
           <h2 className="text-xl">{title}</h2>
           <h3 className="text-sm">by poopoo</h3>
@@ -30,7 +30,7 @@ const Feed = () => {
           <Card key={index} {...article} />
         ))}
         <div className="bg-yellow-50 rounded-lg hover:bg-yellow-100 hover:rounded-lg">
-          <Link href={`/a/${zarathustraSlug}`}>
+          <Link href={`/a/${zarathustraSlug}/`}>
             <div className="p-5">
               <h2 className="text-xl">Thus Spoke Zarathustra</h2>
               <h3 className="text-sm">by Friedrich Nietzsche</h3>

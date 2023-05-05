@@ -117,24 +117,24 @@ function mergeHighlights(newHighlight, oldAnnotation) {
 }
 
 const Reader = (props) => {
-  const router = useRouter();
-  const { articleUuid } = router.query;
-  const createAnnotation = useCreateAnnotation(articleUuid);
-  const updateAnnotation = useUpdateAnnotation(articleUuid);
-  const deleteAnnotation = useDeleteAnnotation(articleUuid);
+  const slug = useRouter().query.slug || []; // Initially returns undefined
+  const rootSlug = slug[0];
+  const createAnnotation = useCreateAnnotation(rootSlug);
+  const updateAnnotation = useUpdateAnnotation(rootSlug);
+  const deleteAnnotation = useDeleteAnnotation(rootSlug);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const {
     isLoading: isLoadingArticle,
     isError: isErrorArticle,
     data: dataArticle,
     error: errorArticle,
-  } = useFetchArticle(articleUuid);
+  } = useFetchArticle(rootSlug);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,
     data: dataAnnotations,
     error: errorAnnotations,
-  } = useFetchAnnotations(articleUuid);
+  } = useFetchAnnotations(rootSlug);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 

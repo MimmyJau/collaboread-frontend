@@ -8,8 +8,9 @@ import { highlightFetchedAnnotations } from "utils";
 const MemoInterweave = memo(Interweave);
 
 const Article = (props) => {
-  const { articleUuid } = useRouter().query;
-  const deleteAnnotation = useDeleteAnnotation(articleUuid);
+  const slug = useRouter().querys.slug || [];
+  const rootSlug = slug[0];
+  const deleteAnnotation = useDeleteAnnotation(rootSlug);
 
   useEffect(() => {
     highlightFetchedAnnotations(
