@@ -5,20 +5,17 @@ import { useFetchArticle } from "hooks";
 const ROOT_LEVEL = 1;
 
 function preOrderTraversal(root, callback) {
-  function traverse(tree, callback, context = []) {
-    for (const node of tree) {
-      const newContext = callback(node, context);
-      if (node.children) {
-        traverse(node.children, callback, newContext);
-      }
+  function traverse(node, callback, context = []) {
+    const newContext = callback(node, context);
+    for (const child of node.children) {
+      traverse(child, callback, newContext);
     }
   }
-  traverse(root.children, callback, [root.uuid]);
+  traverse(root, callback);
 }
 
 const SectionLink = ({ title, level, listOfSlugs }) => {
   const leftMarginSize = level - ROOT_LEVEL;
-
   return (
     <div className={`pl-${leftMarginSize}`}>
       <Link href={listOfSlugs.join("/")}>{title}</Link>
