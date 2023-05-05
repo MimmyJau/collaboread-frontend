@@ -87,7 +87,8 @@ const CommentBody = (props) => {
 };
 
 const CommentButtons = (props) => {
-  const { articleUuid } = useRouter().query;
+  const slug = useRouter().query.slug || [];
+  const articleUuid = slug[slug.length - 1];
   const createComment = useCreateComment(articleUuid);
   const updateComment = useUpdateComment(articleUuid);
 
@@ -224,7 +225,8 @@ const ReplyEditor = (props) => {
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
   const [editorText, setEditorText] = useState("");
-  const { articleUuid } = useRouter().query;
+  const slug = useRouter().query.slug || [];
+  const articleUuid = slug[slug.length - 1];
   const createComment = useCreateComment(articleUuid);
 
   const commentUuid = props.commentUuid || crypto.randomUUID();
@@ -270,7 +272,8 @@ const ReplyEditor = (props) => {
 
 const Thread = (props) => {
   const { user } = useAuth();
-  const { articleUuid } = useRouter().query;
+  const slug = useRouter().query.slug || [];
+  const articleUuid = slug[slug.length - 1];
   const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
   const showReply = user && props.comments;
