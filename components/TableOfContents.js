@@ -4,7 +4,7 @@ import { useFetchArticle } from "hooks";
 
 const ROOT_LEVEL = 1;
 
-function preOrderTraversal(tree, callback) {
+function preOrderTraversal(root, callback) {
   function traverse(tree, callback, context = []) {
     for (const node of tree) {
       const newContext = callback(node, context);
@@ -13,21 +13,15 @@ function preOrderTraversal(tree, callback) {
       }
     }
   }
-  traverse(tree.children, callback);
+  traverse(root.children, callback, [root.uuid]);
 }
 
-const SectionLink = ({ title, level, sectionSlug, rootSlug, listOfSlugs }) => {
+const SectionLink = ({ title, level, listOfSlugs }) => {
   const leftMarginSize = level - ROOT_LEVEL;
-
-  const remainingSlugs = listOfSlugs.join("/") + (listOfSlugs ? "/" : "");
-  const route =
-    rootSlug === sectionSlug
-      ? `/a/${rootSlug}/`
-      : `/a/${rootSlug}/${remainingSlugs}`;
 
   return (
     <div className={`pl-${leftMarginSize}`}>
-      <Link href={route}>{title}</Link>
+      <Link href={listOfSlugs.join("/")}>{title}</Link>
     </div>
   );
 };
@@ -41,18 +35,16 @@ const TableOfContents = (props) => {
   if (isError) return;
 
   const listOfSections = [];
-  preOrderTraversal(data, (node, prevSlugs) => {
+  preOrderTraversal(data, (node, listOfSlugs) => {
     listOfSections.push(
       <SectionLink
         key={node.uuid}
         title={node.title}
         level={node.level}
-        sectionSlug={node.uuid}
-        rootSlug={rootSlug}
-        listOfSlugs={[...prevSlugs, node.uuid]}
+        listOfSlugs={[...listOfSlugs, node.uuid]}
       />
     );
-    return [...prevSlugs, node.uuid];
+    return [...listOfSlugs, node.uuid];
   });
 
   return <div className={props.className}>{listOfSections}</div>;
