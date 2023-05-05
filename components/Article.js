@@ -8,7 +8,7 @@ import { highlightFetchedAnnotations } from "utils";
 const MemoInterweave = memo(Interweave);
 
 const Article = (props) => {
-  const slug = useRouter().querys.slug || [];
+  const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
   const deleteAnnotation = useDeleteAnnotation(rootSlug);
 

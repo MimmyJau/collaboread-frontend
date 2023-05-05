@@ -5,30 +5,25 @@ import { useFetchArticle } from "hooks";
 const ROOT_LEVEL = 1;
 
 function preOrderTraversal(tree, callback) {
-  function traverse(tree, callback, prevSlugs = []) {
+  function traverse(tree, callback, context = []) {
     for (const node of tree) {
-      callback(node, prevSlugs);
+      const newContext = callback(node, context);
       if (node.children) {
-        prevSlugs.push(node.uuid);
-        traverse(node.children, callback, prevSlugs);
-        prevSlugs.pop();
+        traverse(node.children, callback, newContext);
       }
     }
   }
-  const prevSlugs = [];
-  traverse(tree.children, callback, prevSlugs);
+  traverse(tree.children, callback);
 }
 
-// I want the section link to be able to pass the middleSlugs to the SectionLink component
-// but in order to do that I need to keep track of the path of slugs in the preOrderTraversal
-// function. I'm not sure how to do that.
-
-const SectionLink = ({ title, level, sectionSlug, rootSlug, prevSlugs }) => {
+const SectionLink = ({ title, level, sectionSlug, rootSlug, listOfSlugs }) => {
   const leftMarginSize = level - ROOT_LEVEL;
+
+  const remainingSlugs = listOfSlugs.join("/") + (listOfSlugs ? "/" : "");
   const route =
     rootSlug === sectionSlug
       ? `/a/${rootSlug}/`
-      : `/a/${rootSlug}/${prevSlugs.join("/")}/${sectionSlug}/`;
+      : `/a/${rootSlug}/${remainingSlugs}`;
 
   return (
     <div className={`pl-${leftMarginSize}`}>
@@ -47,16 +42,17 @@ const TableOfContents = (props) => {
 
   const listOfSections = [];
   preOrderTraversal(data, (node, prevSlugs) => {
-    console.log(node.uuid, prevSlugs);
     listOfSections.push(
       <SectionLink
+        key={node.uuid}
         title={node.title}
         level={node.level}
         sectionSlug={node.uuid}
         rootSlug={rootSlug}
-        prevSlugs={[...prevSlugs]}
+        listOfSlugs={[...prevSlugs, node.uuid]}
       />
     );
+    return [...prevSlugs, node.uuid];
   });
 
   return <div className={props.className}>{listOfSections}</div>;
