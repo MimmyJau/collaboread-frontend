@@ -194,7 +194,7 @@ const Reader = (props) => {
     >
       <TableOfContents className="col-start-1 col-span-1" />
       <Article
-        className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full"
+        className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full w-full"
         html={wrapHtml(dataArticle.articleHtml)}
         fetchedAnnotations={dataAnnotations}
         setFocusedHighlightId={setFocusedHighlightId}

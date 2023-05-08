@@ -19,7 +19,7 @@ const NavButton = ({ text, href }) => {
 
 const PrevAndNextSection = (props) => {
   return (
-    <div className="flex flex-row justify-between">
+    <div className="flex flex-row justify-between p-2 w-full">
       <NavButton text="Prev" href={props.prevHref} />
       <NavButton text="Next" href={props.nextHref} />
     </div>
@@ -42,7 +42,7 @@ const Article = (props) => {
   }, [props.fetchedAnnotations]);
 
   return (
-    <div className={`flex flex-col ${props.className}`}>
+    <div className={`flex flex-col items-center ${props.className}`}>
       <PrevAndNextSection prevHref="" nextHref="" />
       <div id="article" className="prose">
         <MemoInterweave content={props.html} />
