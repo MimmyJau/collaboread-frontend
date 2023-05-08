@@ -188,7 +188,7 @@ const Reader = (props) => {
   }
   return (
     <div
-      className="grid grid-cols-6 gap-1 h-screen overflow-hidden"
+      className="grid grid-cols-6 gap-1 h-full overflow-hidden"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={(e) => handleMouseUp(e)}
     >
