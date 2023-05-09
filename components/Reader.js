@@ -196,6 +196,8 @@ const Reader = (props) => {
       <Article
         className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full w-full"
         html={wrapHtml(dataArticle.articleHtml)}
+        prev={dataArticle.prev}
+        next={dataArticle.next}
         fetchedAnnotations={dataAnnotations}
         setFocusedHighlightId={setFocusedHighlightId}
       />

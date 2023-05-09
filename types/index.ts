@@ -3,7 +3,9 @@ export interface Article {
     user: string;
     title: string;
     articleHtml: string;
-    articleJson: string;
+    level: number;
+    prev: Array<string>;
+    next: Array<string>;
     children: Array<Article>;
 }
 

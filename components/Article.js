@@ -20,8 +20,16 @@ const NavButton = ({ text, href }) => {
 const PrevAndNextSection = (props) => {
   return (
     <div className="flex flex-row justify-between p-2 w-full">
-      <NavButton text="Prev" href={props.prevHref} />
-      <NavButton text="Next" href={props.nextHref} />
+      {props.prevHref ? (
+        <NavButton text="Prev" href={props.prevHref} />
+      ) : (
+        <div></div>
+      )}
+      {props.nextHref ? (
+        <NavButton text="Next" href={props.nextHref} />
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 };
@@ -43,7 +51,10 @@ const Article = (props) => {
 
   return (
     <div className={`flex flex-col items-center ${props.className}`}>
-      <PrevAndNextSection prevHref="" nextHref="" />
+      <PrevAndNextSection
+        prevHref={props.prev?.join("/")}
+        nextHref={props.next?.join("/")}
+      />
       <div id="article" className="prose">
         <MemoInterweave content={props.html} />
       </div>
