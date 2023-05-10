@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useMemo } from "react";
 import { useFetchArticle } from "hooks";
 
 const ROOT_LEVEL = 1;
@@ -28,21 +29,23 @@ const TableOfContents = (props) => {
   const rootSlug = slug[0];
   const { isLoading, isError, data, error } = useFetchArticle(rootSlug);
 
-  if (isLoading) return;
-  if (isError) return;
+  const listOfSections = useMemo(() => {
+    if (isLoading || isError || !data) return null;
 
-  const listOfSections = [];
-  preOrderTraversal(data, (node, listOfSlugs) => {
-    listOfSections.push(
-      <SectionLink
-        key={node.uuid}
-        title={node.title}
-        level={node.level}
-        listOfSlugs={[...listOfSlugs, node.uuid]}
-      />
-    );
-    return [...listOfSlugs, node.uuid];
-  });
+    const listOfSections = [];
+    preOrderTraversal(data, (node, listOfSlugs) => {
+      listOfSections.push(
+        <SectionLink
+          key={node.uuid}
+          title={node.title}
+          level={node.level}
+          listOfSlugs={[...listOfSlugs, node.uuid]}
+        />
+      );
+      return [...listOfSlugs, node.uuid];
+    });
+    return listOfSections;
+  }, [data]);
 
   return <div className={props.className}>{listOfSections}</div>;
 };
