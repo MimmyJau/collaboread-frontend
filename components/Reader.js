@@ -192,7 +192,7 @@ const Reader = (props) => {
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={(e) => handleMouseUp(e)}
     >
-      <TableOfContents className="col-start-1 col-span-1" />
+      <TableOfContents className="col-start-1 col-span-1 overflow-y-auto pl-2 pb-10" />
       <Article
         className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full w-full"
         html={wrapHtml(dataArticle.articleHtml)}
