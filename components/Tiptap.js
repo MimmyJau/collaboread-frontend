@@ -33,8 +33,9 @@ const MenuButton = ({ name, onClick }) => {
 };
 
 const MenuToolbar = ({ editor }) => {
-  const { articleUuid } = useRouter().query;
-  const updateArticle = useUpdateArticle(articleUuid);
+  const slugs = useRouter().query.slugs || [];
+  const slug = slugs[slugs.length - 1];
+  const updateArticle = useUpdateArticle(slug);
   return (
     <div className="sticky z-10 top-0 bg-white">
       <MenuButton
@@ -78,6 +79,7 @@ const MenuToolbar = ({ editor }) => {
           updateArticle.mutate({
             html: editor.getHTML(),
             json: editor.getJSON(),
+            text: editor.getText(),
           })
         }
       />

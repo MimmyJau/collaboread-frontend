@@ -56,9 +56,10 @@ function useUpdateArticle(articleUuid) {
     const queryClient = useQueryClient();
     const article = queryClient.getQueryData(["article", articleUuid]) as Article
     return useMutation({
-        mutationFn: ({ html, json } : { html: string, json: string }) => {
+        mutationFn: ({ html, json, text } : { html: string, json: string, text: string }) => {
             article.articleHtml = html;
             article.articleJson = json;
+            article.articleText = text;
             return updateArticle(article, getTokenLocalStorage())
         },
         onSuccess: () => {
