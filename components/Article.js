@@ -58,7 +58,10 @@ const Article = (props) => {
       <div id="article" className="prose">
         <MemoInterweave content={props.html} />
       </div>
-      <PrevAndNextSection prevHref="" nextHref="" />
+      <PrevAndNextSection
+        prevHref={props.prev?.join("/")}
+        nextHref={props.next?.join("/")}
+      />
     </div>
   );
 };
