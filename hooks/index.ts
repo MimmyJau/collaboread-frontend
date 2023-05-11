@@ -93,7 +93,7 @@ function useCreateAnnotation(articleUuid) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", "article", articleUuid],
+        queryKey: ["annotations", articleUuid],
       });
     },
   });
@@ -102,7 +102,7 @@ function useCreateAnnotation(articleUuid) {
 function useFetchAnnotations(articleUuid) {
   return useQuery({
     enabled: !!articleUuid,
-    queryKey: ["annotations", "article", articleUuid],
+    queryKey: ["annotations", articleUuid],
     queryFn: async (): Promise<Array<Annotation>> => {
       const flatAnnotations = await fetchAnnotations(articleUuid).catch(
         (error) => {
@@ -132,7 +132,7 @@ function useUpdateAnnotation(articleUuid) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", "article", articleUuid],
+        queryKey: ["annotations", articleUuid],
       });
     },
   });
@@ -144,7 +144,7 @@ function useDeleteAnnotation(articleUuid) {
     mutationFn: (annotationUuid) => deleteAnnotation(annotationUuid, getTokenLocalStorage()),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", "article", articleUuid],
+        queryKey: ["annotations", articleUuid],
       });
     },
   });
