@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useMemo } from "react";
-import { useFetchArticle } from "hooks";
+import { useFetchTableOfContents } from "hooks";
 
 const ROOT_LEVEL = 1;
 
@@ -27,7 +27,7 @@ const SectionLink = ({ title, level, listOfSlugs }) => {
 const TableOfContents = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
-  const { isLoading, isError, data, error } = useFetchArticle(rootSlug);
+  const { isLoading, isError, data, error } = useFetchTableOfContents(rootSlug);
 
   const listOfSections = useMemo(() => {
     if (isLoading || isError || !data) return null;

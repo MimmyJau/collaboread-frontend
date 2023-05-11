@@ -10,6 +10,11 @@ function fetchArticles() {
   return ky.get(route).json();
 }
 
+function fetchTableOfContents(rootSlug) {
+  const route = `${API_BASE_URL}/toc/${rootSlug}/`;
+  return ky.get(route).json();
+}
+
 function fetchArticle(articleUuid) {
   const route = `${API_BASE_URL}/articles/${articleUuid}/`;
   return ky.get(route).json();
@@ -57,6 +62,7 @@ function deleteComment(comment, token) {
 
 export {
   fetchArticles,
+  fetchTableOfContents,
   fetchArticle,
   updateArticle,
   createAnnotation,

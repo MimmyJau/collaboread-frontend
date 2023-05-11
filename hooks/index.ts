@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   fetchArticles,
+  fetchTableOfContents,
   fetchArticle,
   updateArticle,
   createAnnotation,
@@ -42,6 +43,13 @@ function useFetchArticles() {
     queryKey: ["articles"],
     queryFn: () => fetchArticles(),
   });
+}
+
+function useFetchTableOfContents(rootSlug) {
+    return useQuery({
+        queryKey: ["toc", rootSlug],
+        queryFn: () => fetchTableOfContents(rootSlug),
+    })
 }
 
 function useFetchArticle(uuid) {
@@ -186,6 +194,7 @@ function useDeleteComment() {
 
 export {
   useFetchArticles,
+  useFetchTableOfContents,
   useFetchArticle,
   useUpdateArticle,
   useFetchAnnotations,
