@@ -1,32 +1,44 @@
+import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 
-const Editor = (props) => {
+const Editor = ({
+  annotationUuid,
+  content,
+  onChange,
+  placeholder,
+  setEditor,
+  style,
+}) => {
   const editor = useEditor(
     {
       extensions: [
         StarterKit,
         Placeholder.configure({
-          placeholder: props.placeholder || "",
+          placeholder: placeholder || "",
         }),
       ],
-      content: props.content || "",
+      content: content || "",
       editorProps: {
         attributes: {
           class:
-            props.style ||
+            style ||
             "py-2 px-1 bg-white rounded border border-gray-200 focus:outline-none focus:border focus:border-gray-400 hover:border hover:border-gray-300",
         },
       },
       onUpdate: ({ editor }) => {
-        props.onChange.html(editor.getHTML());
-        props.onChange.json(JSON.stringify(editor.getJSON()));
-        props.onChange.text(editor.getText());
+        onChange.html(editor.getHTML());
+        onChange.json(JSON.stringify(editor.getJSON()));
+        onChange.text(editor.getText());
       },
     },
-    [props.annotationUuid]
+    [annotationUuid]
   );
+
+  useEffect(() => {
+    setEditor(editor);
+  }, [editor, setEditor]);
 
   return <EditorContent editor={editor} />;
 };

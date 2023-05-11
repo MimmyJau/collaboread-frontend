@@ -68,9 +68,11 @@ const CommentClickable = (props) => {
 };
 
 const CommentBody = (props) => {
+  const [editor, setEditor] = useState(null);
   if (props.isEditing) {
     return (
       <Editor
+        setEditor={setEditor}
         annotationUuid={props.annotationUuid}
         placeholder={"What is your interpretation of this passage?"}
         content={props.content}
@@ -222,6 +224,7 @@ const Replies = (props) => {
 
 const ReplyEditor = (props) => {
   const [parentUuid, setParentUuid] = useState(null);
+  const [editor, setEditor] = useState(null);
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
   const [editorText, setEditorText] = useState("");
@@ -241,6 +244,7 @@ const ReplyEditor = (props) => {
     <div className="p-2 flex flex-row">
       <div className="flex-grow mr-1">
         <Editor
+          setEditor={setEditor}
           placeholder={"Leave a reply..."}
           onChange={{
             html: setEditorHtml,
@@ -262,7 +266,12 @@ const ReplyEditor = (props) => {
             commentText: editorText,
           };
           createComment.mutate(newComment, {
-            onSuccess: () => {},
+            onSuccess: () => {
+              setEditorHtml("");
+              setEditorJson("");
+              setEditorText("");
+              editor.commands.clearContent();
+            },
           });
         }}
       />
