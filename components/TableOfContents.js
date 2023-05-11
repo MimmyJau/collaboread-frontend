@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useMemo } from "react";
 import { useFetchTableOfContents } from "hooks";
 
 const ROOT_LEVEL = 1;
@@ -15,10 +14,12 @@ function preOrderTraversal(root, callback) {
   traverse(root, callback);
 }
 
-const SectionLink = ({ title, level, listOfSlugs }) => {
+const SectionLink = ({ title, level, isHighlighted, listOfSlugs }) => {
   const leftMarginSize = level - ROOT_LEVEL;
   return (
-    <div className={`pl-${leftMarginSize}`}>
+    <div
+      className={`pl-${leftMarginSize} ${isHighlighted ? "bg-blue-200" : ""}`}
+    >
       <Link href={listOfSlugs.join("/")}>{title}</Link>
     </div>
   );
@@ -27,26 +28,22 @@ const SectionLink = ({ title, level, listOfSlugs }) => {
 const TableOfContents = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
+  const currentSectionSlug = slug[slug.length - 1];
   const { isLoading, isError, data, error } = useFetchTableOfContents(rootSlug);
 
-  const listOfSections = useMemo(() => {
-    if (isLoading || isError || !data) return null;
-
-    const listOfSections = [];
-    preOrderTraversal(data, (node, listOfSlugs) => {
-      listOfSections.push(
-        <SectionLink
-          key={node.uuid}
-          title={node.title}
-          level={node.level}
-          listOfSlugs={[...listOfSlugs, node.uuid]}
-        />
-      );
-      return [...listOfSlugs, node.uuid];
-    });
-    return listOfSections;
-  }, [data]);
-
+  const listOfSections = [];
+  preOrderTraversal(data, (node, listOfSlugs) => {
+    listOfSections.push(
+      <SectionLink
+        key={node.uuid}
+        title={node.title}
+        level={node.level}
+        isHighlighted={currentSectionSlug === node.uuid}
+        listOfSlugs={[...listOfSlugs, node.uuid]}
+      />
+    );
+    return [...listOfSlugs, node.uuid];
+  });
   return <div className={props.className}>{listOfSections}</div>;
 };
 
