@@ -18,7 +18,9 @@ const SectionLink = ({ title, level, isHighlighted, listOfSlugs }) => {
   const leftMarginSize = level - ROOT_LEVEL;
   return (
     <div
-      className={`pl-${leftMarginSize} ${isHighlighted ? "bg-blue-200" : ""}`}
+      className={`overflow-ellipsis whitespace-nowrap overflow-hidden pl-${leftMarginSize} ${
+        isHighlighted ? "bg-blue-200" : ""
+      }`}
     >
       <Link href={listOfSlugs.join("/")}>{title}</Link>
     </div>
