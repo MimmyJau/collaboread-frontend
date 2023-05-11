@@ -33,6 +33,9 @@ const TableOfContents = (props) => {
   const currentSectionSlug = slug[slug.length - 1];
   const { isLoading, isError, data, error } = useFetchTableOfContents(rootSlug);
 
+  if (isLoading) return;
+  if (isError) return;
+
   const listOfSections = [];
   preOrderTraversal(data, (node, listOfSlugs) => {
     listOfSections.push(
