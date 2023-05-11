@@ -24,7 +24,7 @@ const Editor = ({
         attributes: {
           class:
             style ||
-            "py-2 px-1 bg-white rounded border border-gray-200 focus:outline-none focus:border focus:border-gray-400 hover:border hover:border-gray-300",
+            "py-2 px-1 bg-white rounded border border-white focus:outline-none focus:border focus:border-green-700",
         },
       },
       onUpdate: ({ editor }) => {

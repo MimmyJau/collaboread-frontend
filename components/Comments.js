@@ -74,7 +74,7 @@ const CommentBody = (props) => {
       <Editor
         setEditor={setEditor}
         annotationUuid={props.annotationUuid}
-        placeholder={"What is your interpretation of this passage?"}
+        placeholder={"What is your question or interpretation?"}
         content={props.content}
         onChange={{
           html: props.onChange.html,
@@ -143,6 +143,7 @@ const Comment = (props) => {
   const isOwner = props.user.username === user?.username;
 
   useEffect(() => {
+    setIsEditing(false);
     if (thereExistsComment) {
       setEditorHtml(props.comment.commentHtml);
       setEditorJson(props.comment.commentJson);
