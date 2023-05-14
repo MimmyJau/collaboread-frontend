@@ -1,7 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
-  fetchArticleHtml,
+  fetchArticles,
+  fetchTableOfContents,
+  fetchArticle,
+  updateArticle,
   createAnnotation,
   fetchAnnotations,
   updateAnnotation,
@@ -11,7 +14,7 @@ import {
   deleteComment,
 } from "api";
 
-import {Annotation, FlatAnnotation, Highlight } from "types";
+import {Article, Annotation, FlatAnnotation, Highlight } from "types";
 
 // Helper Functions
 function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
@@ -35,12 +38,44 @@ function getTokenLocalStorage() {
 }
 
 // React Query Hooks
-function useFetchArticleHtml(uuid) {
+function useFetchArticles() {
+  return useQuery({
+    queryKey: ["articles"],
+    queryFn: () => fetchArticles(),
+  });
+}
+
+function useFetchTableOfContents(rootSlug) {
+    return useQuery({
+        queryKey: ["toc", rootSlug],
+        queryFn: () => fetchTableOfContents(rootSlug),
+    })
+}
+
+function useFetchArticle(uuid) {
   return useQuery({
     enabled: !!uuid,
-    queryKey: ["article", "html", uuid],
-    queryFn: () => fetchArticleHtml(uuid),
+    queryKey: ["article", uuid],
+    queryFn: () => fetchArticle(uuid),
   });
+}
+
+function useUpdateArticle(articleUuid) {
+    const queryClient = useQueryClient();
+    const article = queryClient.getQueryData(["article", articleUuid]) as Article
+    return useMutation({
+        mutationFn: ({ html, json, text } : { html: string, json: string, text: string }) => {
+            article.articleHtml = html;
+            article.articleJson = json;
+            article.articleText = text;
+            return updateArticle(article, getTokenLocalStorage())
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["article", articleUuid],
+            })
+        }
+    })
 }
 
 function useCreateAnnotation(articleUuid) {
@@ -58,7 +93,7 @@ function useCreateAnnotation(articleUuid) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", "article", articleUuid],
+        queryKey: ["annotations", articleUuid],
       });
     },
   });
@@ -67,7 +102,7 @@ function useCreateAnnotation(articleUuid) {
 function useFetchAnnotations(articleUuid) {
   return useQuery({
     enabled: !!articleUuid,
-    queryKey: ["annotations", "article", articleUuid],
+    queryKey: ["annotations", articleUuid],
     queryFn: async (): Promise<Array<Annotation>> => {
       const flatAnnotations = await fetchAnnotations(articleUuid).catch(
         (error) => {
@@ -97,7 +132,7 @@ function useUpdateAnnotation(articleUuid) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", "article", articleUuid],
+        queryKey: ["annotations", articleUuid],
       });
     },
   });
@@ -109,7 +144,7 @@ function useDeleteAnnotation(articleUuid) {
     mutationFn: (annotationUuid) => deleteAnnotation(annotationUuid, getTokenLocalStorage()),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", "article", articleUuid],
+        queryKey: ["annotations", articleUuid],
       });
     },
   });
@@ -158,7 +193,10 @@ function useDeleteComment() {
 }
 
 export {
-  useFetchArticleHtml,
+  useFetchArticles,
+  useFetchTableOfContents,
+  useFetchArticle,
+  useUpdateArticle,
   useFetchAnnotations,
   useCreateAnnotation,
   useUpdateAnnotation,

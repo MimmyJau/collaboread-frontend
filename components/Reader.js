@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 import {
-  useFetchArticleHtml,
+  useFetchArticle,
   useFetchAnnotations,
   useCreateAnnotation,
   useUpdateAnnotation,
@@ -9,6 +9,7 @@ import {
 } from "hooks";
 import useAuth from "hooks/auth";
 import Article from "components/Article.js";
+import TableOfContents from "components/TableOfContents.js";
 import { getRangeFromSelection, highlightSelection } from "utils";
 import Comments from "components/Comments.js";
 
@@ -116,31 +117,32 @@ function mergeHighlights(newHighlight, oldAnnotation) {
 }
 
 const Reader = (props) => {
-  const router = useRouter();
-  const { articleUuid } = router.query;
-  const createAnnotation = useCreateAnnotation(articleUuid);
-  const updateAnnotation = useUpdateAnnotation(articleUuid);
-  const deleteAnnotation = useDeleteAnnotation(articleUuid);
+  const slug = useRouter().query.slug || []; // Initially returns undefined
+  const sectionSlug = slug[slug.length - 1];
+  const createAnnotation = useCreateAnnotation(sectionSlug);
+  const updateAnnotation = useUpdateAnnotation(sectionSlug);
+  const deleteAnnotation = useDeleteAnnotation(sectionSlug);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const {
     isLoading: isLoadingArticle,
     isError: isErrorArticle,
     data: dataArticle,
     error: errorArticle,
-  } = useFetchArticleHtml(articleUuid);
+  } = useFetchArticle(sectionSlug);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,
     data: dataAnnotations,
     error: errorAnnotations,
-  } = useFetchAnnotations(articleUuid);
+  } = useFetchAnnotations(sectionSlug);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 
   function handleMouseUp(e) {
     setUnauthorizedSelection(false);
-    if (user && !document.getSelection().isCollapsed)
+    if (user && !document.getSelection().isCollapsed) {
       highlightAndSaveSelection();
+    }
     if (!user && !document.getSelection().isCollapsed) {
       // alert("Please sign up to save highlights.");
       setUnauthorizedSelection(true);
@@ -182,17 +184,20 @@ const Reader = (props) => {
     return;
   }
   if (isErrorArticle) {
-    return <span>{error.message}</span>;
+    return;
   }
   return (
     <div
-      className="grid grid-cols-6 gap-1 h-screen overflow-hidden"
+      className="grid grid-cols-6 gap-1 h-full overflow-hidden"
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={(e) => handleMouseUp(e)}
     >
+      <TableOfContents className="col-start-1 col-span-1 overflow-y-auto px-3 pb-10" />
       <Article
-        className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full"
+        className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full w-full"
         html={wrapHtml(dataArticle.articleHtml)}
+        prev={dataArticle.prev}
+        next={dataArticle.next}
         fetchedAnnotations={dataAnnotations}
         setFocusedHighlightId={setFocusedHighlightId}
       />

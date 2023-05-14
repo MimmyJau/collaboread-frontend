@@ -5,9 +5,24 @@ import { FlatAnnotation } from "types";
 const BASE_URL = process.env.SERVER;
 const API_BASE_URL = `${BASE_URL}/api`;
 
-function fetchArticleHtml(articleUuid) {
+function fetchArticles() {
+  const route = `${API_BASE_URL}/articles/`;
+  return ky.get(route).json();
+}
+
+function fetchTableOfContents(rootSlug) {
+  const route = `${API_BASE_URL}/toc/${rootSlug}/`;
+  return ky.get(route).json();
+}
+
+function fetchArticle(articleUuid) {
   const route = `${API_BASE_URL}/articles/${articleUuid}/`;
   return ky.get(route).json();
+}
+
+function updateArticle(article, token) {
+  const route = `${API_BASE_URL}/articles/${article.uuid}/`;
+  return ky.put(route, {headers: {Authorization: `Token ${token}`}, json: article }).json();
 }
 
 function createAnnotation(articleUuid, highlightData, token) {
@@ -46,7 +61,10 @@ function deleteComment(comment, token) {
 }
 
 export {
-  fetchArticleHtml,
+  fetchArticles,
+  fetchTableOfContents,
+  fetchArticle,
+  updateArticle,
   createAnnotation,
   fetchAnnotations,
   updateAnnotation,

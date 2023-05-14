@@ -1,3 +1,15 @@
+export interface Article {
+    uuid: string;
+    user: string;
+    title: string;
+    articleHtml: string;
+    articleJson?: string;
+    articleText?: string;
+    level: number;
+    prev: Array<string>;
+    next: Array<string>;
+    children: Array<Article>;
+}
 
 export interface Highlight {
     characterRange: {

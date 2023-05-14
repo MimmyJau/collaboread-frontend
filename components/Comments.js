@@ -68,11 +68,13 @@ const CommentClickable = (props) => {
 };
 
 const CommentBody = (props) => {
+  const [editor, setEditor] = useState(null);
   if (props.isEditing) {
     return (
       <Editor
+        setEditor={setEditor}
         annotationUuid={props.annotationUuid}
-        placeholder={"What is your interpretation of this passage?"}
+        placeholder={"What is your question or interpretation?"}
         content={props.content}
         onChange={{
           html: props.onChange.html,
@@ -87,7 +89,8 @@ const CommentBody = (props) => {
 };
 
 const CommentButtons = (props) => {
-  const { articleUuid } = useRouter().query;
+  const slug = useRouter().query.slug || [];
+  const articleUuid = slug[slug.length - 1];
   const createComment = useCreateComment(articleUuid);
   const updateComment = useUpdateComment(articleUuid);
 
@@ -140,6 +143,7 @@ const Comment = (props) => {
   const isOwner = props.user.username === user?.username;
 
   useEffect(() => {
+    setIsEditing(false);
     if (thereExistsComment) {
       setEditorHtml(props.comment.commentHtml);
       setEditorJson(props.comment.commentJson);
@@ -221,10 +225,12 @@ const Replies = (props) => {
 
 const ReplyEditor = (props) => {
   const [parentUuid, setParentUuid] = useState(null);
+  const [editor, setEditor] = useState(null);
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
   const [editorText, setEditorText] = useState("");
-  const { articleUuid } = useRouter().query;
+  const slug = useRouter().query.slug || [];
+  const articleUuid = slug[slug.length - 1];
   const createComment = useCreateComment(articleUuid);
 
   const commentUuid = props.commentUuid || crypto.randomUUID();
@@ -239,6 +245,7 @@ const ReplyEditor = (props) => {
     <div className="p-2 flex flex-row">
       <div className="flex-grow mr-1">
         <Editor
+          setEditor={setEditor}
           placeholder={"Leave a reply..."}
           onChange={{
             html: setEditorHtml,
@@ -260,7 +267,12 @@ const ReplyEditor = (props) => {
             commentText: editorText,
           };
           createComment.mutate(newComment, {
-            onSuccess: () => {},
+            onSuccess: () => {
+              setEditorHtml("");
+              setEditorJson("");
+              setEditorText("");
+              editor.commands.clearContent();
+            },
           });
         }}
       />
@@ -270,7 +282,8 @@ const ReplyEditor = (props) => {
 
 const Thread = (props) => {
   const { user } = useAuth();
-  const { articleUuid } = useRouter().query;
+  const slug = useRouter().query.slug || [];
+  const articleUuid = slug[slug.length - 1];
   const deleteAnnotation = useDeleteAnnotation(articleUuid);
 
   const showReply = user && props.comments;
