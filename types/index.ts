@@ -2,6 +2,7 @@ export interface Article {
     uuid: string;
     user: string;
     title: string;
+    author?: string;
     articleHtml: string;
     articleJson?: string;
     articleText?: string;

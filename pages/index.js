@@ -5,13 +5,13 @@ import { useFetchArticles } from "hooks";
 
 const zarathustraSlug = process.env.SLUG;
 
-const Card = ({ title, uuid }) => {
+const Card = ({ uuid, title, author }) => {
   return (
     <div className="bg-yellow-50 rounded-lg hover:bg-yellow-100 hover:rounded-lg">
       <Link href={`/a/${uuid}/`}>
         <div className="p-5">
           <h2 className="text-xl">{title}</h2>
-          <h3 className="text-sm">by poopoo</h3>
+          {author ? <h3 className="text-sm">by {author}</h3> : null}
         </div>
       </Link>
     </div>
