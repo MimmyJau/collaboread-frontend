@@ -10,7 +10,12 @@ import {
 import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
-import { getRangeFromSelection, highlightSelection } from "utils";
+import {
+  doesHighlightOverlapWithAnnotations,
+  getRangeFromSelection,
+  highlightSelection,
+  isSelectionInArticle,
+} from "utils";
 import Comments from "components/Comments.js";
 
 function addClassToElements(elements, className) {
@@ -63,57 +68,6 @@ function syncHoverBehavior(e, setFocusedHighlightId) {
 function wrapHtml(rawHtml) {
   if (!rawHtml) return;
   return `<div id="content-highlightable">` + rawHtml + `</div>`;
-}
-
-function isSelectionInArticle() {
-  const selection = document.getSelection();
-  const selectionRange = selection.getRangeAt(0);
-  const content = document.getElementById("content-highlightable");
-  return content.contains(selectionRange.commonAncestorContainer);
-}
-
-function isXInBetweenYAndZ(x, y, z) {
-  return x >= y && x <= z;
-}
-
-function doHighlightsOverlap(h1, h2) {
-  const h1s = h1[0].characterRange.start;
-  const h1e = h1[0].characterRange.end;
-  const h2s = h2[0].characterRange.start;
-  const h2e = h2[0].characterRange.end;
-  return isXInBetweenYAndZ(h1s, h2s, h2e) || isXInBetweenYAndZ(h2s, h1s, h1e);
-}
-
-function doesHighlightOverlapWithAnnotations(newHighlight, annotations) {
-  for (const oldAnnotation of annotations) {
-    if (doHighlightsOverlap(newHighlight, oldAnnotation.highlight))
-      return oldAnnotation;
-  }
-  return false;
-}
-
-function mergeHighlights(newHighlight, oldAnnotation) {
-  const oldHighlight = oldAnnotation.highlight;
-  const highlightStart = Math.min(
-    newHighlight[0].characterRange.start,
-    oldHighlight[0].characterRange.start
-  );
-  const highlightEnd = Math.max(
-    newHighlight[0].characterRange.end,
-    oldHighlight[0].characterRange.end
-  );
-  return {
-    ...oldAnnotation,
-    highlight: [
-      {
-        ...oldAnnotation.highlight[0],
-        characterRange: {
-          start: highlightStart,
-          end: highlightEnd,
-        },
-      },
-    ],
-  };
 }
 
 const Reader = (props) => {
