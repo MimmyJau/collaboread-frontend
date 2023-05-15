@@ -98,7 +98,6 @@ const Reader = (props) => {
       highlightAndSaveSelection();
     }
     if (!user && !document.getSelection().isCollapsed) {
-      // alert("Please sign up to save highlights.");
       setUnauthorizedSelection(true);
     }
     if (
@@ -119,11 +118,7 @@ const Reader = (props) => {
       dataAnnotations
     );
     if (overlappingAnnotation) {
-      const mergedHighlight = mergeHighlights(
-        newHighlight,
-        overlappingAnnotation
-      );
-      updateAnnotation.mutate(mergedHighlight);
+      document.getSelection().collapse(null);
     } else {
       const highlight = highlightSelection(
         crypto.randomUUID(),
@@ -134,12 +129,7 @@ const Reader = (props) => {
     }
   }
 
-  if (isLoadingArticle) {
-    return;
-  }
-  if (isErrorArticle) {
-    return;
-  }
+  if (isLoadingArticle || isErrorArticle) return;
   return (
     <div
       className="grid grid-cols-6 gap-1 h-full overflow-hidden"
