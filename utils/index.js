@@ -93,3 +93,30 @@ export function clearHighlight(annotationUuid, range) {
   unhighlightSelection();
   removeHangingSpanTags(annotationUuid);
 }
+
+export function isSelectionInArticle() {
+  const selection = document.getSelection();
+  const selectionRange = selection.getRangeAt(0);
+  const content = document.getElementById("content-highlightable");
+  return content.contains(selectionRange.commonAncestorContainer);
+}
+
+function isXInBetweenYAndZ(x, y, z) {
+  return x >= y && x <= z;
+}
+
+function doHighlightsOverlap(h1, h2) {
+  const h1s = h1[0].characterRange.start;
+  const h1e = h1[0].characterRange.end;
+  const h2s = h2[0].characterRange.start;
+  const h2e = h2[0].characterRange.end;
+  return isXInBetweenYAndZ(h1s, h2s, h2e) || isXInBetweenYAndZ(h2s, h1s, h1e);
+}
+
+export function doesHighlightOverlapWithAnnotations(newHighlight, annotations) {
+  for (const oldAnnotation of annotations) {
+    if (doHighlightsOverlap(newHighlight, oldAnnotation.highlight))
+      return oldAnnotation;
+  }
+  return false;
+}

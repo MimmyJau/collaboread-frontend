@@ -41,7 +41,13 @@ function postSignup({ username, email, password1, password2 }) {
 // React Query hooks
 function usePostLogin() {
   return useMutation({
-    mutationFn: ({ username, password }: { username: string, password: string }) => postLogin(username, password),
+    mutationFn: ({
+      username,
+      password,
+    }: {
+      username: string;
+      password: string;
+    }) => postLogin(username, password),
   });
 }
 
@@ -61,8 +67,17 @@ function useGetUser(token) {
 
 function usePostSignup() {
   return useMutation({
-    mutationFn: ({ username, email, password1, password2 }: { username: string, email: string, password1: string, password2: string }) =>
-      postSignup({ username, email, password1, password2 }),
+    mutationFn: ({
+      username,
+      email,
+      password1,
+      password2,
+    }: {
+      username: string;
+      email: string;
+      password1: string;
+      password2: string;
+    }) => postSignup({ username, email, password1, password2 }),
   });
 }
 
