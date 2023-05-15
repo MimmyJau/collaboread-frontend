@@ -30,7 +30,17 @@ function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
       backward: flatAnnotation.highlightBackward,
     }),
     comments: flatAnnotation.comments,
+    isPublic: flatAnnotation.isPublic,
   };
+}
+
+function flattenAnnotation(annotation: Annotation): FlatAnnotation {
+    return {
+        ...annotation,
+        highlightStart: annotation.highlight[0].characterRange.start,
+        highlightEnd: annotation.highlight[0].characterRange.end,
+        highlightBackward: annotation.highlight[0].backward,
+    }
 }
 
 function getTokenLocalStorage() {
@@ -88,7 +98,7 @@ function useCreateAnnotation(articleUuid) {
         highlightEnd: highlight[0].characterRange.end,
         highlightBackward: highlight[0].backward,
         article: articleUuid,
-        isPublic: "True",
+        isPublic: "False",
       }, getTokenLocalStorage());
     },
     onSuccess: () => {
@@ -104,7 +114,7 @@ function useFetchAnnotations(articleUuid) {
     enabled: !!articleUuid,
     queryKey: ["annotations", articleUuid],
     queryFn: async (): Promise<Array<Annotation>> => {
-      const flatAnnotations = await fetchAnnotations(articleUuid).catch(
+      const flatAnnotations = await fetchAnnotations(articleUuid, getTokenLocalStorage()).catch(
         (error) => {
           return [];
         }
@@ -114,21 +124,28 @@ function useFetchAnnotations(articleUuid) {
   });
 }
 
+function useMakeAnnotationPublic(articleUuid, annotationUuid) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (annotationUuid: string) => {
+            const annotations = queryClient.getQueryData(["annotations", articleUuid]) as Array<Annotation>
+            const annotation = annotations.filter((annotation) => annotation.uuid === annotationUuid)[0]
+            const public_annotation = {...annotation, isPublic: true}
+            return updateAnnotation(flattenAnnotation(public_annotation), getTokenLocalStorage())
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ["annotations", articleUuid],
+            })
+        }
+    });
+}
+
 function useUpdateAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (annotation: Annotation) => {
-      const updatedAnnotation = {
-        ...annotation,
-        uuid: annotation.uuid,
-        highlightStart: annotation.highlight[0].characterRange.start,
-        highlightEnd: annotation.highlight[0].characterRange.end,
-        highlightBackward: annotation.highlight[0].backward,
-        article: articleUuid,
-        isPublic: "True",
-      };
-      delete updatedAnnotation.highlight;
-      return updateAnnotation(articleUuid, updatedAnnotation, getTokenLocalStorage());
+      return updateAnnotation(flattenAnnotation(annotation), getTokenLocalStorage());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -199,6 +216,7 @@ export {
   useUpdateArticle,
   useFetchAnnotations,
   useCreateAnnotation,
+  useMakeAnnotationPublic,
   useUpdateAnnotation,
   useDeleteAnnotation,
   useCreateComment,

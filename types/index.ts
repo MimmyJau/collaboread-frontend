@@ -42,6 +42,7 @@ export interface Annotation {
     article: string;
     highlight: Array<Highlight>;
     comments: Array<Comment>;
+    isPublic: boolean;
 }
 
 export interface FlatAnnotation {
@@ -52,6 +53,7 @@ export interface FlatAnnotation {
     highlightEnd: number;
     highlightBackward: boolean;
     comments: Array<Comment>;
+    isPublic: boolean;
 }
 
 export interface User {

@@ -7,6 +7,7 @@ import { Interweave } from "interweave";
 import Dropdown from "components/Dropdown";
 import Editor from "components/Editor";
 import {
+  useMakeAnnotationPublic,
   useDeleteAnnotation,
   useCreateComment,
   useUpdateComment,
@@ -93,6 +94,7 @@ const CommentButtons = (props) => {
   const articleUuid = slug[slug.length - 1];
   const createComment = useCreateComment(articleUuid);
   const updateComment = useUpdateComment(articleUuid);
+  const makeAnnotationPublic = useMakeAnnotationPublic(articleUuid);
 
   const postComment = props.commentUuid ? updateComment : createComment;
   const commentUuid = props.commentUuid || crypto.randomUUID();
@@ -116,6 +118,7 @@ const CommentButtons = (props) => {
             postComment.mutate(newComment, {
               onSuccess: () => {
                 props.setIsEditing(false);
+                makeAnnotationPublic.mutate(props.annotationUuid);
               },
             });
           }}

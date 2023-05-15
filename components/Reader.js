@@ -74,7 +74,6 @@ const Reader = (props) => {
   const slug = useRouter().query.slug || []; // Initially returns undefined
   const sectionSlug = slug[slug.length - 1];
   const createAnnotation = useCreateAnnotation(sectionSlug);
-  const updateAnnotation = useUpdateAnnotation(sectionSlug);
   const deleteAnnotation = useDeleteAnnotation(sectionSlug);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const {
