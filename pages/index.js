@@ -29,14 +29,6 @@ const Feed = () => {
         {data.map((article, index) => (
           <Card key={index} {...article} />
         ))}
-        <div className="bg-yellow-50 rounded-lg hover:bg-yellow-100 hover:rounded-lg">
-          <Link href={`/a/${zarathustraSlug}/`}>
-            <div className="p-5">
-              <h2 className="text-xl">Thus Spoke Zarathustra</h2>
-              <h3 className="text-sm">by Friedrich Nietzsche</h3>
-            </div>
-          </Link>
-        </div>
       </div>
     </div>
   );

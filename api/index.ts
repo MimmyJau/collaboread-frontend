@@ -39,7 +39,9 @@ function createAnnotation(articleUuid, highlightData, token) {
 
 function fetchAnnotations(articleUuid, token): Promise<Array<FlatAnnotation>> {
   const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
-  return ky.get(route, { headers: { Authorization: `Token ${token}` } }).json();
+  return ky
+    .get(route, { headers: { Authorization: token ? `Token ${token}` : "" } })
+    .json();
 }
 
 function updateAnnotation(annotation, token) {
