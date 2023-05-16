@@ -215,11 +215,7 @@ const Replies = (props) => {
       <div>
         <hr className="my-3" />
         {props.replies.map((comment, index) => {
-          return (
-            <>
-              <Reply key={index} comment={comment} />
-            </>
-          );
+          return <Reply key={index} comment={comment} />;
         })}
       </div>
     );
