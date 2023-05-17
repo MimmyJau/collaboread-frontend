@@ -22,7 +22,7 @@ export interface Highlight {
 
 export interface Comment {
   uuid: string;
-  user?: User;
+  user: string;
   article: string;
   annotation: string;
   parent: string;
@@ -31,14 +31,9 @@ export interface Comment {
   commentText: string;
 }
 
-export interface User {
-  uuid: string;
-  username: string;
-}
-
 export interface Annotation {
   uuid: string;
-  user: User;
+  user: string;
   article: string;
   highlight: Array<Highlight>;
   comments: Array<Comment>;
@@ -47,7 +42,7 @@ export interface Annotation {
 
 export interface FlatAnnotation {
   uuid: string;
-  user: User;
+  user: string;
   article: string;
   highlightStart: number;
   highlightEnd: number;

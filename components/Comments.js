@@ -41,10 +41,10 @@ const PostCommentButton = (props) => {
   );
 };
 
-const UserInfo = ({ user, isOwner, onDelete }) => {
+const UserInfo = ({ username, isOwner, onDelete }) => {
   return (
     <div className="flex flex-row justify-between items-center">
-      <span className="text-sm font-semibold">{user.username}</span>
+      <span className="text-sm font-semibold">{username}</span>
       {isOwner ? <Dropdown onDelete={() => onDelete()} /> : null}
     </div>
   );
@@ -143,7 +143,7 @@ const Comment = (props) => {
   const { user } = useAuth();
 
   const thereExistsComment = !!props.comment?.commentText;
-  const isOwner = props.user.username === user?.username;
+  const isOwner = props.username === user?.username;
 
   useEffect(() => {
     setIsEditing(false);
@@ -162,7 +162,11 @@ const Comment = (props) => {
 
   return (
     <div className="flex-grow pl-2">
-      <UserInfo user={props.user} isOwner={isOwner} onDelete={props.onDelete} />
+      <UserInfo
+        username={props.username}
+        isOwner={isOwner}
+        onDelete={props.onDelete}
+      />
       <CommentBody
         isEditing={isEditing}
         annotationUuid={props.annotationUuid}
@@ -201,9 +205,8 @@ const Reply = ({ comment }) => {
         onDelete={() => {
           deleteComment.mutate(comment);
         }}
-        user={{ username: comment.user }}
+        username={comment.user}
         annotationUuid={comment.annotation}
-        annotationHighlight={null}
       />
     </div>
   );
@@ -215,11 +218,7 @@ const Replies = (props) => {
       <div>
         <hr className="my-3" />
         {props.replies.map((comment, index) => {
-          return (
-            <>
-              <Reply key={index} comment={comment} />
-            </>
-          );
+          return <Reply key={index} comment={comment} />;
         })}
       </div>
     );
@@ -296,7 +295,7 @@ const Thread = (props) => {
       <CommentClickable annotationUuid={props.annotationUuid}>
         <Comment
           comment={props.comments}
-          user={props.user}
+          username={props.user}
           annotationUuid={props.annotationUuid}
           onDelete={() => {
             deleteAnnotation.mutate(props.annotationUuid, {
@@ -335,8 +334,6 @@ const SignUpMessage = () => {
 const Comments = (props) => {
   if (!props.fetchedAnnotations) return;
   const annotationUuid = props.focusedHighlightId;
-  const annotations = props.fetchedAnnotations;
-
   const focusedAnnotation = props.fetchedAnnotations.find(
     (annotation) => annotation.uuid === annotationUuid
   );
