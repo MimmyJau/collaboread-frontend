@@ -135,9 +135,9 @@ const Reader = (props) => {
       onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={(e) => handleMouseUp(e)}
     >
-      <TableOfContents className="col-start-1 col-span-1 overflow-y-auto px-3 pb-10" />
+      <TableOfContents className="hidden md:grid col-start-1 col-span-1 overflow-y-auto px-3 pb-10" />
       <Article
-        className="col-start-2 col-span-3 place-self-end overflow-y-auto h-full w-full"
+        className="col-start-1 col-span-6 md:col-start-2 md:col-span-3 md:place-self-end px-2 overflow-y-auto h-full w-full"
         html={wrapHtml(dataArticle.articleHtml)}
         prev={dataArticle.prev}
         next={dataArticle.next}
@@ -146,7 +146,7 @@ const Reader = (props) => {
       />
       <Comments
         unauthorizedSelection={unauthorizedSelection}
-        className="col-start-5 col-span-2 overflow-y-auto h-full"
+        className="hidden md:grid col-start-5 col-span-2 overflow-y-auto h-full"
         focusedHighlightId={focusedHighlightId}
         fetchedAnnotations={dataAnnotations}
       />
