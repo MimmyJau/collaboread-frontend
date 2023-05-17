@@ -207,7 +207,6 @@ const Reply = ({ comment }) => {
         }}
         username={comment.user}
         annotationUuid={comment.annotation}
-        annotationHighlight={null}
       />
     </div>
   );
