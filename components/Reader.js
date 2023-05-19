@@ -121,7 +121,6 @@ const Reader = (props) => {
     } else {
       const highlight = highlightSelection(
         crypto.randomUUID(),
-        deleteAnnotation,
         setFocusedHighlightId
       );
       createAnnotation.mutate(highlight);

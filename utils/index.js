@@ -23,7 +23,6 @@ function unselectSelection() {
 
 export function highlightSelection(
   annotationUuid = crypto.randomUUID(),
-  deleteAnnotation,
   setFocusedHighlightId
 ) {
   const range = getRangeFromSelection(document.getSelection());
@@ -51,18 +50,13 @@ function unhighlightSelection() {
 
 export function highlightFetchedAnnotations(
   annotations,
-  deleteAnnotation,
   setFocusedHighlightId
 ) {
   if (!annotations || annotations.length === 0) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     setSelectionFromRange(annotation.highlight);
-    highlightSelection(
-      annotation.uuid,
-      deleteAnnotation,
-      setFocusedHighlightId
-    );
+    highlightSelection(annotation.uuid, setFocusedHighlightId);
   });
   unselectSelection();
 }
