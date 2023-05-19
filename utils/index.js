@@ -7,6 +7,8 @@ function getHighlightableRoot() {
   return document.getElementById("content-highlightable");
 }
 
+// Returns a Range object based on selection. Like highlightSelection,
+// it requires that the selection already exist. This is a weird API.
 export function getRangeFromSelection(selection) {
   const highlightableRoot = getHighlightableRoot();
   return rangy.getSelection().saveCharacterRanges(highlightableRoot);
@@ -21,6 +23,31 @@ function unselectSelection() {
   rangy.getSelection().collapseToEnd();
 }
 
+/**
+ * Contains the main logic for actually adding span tags for highlighting.
+ *
+ * It requires that the selection already exist. This is a weird API.
+ * The selection should occur in this function instead of outside.
+ *
+ * Additionally, return object is bizarre. Right now after creating a highlight
+ * we then POST it to API. However, this leads to two flows, one from fetched
+ * annotations (that goes back -> front) and one for user-created annotations
+ * (that goes front -> back). We should unify these flows.
+ *
+ * Can also remove setFocusedHighlightId and replace it with a context. That
+ * way any component within the context (i.e. TableOfContents, Comments, Article,
+ * Reader, etc) can change the focused annotation. The name isn't great either.
+ *
+ * I would also like to refactor deleteAnnotation so it doesn't have to be prop
+ * drilled so deeply. I don't think we can do this with context. Perhaps we can
+ * do this instead with useRef. Wait actually it's not required at all...
+ *
+ * @param {string} annotationUuid: Property allowing us to reference
+ * @param {function} deleteAnnotation: Function to delete annotation
+ * @param {function} setFocusedHighlightId: Function to focus highlight after creating it
+ * @param {Document} doc: New param to specific document to use
+ * returns {object} { uuid: annotationUuid, highlight: range }
+ */
 export function highlightSelection(
   annotationUuid = crypto.randomUUID(),
   setFocusedHighlightId
@@ -48,6 +75,8 @@ function unhighlightSelection() {
   highlighter.unhighlightSelection();
 }
 
+// Take remote annotations and adds their highlights to current DOM window.
+// We want to modify this function so that it works on our virtual DOM object.
 export function highlightFetchedAnnotations(
   annotations,
   setFocusedHighlightId
