@@ -36,9 +36,14 @@ const PrevAndNextSection = (props) => {
 
 const MemoInterweave = memo(Interweave);
 
+function updateVirtualDom(article, annotations) {
+  return article;
+}
+
 const Article = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
+  const [virtualDom, setVirtualDom] = useState(props.html);
   const deleteAnnotation = useDeleteAnnotation(rootSlug);
 
   useEffect(() => {
@@ -49,6 +54,19 @@ const Article = (props) => {
     );
   }, [props.fetchedAnnotations]);
 
+  /**
+   * Main useEffect:
+   * Responsible for updating virtualDOM of article.
+   * Update triggered whenever article or annotations change.
+   */
+  useEffect(() => {
+    const newVirtualDom = updateVirtualDom(
+      props.html,
+      props.fetchedAnnotations
+    );
+    setVirtualDom(props.html);
+  }, [props.html, props.fetchedAnnotations]);
+
   return (
     <div className={`flex flex-col items-center ${props.className}`}>
       <PrevAndNextSection
@@ -56,7 +74,7 @@ const Article = (props) => {
         nextHref={props.next?.join("/")}
       />
       <div id="article" className="prose">
-        <MemoInterweave content={props.html} />
+        <MemoInterweave content={virtualDom} />
       </div>
       <PrevAndNextSection
         prevHref={props.prev?.join("/")}
