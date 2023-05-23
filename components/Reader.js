@@ -93,30 +93,30 @@ const Reader = (props) => {
 
   function handleMouseUp(e) {
     setUnauthorizedSelection(false);
-    if (user && !document.getSelection().isCollapsed) {
-      highlightAndSaveSelection();
-    }
-    if (!user && !document.getSelection().isCollapsed) {
+    if (document.getSelection().isCollapsed) return;
+    if (user) {
+      saveSelection(document.getSelection());
+    } else {
       setUnauthorizedSelection(true);
     }
-    if (
-      document.getElementById("article").contains(e.target) &&
-      !e.target.classList.contains("highlight")
-    ) {
+    const isMouseInArticle = document
+      .getElementById("article")
+      .contains(e.target);
+    const isMouseInHighlight = e.target.classList.contains("highlight");
+    if (isMouseInArticle && !isMouseInHighlight) {
       setFocusedHighlightId(null);
       removeAllHoverClasses();
     }
   }
 
-  function highlightAndSaveSelection() {
-    if (document.getSelection().isCollapsed) return;
+  function saveSelection(selection) {
     if (!isSelectionInArticle()) return;
-    const newHighlight = getRangeFromSelection(document.getSelection());
-    const isOverlapping = doAnyHighlightsOverlap(newHighlight, annotations);
+    const range = getRangeFromSelection(selection);
+    const isOverlapping = doAnyHighlightsOverlap(range, annotations);
     if (isOverlapping) {
-      document.getSelection().collapse(null);
+      selection.collapse(null);
     } else {
-      createAnnotation.mutate(newHighlight[0]);
+      createAnnotation.mutate(range[0]);
     }
   }
 
