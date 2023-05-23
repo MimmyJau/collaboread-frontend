@@ -11,7 +11,7 @@ import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
-  doesHighlightOverlapWithAnnotations,
+  doAnyHighlightsOverlap,
   getRangeFromSelection,
   highlightSelection,
   isSelectionInArticle,
@@ -79,13 +79,13 @@ const Reader = (props) => {
   const {
     isLoading: isLoadingArticle,
     isError: isErrorArticle,
-    data: dataArticle,
+    data: article,
     error: errorArticle,
   } = useFetchArticle(sectionSlug);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,
-    data: dataAnnotations,
+    data: annotations,
     error: errorAnnotations,
   } = useFetchAnnotations(sectionSlug);
   const { user } = useAuth();
@@ -112,11 +112,8 @@ const Reader = (props) => {
     if (document.getSelection().isCollapsed) return;
     if (!isSelectionInArticle()) return;
     const newHighlight = getRangeFromSelection(document.getSelection());
-    const overlappingAnnotation = doesHighlightOverlapWithAnnotations(
-      newHighlight,
-      dataAnnotations
-    );
-    if (overlappingAnnotation) {
+    const isOverlapping = doAnyHighlightsOverlap(newHighlight, annotations);
+    if (isOverlapping) {
       document.getSelection().collapse(null);
     } else {
       const highlight = highlightSelection(
@@ -137,17 +134,17 @@ const Reader = (props) => {
       <TableOfContents className="hidden md:grid col-start-1 col-span-1 overflow-y-auto px-3 pb-10" />
       <Article
         className="col-start-1 col-span-6 md:col-start-2 md:col-span-3 md:place-self-end px-2 overflow-y-auto h-full w-full"
-        html={wrapHtml(dataArticle.articleHtml)}
-        prev={dataArticle.prev}
-        next={dataArticle.next}
-        fetchedAnnotations={dataAnnotations}
+        html={wrapHtml(article.articleHtml)}
+        prev={article.prev}
+        next={article.next}
+        fetchedAnnotations={annotations}
         setFocusedHighlightId={setFocusedHighlightId}
       />
       <Comments
         unauthorizedSelection={unauthorizedSelection}
         className="hidden md:grid col-start-5 col-span-2 overflow-y-auto h-full"
         focusedHighlightId={focusedHighlightId}
-        fetchedAnnotations={dataAnnotations}
+        fetchedAnnotations={annotations}
       />
     </div>
   );

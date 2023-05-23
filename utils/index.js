@@ -136,7 +136,7 @@ function doHighlightsOverlap(h1, h2) {
   return isXInBetweenYAndZ(h1s, h2s, h2e) || isXInBetweenYAndZ(h2s, h1s, h1e);
 }
 
-export function doesHighlightOverlapWithAnnotations(newHighlight, annotations) {
+export function doAnyHighlightsOverlap(newHighlight, annotations) {
   for (const oldAnnotation of annotations) {
     if (doHighlightsOverlap(newHighlight, oldAnnotation.highlight))
       return oldAnnotation;
