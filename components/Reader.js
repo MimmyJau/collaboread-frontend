@@ -116,11 +116,7 @@ const Reader = (props) => {
     if (isOverlapping) {
       document.getSelection().collapse(null);
     } else {
-      const highlight = highlightSelection(
-        crypto.randomUUID(),
-        setFocusedHighlightId
-      );
-      createAnnotation.mutate(highlight);
+      createAnnotation.mutate(newHighlight[0]);
     }
   }
 

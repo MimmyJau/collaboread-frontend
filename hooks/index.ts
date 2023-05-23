@@ -99,20 +99,13 @@ function useUpdateArticle(articleUuid) {
 function useCreateAnnotation(articleUuid) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      uuid,
-      highlight,
-    }: {
-      uuid: string;
-      highlight: Highlight;
-    }) => {
+    mutationFn: (highlight: Highlight) => {
       return createAnnotation(
         articleUuid,
         {
-          uuid: uuid,
-          highlightStart: highlight[0].characterRange.start,
-          highlightEnd: highlight[0].characterRange.end,
-          highlightBackward: highlight[0].backward,
+          highlightStart: highlight.characterRange.start,
+          highlightEnd: highlight.characterRange.end,
+          highlightBackward: highlight.backward,
           article: articleUuid,
           isPublic: "False",
         },
