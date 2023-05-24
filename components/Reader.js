@@ -11,10 +11,10 @@ import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
-  doAnyHighlightsOverlap,
   getRangeFromSelection,
-  highlightSelection,
-  isSelectionInArticle,
+  isSelectionValid,
+  isSelectionCollapsed,
+  isClickingEmptyArea,
 } from "utils";
 import Comments from "components/Comments.js";
 
@@ -93,29 +93,18 @@ const Reader = (props) => {
 
   function handleMouseUp(e) {
     setUnauthorizedSelection(false);
-    if (document.getSelection().isCollapsed) return;
-    if (user) {
-      saveSelection(document.getSelection());
-    } else {
+    if (isSelectionCollapsed()) {
+      if (isClickingEmptyArea(e)) {
+        setFocusedHighlightId(null);
+        removeAllHoverClasses();
+      }
+      // else clicking comment or something else
+    } else if (!user) {
       setUnauthorizedSelection(true);
-    }
-    const isMouseInArticle = document
-      .getElementById("article")
-      .contains(e.target);
-    const isMouseInHighlight = e.target.classList.contains("highlight");
-    if (isMouseInArticle && !isMouseInHighlight) {
-      setFocusedHighlightId(null);
-      removeAllHoverClasses();
-    }
-  }
-
-  function saveSelection(selection) {
-    if (!isSelectionInArticle()) return;
-    const range = getRangeFromSelection(selection);
-    const isOverlapping = doAnyHighlightsOverlap(range, annotations);
-    if (isOverlapping) {
-      selection.collapse(null);
+    } else if (!isSelectionValid(annotations)) {
+      document.getSelection().collapse(null);
     } else {
+      const range = getRangeFromSelection(document.getSelection());
       createAnnotation.mutate(range[0]);
     }
   }

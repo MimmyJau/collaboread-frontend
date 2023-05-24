@@ -14,6 +14,7 @@ export function getRangeFromSelection(selection) {
   return rangy.getSelection().saveCharacterRanges(highlightableRoot);
 }
 
+//Given a range object, convert it to a selection.
 function setSelectionFromRange(range) {
   const highlightableRoot = getHighlightableRoot();
   return rangy.getSelection().restoreCharacterRanges(highlightableRoot, range);
@@ -48,7 +49,7 @@ function unselectSelection() {
  * @param {Document} doc: New param to specific document to use
  * returns {object} { uuid: annotationUuid, highlight: range }
  */
-export function highlightSelection(
+function highlightSelection(
   annotationUuid = crypto.randomUUID(),
   setFocusedHighlightId
 ) {
@@ -117,13 +118,6 @@ export function clearHighlight(annotationUuid, range) {
   removeHangingSpanTags(annotationUuid);
 }
 
-export function isSelectionInArticle() {
-  const selection = document.getSelection();
-  const selectionRange = selection.getRangeAt(0);
-  const content = document.getElementById("content-highlightable");
-  return content.contains(selectionRange.commonAncestorContainer);
-}
-
 function isXInBetweenYAndZ(x, y, z) {
   return x >= y && x <= z;
 }
@@ -136,10 +130,42 @@ function doHighlightsOverlap(h1, h2) {
   return isXInBetweenYAndZ(h1s, h2s, h2e) || isXInBetweenYAndZ(h2s, h1s, h1e);
 }
 
-export function doAnyHighlightsOverlap(newHighlight, annotations) {
+function doAnyHighlightsOverlap(newHighlight, annotations) {
   for (const oldAnnotation of annotations) {
     if (doHighlightsOverlap(newHighlight, oldAnnotation.highlight))
       return oldAnnotation;
   }
   return false;
+}
+
+export function isSelectionCollapsed() {
+  return document.getSelection().isCollapsed;
+}
+
+function isSelectionOverlapping(annotations) {
+  const range = getRangeFromSelection(document.getSelection());
+  return doAnyHighlightsOverlap(range, annotations);
+}
+
+function isSelectionInArticle() {
+  const selection = document.getSelection();
+  const selectionRange = selection.getRangeAt(0);
+  const content = document.getElementById("content-highlightable");
+  return content.contains(selectionRange.commonAncestorContainer);
+}
+
+export function isSelectionValid(annotations) {
+  return !isSelectionOverlapping(annotations) && isSelectionInArticle();
+}
+
+function isMouseInArticle(e) {
+  return document.getElementById("article").contains(e.target);
+}
+
+function isMouseInHighlight(e) {
+  return e.target.classList.contains("highlight");
+}
+
+export function isClickingEmptyArea(e) {
+  return isMouseInArticle(e) && !isMouseInHighlight(e);
 }
