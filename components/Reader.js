@@ -92,25 +92,30 @@ const Reader = (props) => {
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 
   function handleMouseUp(e) {
+    // Use inverted if statements to reduce nesting
+    // Source: https://softwareengineering.stackexchange.com/a/18454
     setUnauthorizedSelection(false);
     if (isSelectionCollapsed()) {
       if (isClickingEmptyArea(e)) {
         setFocusedHighlightId(null);
         removeAllHoverClasses();
       }
-      // else clicking comment or something else
-    } else if (!user) {
-      setUnauthorizedSelection(true);
-    } else if (!isSelectionValid(annotations)) {
-      document.getSelection().collapse(null);
-    } else {
-      const range = getRangeFromSelection(document.getSelection());
-      createAnnotation.mutate(range[0], {
-        onSuccess: (data) => {
-          setFocusedHighlightId(data.uuid);
-        },
-      });
+      return;
     }
+    if (!isSelectionValid(annotations)) {
+      document.getSelection().collapse(null);
+      return;
+    }
+    if (!user) {
+      setUnauthorizedSelection(true);
+      return;
+    }
+    const range = getRangeFromSelection(document.getSelection());
+    createAnnotation.mutate(range[0], {
+      onSuccess: (data) => {
+        setFocusedHighlightId(data.uuid);
+      },
+    });
   }
 
   if (isLoadingArticle || isErrorArticle) return;
@@ -124,10 +129,10 @@ const Reader = (props) => {
       <Article
         className="col-start-1 col-span-6 md:col-start-2 md:col-span-3 md:place-self-end px-2 overflow-y-auto h-full w-full"
         html={wrapHtml(article.articleHtml)}
-        prev={article.prev}
-        next={article.next}
         fetchedAnnotations={annotations}
         setFocusedHighlightId={setFocusedHighlightId}
+        prev={article.prev}
+        next={article.next}
       />
       <Comments
         unauthorizedSelection={unauthorizedSelection}
