@@ -35,24 +35,16 @@ function unselectSelection() {
  * annotations (that goes back -> front) and one for user-created annotations
  * (that goes front -> back). We should unify these flows.
  *
- * Can also remove setFocusedHighlightId and replace it with a context. That
- * way any component within the context (i.e. TableOfContents, Comments, Article,
- * Reader, etc) can change the focused annotation. The name isn't great either.
- *
  * I would also like to refactor deleteAnnotation so it doesn't have to be prop
  * drilled so deeply. I don't think we can do this with context. Perhaps we can
  * do this instead with useRef. Wait actually it's not required at all...
  *
  * @param {string} annotationUuid: Property allowing us to reference
  * @param {function} deleteAnnotation: Function to delete annotation
- * @param {function} setFocusedHighlightId: Function to focus highlight after creating it
  * @param {Document} doc: New param to specific document to use
  * returns {object} { uuid: annotationUuid, highlight: range }
  */
-function highlightSelection(
-  annotationUuid = crypto.randomUUID(),
-  setFocusedHighlightId
-) {
+function highlightSelection(annotationUuid = crypto.randomUUID()) {
   const range = getRangeFromSelection(document.getSelection());
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   const highlighter = rangy.createHighlighter();
@@ -78,15 +70,12 @@ function unhighlightSelection() {
 
 // Take remote annotations and adds their highlights to current DOM window.
 // We want to modify this function so that it works on our virtual DOM object.
-export function highlightFetchedAnnotations(
-  annotations,
-  setFocusedHighlightId
-) {
+export function highlightFetchedAnnotations(annotations) {
   if (!annotations || annotations.length === 0) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     setSelectionFromRange(annotation.highlight);
-    highlightSelection(annotation.uuid, setFocusedHighlightId);
+    highlightSelection(annotation.uuid);
   });
   unselectSelection();
 }

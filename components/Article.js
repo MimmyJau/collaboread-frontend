@@ -47,11 +47,7 @@ const Article = (props) => {
   const deleteAnnotation = useDeleteAnnotation(rootSlug);
 
   useEffect(() => {
-    highlightFetchedAnnotations(
-      props.fetchedAnnotations,
-      deleteAnnotation,
-      props.setFocusedHighlightId
-    );
+    highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
   }, [props.fetchedAnnotations]);
 
   /**
