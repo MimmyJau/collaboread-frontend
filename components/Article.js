@@ -4,7 +4,7 @@ import { memo, useEffect, useState } from "react";
 import { Interweave } from "interweave";
 
 import { useDeleteAnnotation } from "hooks";
-import { highlightFetchedAnnotations } from "utils";
+import { highlightFetchedAnnotations, removeAllHoverClasses } from "utils";
 
 const NavButton = ({ text, href }) => {
   return (
@@ -40,11 +40,33 @@ function updateVirtualDom(article, annotations) {
   return article;
 }
 
+function addClassToElements(elements, className) {
+  for (const element of elements) {
+    element.classList.add(className);
+  }
+}
+
+function addHoverClassToRelatedHighlights(annotationId) {
+  const relatedHighlights = getRelatedHighlights(annotationId);
+  addClassToElements(relatedHighlights, "bg-yellow-400");
+}
+
+function extractAnnotationIdFromEvent(e) {
+  return e.target.dataset.annotationId || "";
+}
+
+function getRelatedHighlights(annotationId) {
+  return document.querySelectorAll(
+    `.highlight[data-annotation-id="${annotationId}"]`
+  );
+}
+
 const Article = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
   const [virtualDom, setVirtualDom] = useState(props.html);
   const deleteAnnotation = useDeleteAnnotation(rootSlug);
+  const setFocusedHighlightId = props.setFocusedHighlightId;
 
   useEffect(() => {
     highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
@@ -63,8 +85,20 @@ const Article = (props) => {
     setVirtualDom(props.html);
   }, [props.html, props.fetchedAnnotations]);
 
+  function syncHoverBehavior(e) {
+    const annotationId = extractAnnotationIdFromEvent(e);
+    if (annotationId) {
+      removeAllHoverClasses();
+      setFocusedHighlightId(annotationId);
+      addHoverClassToRelatedHighlights(annotationId);
+    }
+  }
+
   return (
-    <div className={`flex flex-col items-center ${props.className}`}>
+    <div
+      className={`flex flex-col items-center ${props.className}`}
+      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
+    >
       <PrevAndNextSection
         prevHref={props.prev?.join("/")}
         nextHref={props.next?.join("/")}

@@ -158,3 +158,20 @@ function isMouseInHighlight(e) {
 export function isClickingEmptyArea(e) {
   return isMouseInArticle(e) && !isMouseInHighlight(e);
 }
+
+function getAllHoveredHighlights() {
+  return document.getElementsByClassName("bg-yellow-400");
+}
+
+function removeClassFromElements(elements, className) {
+  for (const element of elements) {
+    element.classList.remove(className);
+  }
+}
+
+export function removeAllHoverClasses() {
+  // We use Array.from() since geElementsByClassName returns a live collection.
+  // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
+  const hoveredHighlights = Array.from(getAllHoveredHighlights());
+  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
+}

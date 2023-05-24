@@ -15,46 +15,9 @@ import {
   isSelectionValid,
   isSelectionCollapsed,
   isClickingEmptyArea,
+  removeAllHoverClasses,
 } from "utils";
 import Comments from "components/Comments.js";
-
-function addClassToElements(elements, className) {
-  for (const element of elements) {
-    element.classList.add(className);
-  }
-}
-
-function removeClassFromElements(elements, className) {
-  for (const element of elements) {
-    element.classList.remove(className);
-  }
-}
-
-function getAllHoveredHighlights() {
-  return document.getElementsByClassName("bg-yellow-400");
-}
-
-function addHoverClassToRelatedHighlights(annotationId) {
-  const relatedHighlights = getRelatedHighlights(annotationId);
-  addClassToElements(relatedHighlights, "bg-yellow-400");
-}
-
-function removeAllHoverClasses() {
-  // We use Array.from() since geElementsByClassName returns a live collection.
-  // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
-  const hoveredHighlights = Array.from(getAllHoveredHighlights());
-  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
-}
-
-function extractAnnotationIdFromEvent(e) {
-  return e.target.dataset.annotationId || "";
-}
-
-function getRelatedHighlights(annotationId) {
-  return document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationId}"]`
-  );
-}
 
 function wrapHtml(rawHtml) {
   if (!rawHtml) return;
@@ -81,15 +44,6 @@ const Reader = (props) => {
   } = useFetchAnnotations(sectionSlug);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
-
-  function syncHoverBehavior(e) {
-    const annotationId = extractAnnotationIdFromEvent(e);
-    if (annotationId) {
-      removeAllHoverClasses();
-      setFocusedHighlightId(annotationId);
-      addHoverClassToRelatedHighlights(annotationId);
-    }
-  }
 
   function handleMouseUp(e) {
     // Use inverted if statements to reduce nesting
@@ -122,7 +76,6 @@ const Reader = (props) => {
   return (
     <div
       className="grid grid-cols-6 gap-1 h-full overflow-hidden"
-      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={(e) => handleMouseUp(e)}
     >
       <TableOfContents className="hidden md:grid col-start-1 col-span-1 overflow-y-auto px-3 pb-10" />
@@ -132,6 +85,7 @@ const Reader = (props) => {
         fetchedAnnotations={annotations}
         prev={article.prev}
         next={article.next}
+        setFocusedHighlightId={setFocusedHighlightId}
       />
       <Comments
         unauthorizedSelection={unauthorizedSelection}
