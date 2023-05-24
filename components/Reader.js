@@ -56,15 +56,6 @@ function getRelatedHighlights(annotationId) {
   );
 }
 
-function syncHoverBehavior(e, setFocusedHighlightId) {
-  const annotationId = extractAnnotationIdFromEvent(e);
-  if (annotationId) {
-    removeAllHoverClasses();
-    setFocusedHighlightId(annotationId);
-    addHoverClassToRelatedHighlights(annotationId);
-  }
-}
-
 function wrapHtml(rawHtml) {
   if (!rawHtml) return;
   return `<div id="content-highlightable">` + rawHtml + `</div>`;
@@ -90,6 +81,15 @@ const Reader = (props) => {
   } = useFetchAnnotations(sectionSlug);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
+
+  function syncHoverBehavior(e) {
+    const annotationId = extractAnnotationIdFromEvent(e);
+    if (annotationId) {
+      removeAllHoverClasses();
+      setFocusedHighlightId(annotationId);
+      addHoverClassToRelatedHighlights(annotationId);
+    }
+  }
 
   function handleMouseUp(e) {
     // Use inverted if statements to reduce nesting
