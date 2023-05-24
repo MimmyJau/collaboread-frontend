@@ -105,7 +105,11 @@ const Reader = (props) => {
       document.getSelection().collapse(null);
     } else {
       const range = getRangeFromSelection(document.getSelection());
-      createAnnotation.mutate(range[0]);
+      createAnnotation.mutate(range[0], {
+        onSuccess: (data) => {
+          setFocusedHighlightId(data.uuid);
+        },
+      });
     }
   }
 
