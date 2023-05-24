@@ -85,7 +85,8 @@ const Reader = (props) => {
         fetchedAnnotations={annotations}
         prev={article.prev}
         next={article.next}
-        setFocusedHighlightId={setFocusedHighlightId}
+        focus={focusedHighlightId}
+        setFocus={setFocusedHighlightId}
       />
       <Comments
         unauthorizedSelection={unauthorizedSelection}

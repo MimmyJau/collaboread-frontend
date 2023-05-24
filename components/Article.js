@@ -46,6 +46,12 @@ function addClassToElements(elements, className) {
   }
 }
 
+function getRelatedHighlights(annotationId) {
+  return document.querySelectorAll(
+    `.highlight[data-annotation-id="${annotationId}"]`
+  );
+}
+
 function addHoverClassToRelatedHighlights(annotationId) {
   const relatedHighlights = getRelatedHighlights(annotationId);
   addClassToElements(relatedHighlights, "bg-yellow-400");
@@ -55,21 +61,14 @@ function extractAnnotationIdFromEvent(e) {
   return e.target.dataset.annotationId || "";
 }
 
-function getRelatedHighlights(annotationId) {
-  return document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationId}"]`
-  );
-}
-
 const Article = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
   const [virtualDom, setVirtualDom] = useState(props.html);
-  const deleteAnnotation = useDeleteAnnotation(rootSlug);
-  const setFocusedHighlightId = props.setFocusedHighlightId;
+  const setFocus = props.setFocus;
 
   useEffect(() => {
-    highlightFetchedAnnotations(props.fetchedAnnotations, deleteAnnotation);
+    highlightFetchedAnnotations(props.fetchedAnnotations);
   }, [props.fetchedAnnotations]);
 
   /**
@@ -89,7 +88,7 @@ const Article = (props) => {
     const annotationId = extractAnnotationIdFromEvent(e);
     if (annotationId) {
       removeAllHoverClasses();
-      setFocusedHighlightId(annotationId);
+      setFocus(annotationId);
       addHoverClassToRelatedHighlights(annotationId);
     }
   }
@@ -97,7 +96,7 @@ const Article = (props) => {
   return (
     <div
       className={`flex flex-col items-center ${props.className}`}
-      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
+      onMouseOver={(e) => syncHoverBehavior(e, setFocus)}
     >
       <PrevAndNextSection
         prevHref={props.prev?.join("/")}

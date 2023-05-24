@@ -159,6 +159,8 @@ export function isClickingEmptyArea(e) {
   return isMouseInArticle(e) && !isMouseInHighlight(e);
 }
 
+// SyncHoverBehaviour functions
+
 function getAllHoveredHighlights() {
   return document.getElementsByClassName("bg-yellow-400");
 }
