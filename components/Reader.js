@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
+
 import {
   useFetchArticle,
   useFetchAnnotations,
@@ -11,6 +12,7 @@ import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
+  clearHighlight,
   getRangeFromSelection,
   isSelectionValid,
   isSelectionCollapsed,
@@ -85,7 +87,6 @@ const Reader = (props) => {
         fetchedAnnotations={annotations}
         prev={article.prev}
         next={article.next}
-        focus={focusedHighlightId}
         setFocus={setFocusedHighlightId}
       />
       <Comments

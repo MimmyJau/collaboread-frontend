@@ -98,6 +98,7 @@ function removeHangingSpanTags(annotationUuid) {
       pa.insertBefore(el.firstChild, el);
     }
     pa.removeChild(el);
+    pa.normalize();
   });
 }
 

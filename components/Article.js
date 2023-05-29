@@ -4,7 +4,11 @@ import { memo, useEffect, useState } from "react";
 import { Interweave } from "interweave";
 
 import { useDeleteAnnotation } from "hooks";
-import { highlightFetchedAnnotations, removeAllHoverClasses } from "utils";
+import {
+  clearHighlight,
+  highlightFetchedAnnotations,
+  removeAllHoverClasses,
+} from "utils";
 
 const NavButton = ({ text, href }) => {
   return (
@@ -36,10 +40,6 @@ const PrevAndNextSection = (props) => {
 
 const MemoInterweave = memo(Interweave);
 
-function updateVirtualDom(article, annotations) {
-  return article;
-}
-
 function addClassToElements(elements, className) {
   for (const element of elements) {
     element.classList.add(className);
@@ -64,12 +64,24 @@ function extractAnnotationIdFromEvent(e) {
 const Article = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
+  const sectionSlug = slug[slug.length - 1];
   const [virtualDom, setVirtualDom] = useState(props.html);
   const setFocus = props.setFocus;
 
   useEffect(() => {
+    setVirtualDom(props.html);
     highlightFetchedAnnotations(props.fetchedAnnotations);
-  }, [props.fetchedAnnotations]);
+    return () => {
+      if (!props.fetchedAnnotations) return;
+      clearAllHighlights();
+    };
+  }, [props.html, props.fetchedAnnotations]);
+
+  function clearAllHighlights() {
+    for (const annotation of props.fetchedAnnotations) {
+      clearHighlight(annotation.uuid, annotation.highlight);
+    }
+  }
 
   /**
    * Main useEffect:
@@ -77,10 +89,6 @@ const Article = (props) => {
    * Update triggered whenever article or annotations change.
    */
   useEffect(() => {
-    const newVirtualDom = updateVirtualDom(
-      props.html,
-      props.fetchedAnnotations
-    );
     setVirtualDom(props.html);
   }, [props.html, props.fetchedAnnotations]);
 
@@ -102,8 +110,9 @@ const Article = (props) => {
         prevHref={props.prev?.join("/")}
         nextHref={props.next?.join("/")}
       />
+      <button onClick={clearAllHighlights}>Clear All Highlights</button>
       <div id="article" className="prose">
-        <MemoInterweave content={virtualDom} />
+        <Interweave content={props.html} />
       </div>
       <PrevAndNextSection
         prevHref={props.prev?.join("/")}
