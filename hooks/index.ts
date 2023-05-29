@@ -27,6 +27,7 @@ function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
         start: flatAnnotation.highlightStart,
         end: flatAnnotation.highlightEnd,
       },
+      serialization: flatAnnotation.serialization,
       backward: flatAnnotation.highlightBackward,
     }),
     comments: flatAnnotation.comments,
@@ -39,6 +40,7 @@ function flattenAnnotation(annotation: Annotation): FlatAnnotation {
     ...annotation,
     highlightStart: annotation.highlight[0].characterRange.start,
     highlightEnd: annotation.highlight[0].characterRange.end,
+    highlightSerialization: annotation.highlight[0].serialization,
     highlightBackward: annotation.highlight[0].backward,
   };
 }
@@ -105,6 +107,7 @@ function useCreateAnnotation(articleUuid) {
         {
           highlightStart: highlight.characterRange.start,
           highlightEnd: highlight.characterRange.end,
+          highlightSerialization: highlight.serialization,
           highlightBackward: highlight.backward,
           article: articleUuid,
           isPublic: "False",

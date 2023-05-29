@@ -17,6 +17,7 @@ export interface Highlight {
     start: number;
     end: number;
   };
+  serialization: string;
   backward: boolean;
 }
 
@@ -46,6 +47,7 @@ export interface FlatAnnotation {
   article: string;
   highlightStart: number;
   highlightEnd: number;
+  highlightSerialization: string;
   highlightBackward: boolean;
   comments: Array<Comment>;
   isPublic: boolean;
