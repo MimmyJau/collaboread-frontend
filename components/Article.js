@@ -3,11 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useDeleteAnnotation } from "hooks";
-import {
-  clearHighlight,
-  highlightFetchedAnnotations,
-  removeAllHoverClasses,
-} from "utils";
+import { highlightFetchedAnnotations, removeAllHoverClasses } from "utils";
 
 const NavButton = ({ text, href }) => {
   return (
