@@ -7,11 +7,14 @@ function getHighlightableRoot() {
   return document.getElementById("content-highlightable");
 }
 
+// Returns a Range object based on selection. Like highlightSelection,
+// it requires that the selection already exist. This is a weird API.
 export function getRangeFromSelection(selection) {
   const highlightableRoot = getHighlightableRoot();
   return rangy.getSelection().saveCharacterRanges(highlightableRoot);
 }
 
+//Given a range object, convert it to a selection.
 function setSelectionFromRange(range) {
   const highlightableRoot = getHighlightableRoot();
   return rangy.getSelection().restoreCharacterRanges(highlightableRoot, range);
@@ -21,11 +24,27 @@ function unselectSelection() {
   rangy.getSelection().collapseToEnd();
 }
 
-export function highlightSelection(
-  annotationUuid = crypto.randomUUID(),
-  deleteAnnotation,
-  setFocusedHighlightId
-) {
+/**
+ * Contains the main logic for actually adding span tags for highlighting.
+ *
+ * It requires that the selection already exist. This is a weird API.
+ * The selection should occur in this function instead of outside.
+ *
+ * Additionally, return object is bizarre. Right now after creating a highlight
+ * we then POST it to API. However, this leads to two flows, one from fetched
+ * annotations (that goes back -> front) and one for user-created annotations
+ * (that goes front -> back). We should unify these flows.
+ *
+ * I would also like to refactor deleteAnnotation so it doesn't have to be prop
+ * drilled so deeply. I don't think we can do this with context. Perhaps we can
+ * do this instead with useRef. Wait actually it's not required at all...
+ *
+ * @param {string} annotationUuid: Property allowing us to reference
+ * @param {function} deleteAnnotation: Function to delete annotation
+ * @param {Document} doc: New param to specific document to use
+ * returns {object} { uuid: annotationUuid, highlight: range }
+ */
+function highlightSelection(annotationUuid = crypto.randomUUID()) {
   const range = getRangeFromSelection(document.getSelection());
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   const highlighter = rangy.createHighlighter();
@@ -49,20 +68,14 @@ function unhighlightSelection() {
   highlighter.unhighlightSelection();
 }
 
-export function highlightFetchedAnnotations(
-  annotations,
-  deleteAnnotation,
-  setFocusedHighlightId
-) {
+// Take remote annotations and adds their highlights to current DOM window.
+// We want to modify this function so that it works on our virtual DOM object.
+export function highlightFetchedAnnotations(annotations) {
   if (!annotations || annotations.length === 0) return;
   const highlightableRoot = getHighlightableRoot();
   annotations.forEach((annotation, index) => {
     setSelectionFromRange(annotation.highlight);
-    highlightSelection(
-      annotation.uuid,
-      deleteAnnotation,
-      setFocusedHighlightId
-    );
+    highlightSelection(annotation.uuid);
   });
   unselectSelection();
 }
@@ -85,6 +98,7 @@ function removeHangingSpanTags(annotationUuid) {
       pa.insertBefore(el.firstChild, el);
     }
     pa.removeChild(el);
+    pa.normalize();
   });
 }
 
@@ -92,13 +106,6 @@ export function clearHighlight(annotationUuid, range) {
   setSelectionFromRange(range);
   unhighlightSelection();
   removeHangingSpanTags(annotationUuid);
-}
-
-export function isSelectionInArticle() {
-  const selection = document.getSelection();
-  const selectionRange = selection.getRangeAt(0);
-  const content = document.getElementById("content-highlightable");
-  return content.contains(selectionRange.commonAncestorContainer);
 }
 
 function isXInBetweenYAndZ(x, y, z) {
@@ -113,10 +120,61 @@ function doHighlightsOverlap(h1, h2) {
   return isXInBetweenYAndZ(h1s, h2s, h2e) || isXInBetweenYAndZ(h2s, h1s, h1e);
 }
 
-export function doesHighlightOverlapWithAnnotations(newHighlight, annotations) {
+function doAnyHighlightsOverlap(newHighlight, annotations) {
   for (const oldAnnotation of annotations) {
     if (doHighlightsOverlap(newHighlight, oldAnnotation.highlight))
       return oldAnnotation;
   }
   return false;
+}
+
+export function isSelectionCollapsed() {
+  return document.getSelection().isCollapsed;
+}
+
+function isSelectionOverlapping(annotations) {
+  const range = getRangeFromSelection(document.getSelection());
+  return doAnyHighlightsOverlap(range, annotations);
+}
+
+function isSelectionInArticle() {
+  const selection = document.getSelection();
+  const selectionRange = selection.getRangeAt(0);
+  const content = document.getElementById("content-highlightable");
+  return content.contains(selectionRange.commonAncestorContainer);
+}
+
+export function isSelectionValid(annotations) {
+  return !isSelectionOverlapping(annotations) && isSelectionInArticle();
+}
+
+function isMouseInArticle(e) {
+  return document.getElementById("article").contains(e.target);
+}
+
+function isMouseInHighlight(e) {
+  return e.target.classList.contains("highlight");
+}
+
+export function isClickingEmptyArea(e) {
+  return isMouseInArticle(e) && !isMouseInHighlight(e);
+}
+
+// SyncHoverBehaviour functions
+
+function getAllHoveredHighlights() {
+  return document.getElementsByClassName("bg-yellow-400");
+}
+
+function removeClassFromElements(elements, className) {
+  for (const element of elements) {
+    element.classList.remove(className);
+  }
+}
+
+export function removeAllHoverClasses() {
+  // We use Array.from() since geElementsByClassName returns a live collection.
+  // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
+  const hoveredHighlights = Array.from(getAllHoveredHighlights());
+  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
 }

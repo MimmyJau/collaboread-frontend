@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
+
 import {
   useFetchArticle,
   useFetchAnnotations,
@@ -11,59 +12,14 @@ import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
-  doesHighlightOverlapWithAnnotations,
+  clearHighlight,
   getRangeFromSelection,
-  highlightSelection,
-  isSelectionInArticle,
+  isSelectionValid,
+  isSelectionCollapsed,
+  isClickingEmptyArea,
+  removeAllHoverClasses,
 } from "utils";
 import Comments from "components/Comments.js";
-
-function addClassToElements(elements, className) {
-  for (const element of elements) {
-    element.classList.add(className);
-  }
-}
-
-function removeClassFromElements(elements, className) {
-  for (const element of elements) {
-    element.classList.remove(className);
-  }
-}
-
-function getAllHoveredHighlights() {
-  return document.getElementsByClassName("bg-yellow-400");
-}
-
-function addHoverClassToRelatedHighlights(annotationId) {
-  const relatedHighlights = getRelatedHighlights(annotationId);
-  addClassToElements(relatedHighlights, "bg-yellow-400");
-}
-
-function removeAllHoverClasses() {
-  // We use Array.from() since geElementsByClassName returns a live collection.
-  // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
-  const hoveredHighlights = Array.from(getAllHoveredHighlights());
-  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
-}
-
-function extractAnnotationIdFromEvent(e) {
-  return e.target.dataset.annotationId || "";
-}
-
-function getRelatedHighlights(annotationId) {
-  return document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationId}"]`
-  );
-}
-
-function syncHoverBehavior(e, setFocusedHighlightId) {
-  const annotationId = extractAnnotationIdFromEvent(e);
-  if (annotationId) {
-    removeAllHoverClasses();
-    setFocusedHighlightId(annotationId);
-    addHoverClassToRelatedHighlights(annotationId);
-  }
-}
 
 function wrapHtml(rawHtml) {
   if (!rawHtml) return;
@@ -79,76 +35,65 @@ const Reader = (props) => {
   const {
     isLoading: isLoadingArticle,
     isError: isErrorArticle,
-    data: dataArticle,
+    data: article,
     error: errorArticle,
   } = useFetchArticle(sectionSlug);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,
-    data: dataAnnotations,
+    data: annotations,
     error: errorAnnotations,
   } = useFetchAnnotations(sectionSlug);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 
   function handleMouseUp(e) {
+    // Use inverted if statements to reduce nesting
+    // Source: https://softwareengineering.stackexchange.com/a/18454
     setUnauthorizedSelection(false);
-    if (user && !document.getSelection().isCollapsed) {
-      highlightAndSaveSelection();
+    if (isSelectionCollapsed()) {
+      if (isClickingEmptyArea(e)) {
+        setFocusedHighlightId(null);
+        removeAllHoverClasses();
+      }
+      return;
     }
-    if (!user && !document.getSelection().isCollapsed) {
-      setUnauthorizedSelection(true);
-    }
-    if (
-      document.getElementById("article").contains(e.target) &&
-      !e.target.classList.contains("highlight")
-    ) {
-      setFocusedHighlightId(null);
-      removeAllHoverClasses();
-    }
-  }
-
-  function highlightAndSaveSelection() {
-    if (document.getSelection().isCollapsed) return;
-    if (!isSelectionInArticle()) return;
-    const newHighlight = getRangeFromSelection(document.getSelection());
-    const overlappingAnnotation = doesHighlightOverlapWithAnnotations(
-      newHighlight,
-      dataAnnotations
-    );
-    if (overlappingAnnotation) {
+    if (!isSelectionValid(annotations)) {
       document.getSelection().collapse(null);
-    } else {
-      const highlight = highlightSelection(
-        crypto.randomUUID(),
-        deleteAnnotation,
-        setFocusedHighlightId
-      );
-      createAnnotation.mutate(highlight);
+      return;
     }
+    if (!user) {
+      setUnauthorizedSelection(true);
+      return;
+    }
+    const range = getRangeFromSelection(document.getSelection());
+    createAnnotation.mutate(range[0], {
+      onSuccess: (data) => {
+        setFocusedHighlightId(data.uuid);
+      },
+    });
   }
 
   if (isLoadingArticle || isErrorArticle) return;
   return (
     <div
       className="grid grid-cols-6 gap-1 h-full overflow-hidden"
-      onMouseOver={(e) => syncHoverBehavior(e, setFocusedHighlightId)}
       onMouseUp={(e) => handleMouseUp(e)}
     >
       <TableOfContents className="hidden md:grid col-start-1 col-span-1 overflow-y-auto px-3 pb-10" />
       <Article
         className="col-start-1 col-span-6 md:col-start-2 md:col-span-3 md:place-self-end px-2 overflow-y-auto h-full w-full"
-        html={wrapHtml(dataArticle.articleHtml)}
-        prev={dataArticle.prev}
-        next={dataArticle.next}
-        fetchedAnnotations={dataAnnotations}
-        setFocusedHighlightId={setFocusedHighlightId}
+        html={wrapHtml(article.articleHtml)}
+        fetchedAnnotations={annotations}
+        prev={article.prev}
+        next={article.next}
+        setFocus={setFocusedHighlightId}
       />
       <Comments
         unauthorizedSelection={unauthorizedSelection}
         className="hidden md:grid col-start-5 col-span-2 overflow-y-auto h-full"
         focusedHighlightId={focusedHighlightId}
-        fetchedAnnotations={dataAnnotations}
+        fetchedAnnotations={annotations}
       />
     </div>
   );
