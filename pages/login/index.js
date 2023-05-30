@@ -5,7 +5,7 @@ import NavBar from "components/NavBar";
 
 const LoginForm = () => {
   const { register, handleSubmit, watch } = useForm();
-  const { user, login, logout } = useAuth();
+  const { user, login, logout, error } = useAuth();
 
   // Will only run if form passes validation.
   const onSubmit = handleSubmit((data) => {
@@ -54,6 +54,12 @@ const LoginForm = () => {
               />
             </div>
           </div>
+
+          {error && (
+            <div>
+              <p className="text-red-500">Incorrect username or password.</p>
+            </div>
+          )}
 
           <div>
             <button className="group relative flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">

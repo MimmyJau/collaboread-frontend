@@ -24,6 +24,7 @@ function removeTokenLocalStorage() {
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [error, setError] = useState("");
   const postLogin = usePostLogin();
   const postLogout = usePostLogout();
   const postSignup = usePostSignup();
@@ -61,6 +62,10 @@ const AuthProvider = ({ children }) => {
           setToken(data.key);
           queryClient.invalidateQueries({ queryKey: "user", exact: false });
           router.push("/");
+          setError("");
+        },
+        onError: (error) => {
+          setError("Invalid username or password");
         },
       }
     );
@@ -86,6 +91,7 @@ const AuthProvider = ({ children }) => {
       {
         onSuccess: () => {
           router.push("/signup/successful");
+          setError("");
         },
         onError: () => {
           router.push("/signup/error");
@@ -95,7 +101,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, signup }}>
+    <AuthContext.Provider value={{ user, login, logout, signup, error }}>
       {children}
     </AuthContext.Provider>
   );

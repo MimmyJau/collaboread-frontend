@@ -12,7 +12,6 @@ import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
-  clearHighlight,
   getRangeFromSelection,
   isSelectionValid,
   isSelectionCollapsed,
