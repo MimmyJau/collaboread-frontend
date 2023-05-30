@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { memo, useEffect, useState } from "react";
-import { Interweave } from "interweave";
+import { useEffect, useState } from "react";
 
 import { useDeleteAnnotation } from "hooks";
 import {
@@ -38,8 +37,6 @@ const PrevAndNextSection = (props) => {
   );
 };
 
-const MemoInterweave = memo(Interweave);
-
 function addClassToElements(elements, className) {
   for (const element of elements) {
     element.classList.add(className);
@@ -64,32 +61,10 @@ function extractAnnotationIdFromEvent(e) {
 const Article = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
-  const sectionSlug = slug[slug.length - 1];
-  const [virtualDom, setVirtualDom] = useState(props.html);
   const setFocus = props.setFocus;
 
   useEffect(() => {
-    setVirtualDom(props.html);
     highlightFetchedAnnotations(props.fetchedAnnotations);
-    return () => {
-      if (!props.fetchedAnnotations) return;
-      clearAllHighlights();
-    };
-  }, [props.html, props.fetchedAnnotations]);
-
-  function clearAllHighlights() {
-    for (const annotation of props.fetchedAnnotations) {
-      clearHighlight(annotation.uuid, annotation.highlight);
-    }
-  }
-
-  /**
-   * Main useEffect:
-   * Responsible for updating virtualDOM of article.
-   * Update triggered whenever article or annotations change.
-   */
-  useEffect(() => {
-    setVirtualDom(props.html);
   }, [props.html, props.fetchedAnnotations]);
 
   function syncHoverBehavior(e) {
@@ -110,9 +85,8 @@ const Article = (props) => {
         prevHref={props.prev?.join("/")}
         nextHref={props.next?.join("/")}
       />
-      <button onClick={clearAllHighlights}>Clear All Highlights</button>
       <div id="article" className="prose">
-        <Interweave content={props.html} />
+        <div dangerouslySetInnerHTML={{ __html: props.html }} />
       </div>
       <PrevAndNextSection
         prevHref={props.prev?.join("/")}
