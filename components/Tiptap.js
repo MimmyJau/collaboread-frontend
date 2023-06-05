@@ -5,6 +5,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Paragraph from "@tiptap/extension-paragraph";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
+import Image from "@tiptap/extension-image";
 
 import { useUpdateArticle } from "hooks";
 
@@ -19,6 +20,13 @@ const printHtml = (editor) => {
 
 const printText = (editor) => {
   console.log(editor.getText());
+};
+
+const addImage = (editor) => {
+  const url = window.prompt("URL");
+  if (url) {
+    editor.chain().focus().setImage({ src: url }).run();
+  }
 };
 
 const MenuButton = ({ name, onClick }) => {
@@ -70,6 +78,7 @@ const MenuToolbar = ({ editor }) => {
         name="Bullets"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       />
+      <MenuButton name="Image" onClick={() => addImage(editor)} />
       <MenuButton name="JSON" onClick={() => printJson(editor)} />
       <MenuButton name="HTML" onClick={() => printHtml(editor)} />
       <MenuButton name="Text" onClick={() => printText(editor)} />
@@ -89,7 +98,7 @@ const MenuToolbar = ({ editor }) => {
 
 const Tiptap = (props) => {
   const editor = useEditor({
-    extensions: [StarterKit, Highlight, BulletList, ListItem],
+    extensions: [StarterKit, BulletList, Highlight, ListItem, Image],
     content:
       props.content ||
       "<p>Hi this is a test document for collaboread. It consists of <strong>bold text</strong>, <em>italics text</em>, and combined <strong><em>bold and italics</em></strong>. It also consists of the following bullet points:</p><ul><li><p>This is the first bullet point. It might have some <em>styled text</em>.</p></li><li><p>This is the second bullet point, it might not have any textx.</p></li><li><p>This is the third and last bullet point. It's important that we can highlight across bullet points :)</p></li></ul><p>This is the last paragraph. Hope you enjoyed!</p>",
