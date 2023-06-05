@@ -81,7 +81,7 @@ const Article = (props) => {
         prevHref={props.prev?.join("/")}
         nextHref={props.next?.join("/")}
       />
-      <div id="article" className="prose">
+      <div id="article" className="prose w-full">
         <div id="content-highlightable">
           <div dangerouslySetInnerHTML={{ __html: props.html }} />
         </div>
