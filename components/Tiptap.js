@@ -144,6 +144,9 @@ const Tiptap = (props) => {
       ListItem,
       Image,
       Table.configure({
+        HTMLAttributes: {
+          class: "my-table",
+        },
         resizable: true,
       }),
       TableRow,
