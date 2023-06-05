@@ -3,6 +3,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 
 import StarterKit from "@tiptap/starter-kit";
 import BulletList from "@tiptap/extension-bullet-list";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -13,6 +14,13 @@ import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
+
+import { lowlight } from "lowlight/lib/core";
+import js from "highlight.js/lib/languages/javascript";
+import ts from "highlight.js/lib/languages/typescript";
+
+lowlight.registerLanguage("js", js);
+lowlight.registerLanguage("ts", ts);
 
 import { useUpdateArticle } from "hooks";
 
@@ -97,6 +105,10 @@ const MenuToolbar = ({ editor }) => {
           name="Code"
           onClick={() => editor.chain().focus().toggleCode().run()}
         />
+        <MenuButton
+          name="Code block"
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        />
         <MenuButton name="Link" onClick={() => toggleLink(editor)} />
         <MenuButton name="Image" onClick={() => addImage(editor)} />
         <MenuButton
@@ -144,6 +156,12 @@ const Tiptap = (props) => {
     extensions: [
       StarterKit,
       BulletList,
+      CodeBlockLowlight.configure({
+        HTMLAttributes: {
+          class: "not-prose",
+        },
+        lowlight,
+      }),
       Highlight,
       Link.configure({ openOnClick: false }),
       ListItem,
