@@ -8,6 +8,7 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import ListItem from "@tiptap/extension-list-item";
 import Paragraph from "@tiptap/extension-paragraph";
+import Superscript from "@tiptap/extension-superscript";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
@@ -98,6 +99,10 @@ const MenuToolbar = ({ editor }) => {
         />
         <MenuButton name="Link" onClick={() => toggleLink(editor)} />
         <MenuButton name="Image" onClick={() => addImage(editor)} />
+        <MenuButton
+          name="Superscript"
+          onClick={() => editor.chain().focus().toggleSuperscript().run()}
+        />
       </div>
       <div className="flex">
         <MenuButton
@@ -143,6 +148,7 @@ const Tiptap = (props) => {
       Link.configure({ openOnClick: false }),
       ListItem,
       Image,
+      Superscript,
       Table.configure({
         HTMLAttributes: {
           class: "my-table",
