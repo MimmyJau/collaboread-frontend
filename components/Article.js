@@ -82,7 +82,9 @@ const Article = (props) => {
         nextHref={props.next?.join("/")}
       />
       <div id="article" className="prose">
-        <div dangerouslySetInnerHTML={{ __html: props.html }} />
+        <div id="content-highlightable">
+          <div dangerouslySetInnerHTML={{ __html: props.html }} />
+        </div>
       </div>
       <PrevAndNextSection
         prevHref={props.prev?.join("/")}
