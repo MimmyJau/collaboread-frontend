@@ -8,6 +8,10 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import ListItem from "@tiptap/extension-list-item";
 import Paragraph from "@tiptap/extension-paragraph";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
 
 import { useUpdateArticle } from "hooks";
 
@@ -54,58 +58,78 @@ const MenuToolbar = ({ editor }) => {
   const slug = slugs[slugs.length - 1];
   const updateArticle = useUpdateArticle(slug);
   return (
-    <div className="sticky z-10 top-0 bg-white">
-      <MenuButton
-        name="Bold"
-        onClick={() => editor.chain().focus().toggleBold().run()}
-      />
-      <MenuButton
-        name="Italics"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-      />
-      <MenuButton
-        name="h1"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-      />
-      <MenuButton
-        name="h2"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-      />
-      <MenuButton
-        name="h3"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-      />
-      <MenuButton
-        name="h4"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-      />
-      <MenuButton
-        name="Highlight"
-        onClick={() => editor.chain().focus().toggleHighlight().run()}
-      />
-      <MenuButton
-        name="Bullets"
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-      />
-      <MenuButton
-        name="Code"
-        onClick={() => editor.chain().focus().toggleCode().run()}
-      />
-      <MenuButton name="Link" onClick={() => toggleLink(editor)} />
-      <MenuButton name="Image" onClick={() => addImage(editor)} />
-      <MenuButton name="JSON" onClick={() => printJson(editor)} />
-      <MenuButton name="HTML" onClick={() => printHtml(editor)} />
-      <MenuButton name="Text" onClick={() => printText(editor)} />
-      <MenuButton
-        name="Save"
-        onClick={() =>
-          updateArticle.mutate({
-            html: editor.getHTML(),
-            json: editor.getJSON(),
-            text: editor.getText(),
-          })
-        }
-      />
+    <div className="flex flex-col sticky z-10 top-0 bg-white">
+      <div className="flex">
+        <MenuButton
+          name="Bold"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        />
+        <MenuButton
+          name="Italics"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        />
+        <MenuButton
+          name="h1"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
+        />
+        <MenuButton
+          name="h2"
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+        />
+        <MenuButton
+          name="Highlight"
+          onClick={() => editor.chain().focus().toggleHighlight().run()}
+        />
+        <MenuButton
+          name="Blockquotes"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        />
+        <MenuButton
+          name="Bullets"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        />
+        <MenuButton
+          name="Code"
+          onClick={() => editor.chain().focus().toggleCode().run()}
+        />
+        <MenuButton name="Link" onClick={() => toggleLink(editor)} />
+        <MenuButton name="Image" onClick={() => addImage(editor)} />
+      </div>
+      <div className="flex">
+        <MenuButton
+          name="Insert Table"
+          onClick={() =>
+            editor
+              .chain()
+              .focus()
+              .insertTable({ rows: 2, cols: 2, withHeaderRow: true })
+              .run()
+          }
+        />
+        <MenuButton
+          name="Delete Col"
+          onClick={() => editor.chain().focus().deleteColumn().run()}
+        />
+      </div>
+      <div className="flex">
+        <MenuButton name="JSON" onClick={() => printJson(editor)} />
+        <MenuButton name="HTML" onClick={() => printHtml(editor)} />
+        <MenuButton name="Text" onClick={() => printText(editor)} />
+        <MenuButton
+          name="Save"
+          onClick={() =>
+            updateArticle.mutate({
+              html: editor.getHTML(),
+              json: editor.getJSON(),
+              text: editor.getText(),
+            })
+          }
+        />
+      </div>
     </div>
   );
 };
@@ -119,6 +143,12 @@ const Tiptap = (props) => {
       Link.configure({ openOnClick: false }),
       ListItem,
       Image,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content:
       props.content ||
