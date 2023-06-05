@@ -87,6 +87,10 @@ const MenuToolbar = ({ editor }) => {
         name="Bullets"
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       />
+      <MenuButton
+        name="Code"
+        onClick={() => editor.chain().focus().toggleCode().run()}
+      />
       <MenuButton name="Link" onClick={() => toggleLink(editor)} />
       <MenuButton name="Image" onClick={() => addImage(editor)} />
       <MenuButton name="JSON" onClick={() => printJson(editor)} />
