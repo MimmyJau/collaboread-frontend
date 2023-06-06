@@ -27,22 +27,19 @@
 }
 
 @layer components {
-  .my-table {
+  .gray-table {
     @apply w-full text-left;
   }
-  .my-table th {
-    @apply bg-gray-500;
+  .gray-table th {
+    @apply bg-gray-500 text-white border-white px-4;
   }
-  .my-table th {
-    @apply text-white border-white px-4;
-  }
-  .my-table tbody tr:nth-child(odd) {
+  .gray-table tr:nth-child(odd) {
     @apply bg-gray-200;
   }
-  .my-table tbody tr:nth-child(even) {
+  .gray-table tr:nth-child(even) {
     @apply bg-gray-100;
   }
-  .my-table tbody td {
+  .gray-table td {
     @apply border-gray-500 px-4;
   }
 }

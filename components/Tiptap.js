@@ -169,7 +169,7 @@ const Tiptap = (props) => {
       Superscript,
       Table.configure({
         HTMLAttributes: {
-          class: "my-table",
+          class: "gray-table",
         },
         resizable: true,
       }),
