@@ -110,6 +110,10 @@ const MenuToolbar = ({ editor }) => {
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         />
         <MenuButton name="Link" onClick={() => toggleLink(editor)} />
+        <MenuButton
+          name="Unlink"
+          onClick={() => editor.chain().focus().unsetLink().run()}
+        />
         <MenuButton name="Image" onClick={() => addImage(editor)} />
         <MenuButton
           name="Superscript"
