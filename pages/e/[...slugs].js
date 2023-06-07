@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { Editor } from "components/Tiptap";
+import { Editor } from "components/ArticleEditor";
 import NavBar from "components/NavBar";
 import { useFetchArticle } from "hooks";
 
