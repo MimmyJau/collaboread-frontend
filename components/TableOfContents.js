@@ -15,16 +15,17 @@ function preOrderTraversal(root, callback) {
 }
 
 const SectionLink = ({ title, level, isHighlighted, listOfSlugs }) => {
+  // Levels start at 1 (not 0)
   const leftMarginSize = {
-    0: "pl-0",
     1: "pl-0",
-    2: "pl-4",
-    3: "pl-6",
-    4: "pl-8",
-    5: "pl-10",
-    6: "pl-12",
-    7: "pl-14",
-    8: "pl-16",
+    2: "pl-0",
+    3: "pl-4",
+    4: "pl-6",
+    5: "pl-8",
+    6: "pl-10",
+    7: "pl-12",
+    8: "pl-14",
+    9: "pl-16",
   };
 
   return (
