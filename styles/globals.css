@@ -27,7 +27,7 @@
 }
 
 @layer components {
-  .gray-table {
+  .gray-table table {
     @apply w-full text-left;
   }
   .gray-table th {

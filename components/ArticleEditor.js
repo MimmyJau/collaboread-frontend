@@ -119,17 +119,21 @@ const MenuToolbar = ({ editor }) => {
       <div className="flex">
         <MenuButton
           name="Insert Table"
-          onClick={() =>
+          onClick={() => {
             editor
               .chain()
               .focus()
-              .insertTable({ rows: 2, cols: 2, withHeaderRow: true })
-              .run()
-          }
+              .insertTable({ rows: 2, cols: 1, withHeaderRow: true })
+              .run();
+          }}
         />
         <MenuButton
           name="Delete Col"
           onClick={() => editor.chain().focus().deleteColumn().run()}
+        />
+        <MenuButton
+          name="Delete Table"
+          onClick={() => editor.chain().focus().deleteTable().run()}
         />
       </div>
       <div className="flex">
@@ -168,7 +172,6 @@ const Editor = (props) => {
         HTMLAttributes: {
           class: "gray-table",
         },
-        resizable: true,
       }),
       TableRow,
       TableHeader,
