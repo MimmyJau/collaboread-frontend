@@ -151,7 +151,7 @@ const MenuToolbar = ({ editor }) => {
   );
 };
 
-const Tiptap = (props) => {
+const Editor = (props) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -174,9 +174,7 @@ const Tiptap = (props) => {
       TableHeader,
       TableCell,
     ],
-    content:
-      props.content ||
-      "<p>Hi this is a test document for collaboread. It consists of <strong>bold text</strong>, <em>italics text</em>, and combined <strong><em>bold and italics</em></strong>. It also consists of the following bullet points:</p><ul><li><p>This is the first bullet point. It might have some <em>styled text</em>.</p></li><li><p>This is the second bullet point, it might not have any textx.</p></li><li><p>This is the third and last bullet point. It's important that we can highlight across bullet points :)</p></li></ul><p>This is the last paragraph. Hope you enjoyed!</p>",
+    content: props.content || "",
     editorProps: {
       attributes: {
         class:
@@ -187,13 +185,11 @@ const Tiptap = (props) => {
   });
 
   return (
-    <div className="flex w-screen">
-      <div className="">
-        <MenuToolbar editor={editor} />
-        <EditorContent editor={editor} />
-      </div>
+    <div className="flex flex-col w-screen">
+      <MenuToolbar editor={editor} />
+      <EditorContent editor={editor} />
     </div>
   );
 };
 
-export default Tiptap;
+export { Editor };

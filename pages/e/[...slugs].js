@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import Tiptap from "components/Tiptap";
+import { Editor } from "components/Tiptap";
 import NavBar from "components/NavBar";
 import { useFetchArticle } from "hooks";
 
@@ -18,7 +18,7 @@ export default function Page() {
   return (
     <>
       <NavBar />
-      <Tiptap content={data.articleHtml} />
+      <Editor content={data.articleHtml} />
     </>
   );
 }
