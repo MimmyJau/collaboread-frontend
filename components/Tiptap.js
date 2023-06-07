@@ -157,9 +157,6 @@ const Tiptap = (props) => {
       StarterKit,
       BulletList,
       CodeBlockLowlight.configure({
-        HTMLAttributes: {
-          class: "not-prose",
-        },
         lowlight,
       }),
       Highlight,

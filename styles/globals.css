@@ -44,56 +44,60 @@
   }
 }
 
-@layer components {
-  .hljs-comment,
-  .hljs-quote {
-    @apply text-gray-500;
-  }
+/* Using @layer doesn't work with lowlight. 
+ * Not sure why, but guess is that lowlight adds the classes
+ * dynamically, so Tailwind won't know they exist.
+ * Source: https://tailwindcss.com/docs/content-configuration#working-with-third-party-libraries
+ */
 
-  .hljs-variable,
-  .hljs-template-variable,
-  .hljs-attribute,
-  .hljs-tag,
-  .hljs-name,
-  .hljs-regexp,
-  .hljs-link,
-  .hljs-name,
-  .hljs-selector-id,
-  .hljs-selector-class {
-    @apply text-yellow-500;
-  }
+.hljs-comment,
+.hljs-quote {
+  @apply text-gray-500;
+}
 
-  .hljs-number,
-  .hljs-meta,
-  .hljs-built_in,
-  .hljs-builtin-name,
-  .hljs-literal,
-  .hljs-type,
-  .hljs-params {
-    @apply text-blue-500;
-  }
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attribute,
+.hljs-tag,
+.hljs-name,
+.hljs-regexp,
+.hljs-link,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class {
+  @apply text-yellow-500;
+}
 
-  .hljs-string,
-  .hljs-symbol,
-  .hljs-bullet {
-    @apply text-green-500;
-  }
+.hljs-number,
+.hljs-meta,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params {
+  @apply text-blue-500;
+}
 
-  .hljs-title,
-  .hljs-section {
-    @apply text-purple-500;
-  }
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet {
+  @apply text-green-500;
+}
 
-  .hljs-keyword,
-  .hljs-selector-tag {
-    @apply text-red-500;
-  }
+.hljs-title,
+.hljs-section {
+  @apply text-purple-500;
+}
 
-  .hljs-emphasis {
-    @apply font-style-italic;
-  }
+.hljs-keyword,
+.hljs-selector-tag {
+  @apply text-red-500;
+}
 
-  .hljs-strong {
-    @apply font-weight-700;
-  }
+.hljs-emphasis {
+  @apply italic;
+}
+
+.hljs-strong {
+  @apply font-bold;
 }
