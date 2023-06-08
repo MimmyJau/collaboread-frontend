@@ -15,10 +15,22 @@ function preOrderTraversal(root, callback) {
 }
 
 const SectionLink = ({ title, level, isHighlighted, listOfSlugs }) => {
-  const leftMarginSize = level - ROOT_LEVEL;
+  // Levels start at 1 (not 0)
+  const leftMarginSize = {
+    1: "pl-0",
+    2: "pl-0",
+    3: "pl-4",
+    4: "pl-6",
+    5: "pl-8",
+    6: "pl-10",
+    7: "pl-12",
+    8: "pl-14",
+    9: "pl-16",
+  };
+
   return (
     <div
-      className={`hover:bg-blue-200 pl-${leftMarginSize} ${
+      className={`hover:bg-blue-200 ${leftMarginSize[level]} ${
         isHighlighted ? "bg-blue-300" : ""
       }`}
     >

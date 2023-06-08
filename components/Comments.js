@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Interweave } from "interweave";
 
 import Dropdown from "components/Dropdown";
-import Editor from "components/Editor";
+import Editor from "components/CommentEditor";
 import {
   useMakeAnnotationPublic,
   useDeleteAnnotation,
