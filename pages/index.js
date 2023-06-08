@@ -1,14 +1,17 @@
+import * as amplitude from "@amplitude/analytics-browser";
 import Link from "next/link";
 
 import NavBar from "components/NavBar";
 import { useFetchArticles } from "hooks";
+
+import { ampTrack } from "utils/amplitude";
 
 const zarathustraSlug = process.env.SLUG;
 
 const Card = ({ uuid, title, author }) => {
   return (
     <div className="bg-yellow-50 rounded-lg hover:bg-yellow-100 hover:rounded-lg">
-      <Link href={`/a/${uuid}/`}>
+      <Link href={`/a/${uuid}/`} onClick={() => ampTrack(title)}>
         <div className="p-5">
           <h2 className="text-xl">{title}</h2>
           {author ? <h3 className="text-sm">by {author}</h3> : null}

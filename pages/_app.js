@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { ampInit } from "utils/amplitude";
 import { polyfill } from "interweave-ssr";
 import {
   Hydrate,
@@ -16,6 +17,7 @@ import Layout from "components/Layout";
 // Interweave requires DOM, so polyfill is required
 // for SSR (source: https://interweave.dev/docs/ssr)
 polyfill();
+ampInit();
 
 export default function App({ Component, pageProps }) {
   const [queryClient] = useState(() => new QueryClient());
