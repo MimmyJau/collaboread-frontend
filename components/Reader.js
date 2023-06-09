@@ -13,9 +13,10 @@ import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
   getRangeFromSelection,
+  isClickingEmptyArea,
   isSelectionValid,
   isSelectionCollapsed,
-  isClickingEmptyArea,
+  isSelectionInElementById,
   removeAllHoverClasses,
 } from "utils";
 import Comments from "components/Comments.js";
@@ -50,6 +51,9 @@ const Reader = (props) => {
         setFocusedHighlightId(null);
         removeAllHoverClasses();
       }
+      return;
+    }
+    if (isSelectionInElementById("Comments")) {
       return;
     }
     if (!isSelectionValid(annotations)) {

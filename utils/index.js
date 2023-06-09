@@ -137,15 +137,16 @@ function isSelectionOverlapping(annotations) {
   return doAnyHighlightsOverlap(range, annotations);
 }
 
-function isSelectionInArticle() {
-  const selection = document.getSelection();
-  const selectionRange = selection.getRangeAt(0);
-  const content = document.getElementById("content-highlightable");
-  return content.contains(selectionRange.commonAncestorContainer);
+export function isSelectionInElementById(id) {
+  const range = document.getSelection().getRangeAt(0);
+  return document.getElementById(id)?.contains(range.commonAncestorContainer);
 }
 
 export function isSelectionValid(annotations) {
-  return !isSelectionOverlapping(annotations) && isSelectionInArticle();
+  return (
+    !isSelectionOverlapping(annotations) &&
+    isSelectionInElementById("content-highlightable")
+  );
 }
 
 function isMouseInArticle(e) {

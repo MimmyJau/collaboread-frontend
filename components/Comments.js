@@ -340,7 +340,7 @@ const Comments = (props) => {
   const showSignUpMessage = props.unauthorizedSelection && !focusedAnnotation;
 
   return (
-    <div className={`${props.className} shadow`}>
+    <div id="Comments" className={`${props.className} shadow`}>
       {focusedAnnotation ? (
         <Thread
           comments={focusedAnnotation.comments[0]}
