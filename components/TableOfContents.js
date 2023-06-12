@@ -53,7 +53,6 @@ const TableOfContents = (props) => {
   if (isError) return;
 
   const listOfSections = [];
-  console.log(data);
   preOrderTraversal(data, (node, []) => {
     listOfSections.push(
       <SectionLink
@@ -61,7 +60,7 @@ const TableOfContents = (props) => {
         slug={node.slugFull}
         title={node.title}
         level={node.level}
-        isHighlighted={currentSlug=== node.slugFull}
+        isHighlighted={currentSlug === node.slugFull}
       />
     );
     return [];
