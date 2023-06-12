@@ -14,7 +14,7 @@ function preOrderTraversal(root, callback) {
   traverse(root, callback);
 }
 
-const SectionLink = ({ title, level, isHighlighted, listOfSlugs }) => {
+const SectionLink = ({ title, slug, level, isHighlighted }) => {
   // Levels start at 1 (not 0)
   const leftMarginSize = {
     1: "pl-0",
@@ -34,7 +34,7 @@ const SectionLink = ({ title, level, isHighlighted, listOfSlugs }) => {
         isHighlighted ? "bg-blue-300" : ""
       }`}
     >
-      <Link href={listOfSlugs.join("/")}>
+      <Link href={slug}>
         <div className="overflow-ellipsis whitespace-nowrap overflow-hidden w-full">
           {title}
         </div>
@@ -44,26 +44,27 @@ const SectionLink = ({ title, level, isHighlighted, listOfSlugs }) => {
 };
 
 const TableOfContents = (props) => {
-  const slug = useRouter().query.slug || [];
-  const rootSlug = slug[0];
-  const currentSectionSlug = slug[slug.length - 1];
+  const slugList = useRouter().query.slug || [];
+  const rootSlug = slugList[0];
+  const currentSlug = slugList.join("/");
   const { isLoading, isError, data, error } = useFetchTableOfContents(rootSlug);
 
   if (isLoading) return;
   if (isError) return;
 
   const listOfSections = [];
-  preOrderTraversal(data, (node, listOfSlugs) => {
+  console.log(data);
+  preOrderTraversal(data, (node, []) => {
     listOfSections.push(
       <SectionLink
         key={node.uuid}
+        slug={node.slugFull}
         title={node.title}
         level={node.level}
-        isHighlighted={currentSectionSlug === node.uuid}
-        listOfSlugs={[...listOfSlugs, node.uuid]}
+        isHighlighted={currentSlug=== node.slugFull}
       />
     );
-    return [...listOfSlugs, node.uuid];
+    return [];
   });
   return <div className={props.className}>{listOfSections}</div>;
 };

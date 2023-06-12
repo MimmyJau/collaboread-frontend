@@ -22,23 +22,23 @@ import {
 import Comments from "components/Comments.js";
 
 const Reader = (props) => {
-  const slug = useRouter().query.slug || []; // Initially returns undefined
-  const sectionSlug = slug[slug.length - 1];
-  const createAnnotation = useCreateAnnotation(sectionSlug);
-  const deleteAnnotation = useDeleteAnnotation(sectionSlug);
+  const slugList = useRouter().query.slug || []; // Initially returns undefined
+  const slug = slugList.join("/");
+  const createAnnotation = useCreateAnnotation(slug);
+  const deleteAnnotation = useDeleteAnnotation(slug);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const {
     isLoading: isLoadingArticle,
     isError: isErrorArticle,
     data: article,
     error: errorArticle,
-  } = useFetchArticle(sectionSlug);
+  } = useFetchArticle(slug);
   const {
     isLoading: isLoadingAnnotations,
     isError: isErrorAnnotations,
     data: annotations,
     error: errorAnnotations,
-  } = useFetchAnnotations(sectionSlug);
+  } = useFetchAnnotations(slug);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 

@@ -77,19 +77,13 @@ const Article = (props) => {
       className={`flex flex-col items-center ${props.className}`}
       onMouseOver={(e) => syncHoverBehavior(e, setFocus)}
     >
-      <PrevAndNextSection
-        prevHref={props.prev?.join("/")}
-        nextHref={props.next?.join("/")}
-      />
+      <PrevAndNextSection prevHref={props.prev} nextHref={props.next} />
       <div id="article" className="prose w-full">
         <div id="content-highlightable">
           <div dangerouslySetInnerHTML={{ __html: props.html }} />
         </div>
       </div>
-      <PrevAndNextSection
-        prevHref={props.prev?.join("/")}
-        nextHref={props.next?.join("/")}
-      />
+      <PrevAndNextSection prevHref={props.prev} nextHref={props.next} />
     </div>
   );
 };
