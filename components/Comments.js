@@ -90,11 +90,11 @@ const CommentBody = (props) => {
 };
 
 const CommentButtons = (props) => {
-  const slug = useRouter().query.slug || [];
-  const articleUuid = slug[slug.length - 1];
-  const createComment = useCreateComment(articleUuid);
-  const updateComment = useUpdateComment(articleUuid);
-  const makeAnnotationPublic = useMakeAnnotationPublic(articleUuid);
+  const slugList = useRouter().query.slug || [];
+  const slug = slugList.join("/");
+  const createComment = useCreateComment(slug);
+  const updateComment = useUpdateComment(slug);
+  const makeAnnotationPublic = useMakeAnnotationPublic(slug);
 
   const postComment = props.commentUuid ? updateComment : createComment;
   const commentUuid = props.commentUuid || crypto.randomUUID();
@@ -108,7 +108,7 @@ const CommentButtons = (props) => {
           onClick={() => {
             const newComment = {
               uuid: commentUuid,
-              article: articleUuid,
+              article: slug,
               annotation: props.annotationUuid,
               parentUuid: props.parentUuid,
               commentHtml: props.editorHtml,
@@ -231,9 +231,9 @@ const ReplyEditor = (props) => {
   const [editorHtml, setEditorHtml] = useState("");
   const [editorJson, setEditorJson] = useState("");
   const [editorText, setEditorText] = useState("");
-  const slug = useRouter().query.slug || [];
-  const articleUuid = slug[slug.length - 1];
-  const createComment = useCreateComment(articleUuid);
+  const slugList = useRouter().query.slug || [];
+  const slug = slugList.join("/");
+  const createComment = useCreateComment(slug);
 
   const commentUuid = props.commentUuid || crypto.randomUUID();
 
@@ -261,7 +261,7 @@ const ReplyEditor = (props) => {
         onClick={() => {
           const newComment = {
             uuid: commentUuid,
-            article: articleUuid,
+            article: slug,
             annotation: props.annotationUuid,
             parentUuid: props.parentUuid,
             commentHtml: editorHtml,
@@ -284,9 +284,9 @@ const ReplyEditor = (props) => {
 
 const Thread = (props) => {
   const { user } = useAuth();
-  const slug = useRouter().query.slug || [];
-  const articleUuid = slug[slug.length - 1];
-  const deleteAnnotation = useDeleteAnnotation(articleUuid);
+  const slugList = useRouter().query.slug || [];
+  const slug = slugList.join("/");
+  const deleteAnnotation = useDeleteAnnotation(slug);
 
   const showReply = user && props.comments;
 
