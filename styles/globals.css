@@ -11,16 +11,18 @@
   pointer-events: none;
 }
 
-#article ::selection {
+#article ::selection, #article .highlight {
   @apply bg-yellow-300 bg-opacity-50 mix-blend-multiply;
 }
 
-#article .highlight {
-  @apply bg-yellow-300 bg-opacity-50 mix-blend-multiply;
+/* When hovering a highlight that has a overlapped area, we 
+ * don't want that overlap area to look different.*/
+#article .hover-highlight .highlight, #article .highlight .hover-highlight {
+  @apply bg-yellow-400 mix-blend-darken;
 }
 
 #article .hover-highlight {
-  @apply bg-yellow-400 bg-opacity-50 mix-blend-multiply;
+  @apply bg-yellow-400;
 }
 
 /* For Webkit-based browsers (Chrome, Safari and Opera) */
