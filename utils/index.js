@@ -49,7 +49,7 @@ function highlightSelection(annotationUuid = crypto.randomUUID()) {
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   const highlighter = rangy.createHighlighter();
   highlighter.addClassApplier(
-    rangy.createClassApplier("bg-yellow-300", {
+    rangy.createClassApplier(annotationUuid, {
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add("highlight");
@@ -58,7 +58,7 @@ function highlightSelection(annotationUuid = crypto.randomUUID()) {
       tagNames: ["span"],
     })
   );
-  highlighter.highlightSelection("bg-yellow-300");
+  highlighter.highlightSelection(annotationUuid, { exclusive: false });
 
   return { uuid: annotationUuid, highlight: range };
 }
@@ -144,7 +144,7 @@ export function isSelectionInElementById(id) {
 
 export function isSelectionValid(annotations) {
   return (
-    !isSelectionOverlapping(annotations) &&
+    // !isSelectionOverlapping(annotations) &&
     isSelectionInElementById("content-highlightable")
   );
 }
