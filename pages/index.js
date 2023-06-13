@@ -10,7 +10,7 @@ const zarathustraSlug = process.env.SLUG;
 
 const Card = ({ slugFull, title, author }) => {
   return (
-    <div className="bg-yellow-50 rounded-lg hover:bg-yellow-100 hover:rounded-lg">
+    <div className="bg-yellow-50 rounded-lg my-2 hover:bg-yellow-100 hover:rounded-lg">
       <Link href={`/a/${slugFull}/`} onClick={() => ampTrack(title)}>
         <div className="p-5">
           <h2 className="text-xl">{title}</h2>
