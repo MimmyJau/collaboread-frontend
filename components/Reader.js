@@ -5,7 +5,6 @@ import {
   useFetchArticle,
   useFetchAnnotations,
   useCreateAnnotation,
-  useUpdateAnnotation,
   useDeleteAnnotation,
 } from "hooks";
 import useAuth from "hooks/auth";
