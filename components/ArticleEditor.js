@@ -63,8 +63,8 @@ const MenuButton = ({ name, onClick }) => {
 };
 
 const MenuToolbar = ({ editor }) => {
-  const slugs = useRouter().query.slugs || [];
-  const slug = slugs[slugs.length - 1];
+  const slugList = useRouter().query.slugs || [];
+  const slug = slugList.join("/");
   const updateArticle = useUpdateArticle(slug);
   return (
     <div className="flex flex-col sticky z-10 top-0 bg-white">

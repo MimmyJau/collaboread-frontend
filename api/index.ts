@@ -21,7 +21,7 @@ function fetchArticle(articleUuid) {
 }
 
 function updateArticle(article, token) {
-  const route = `${API_BASE_URL}/articles/${article.uuid}/`;
+  const route = `${API_BASE_URL}/articles/${article.slugFull}/`;
   return ky
     .put(route, { headers: { Authorization: `Token ${token}` }, json: article })
     .json();
