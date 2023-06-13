@@ -3,7 +3,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useDeleteAnnotation } from "hooks";
-import { highlightFetchedAnnotations, removeAllHoverClasses } from "utils";
+import {
+  addHoverClassToRelatedHighlights,
+  highlightFetchedAnnotations,
+  removeAllHoverClasses,
+} from "utils";
 
 const NavButton = ({ text, href }) => {
   return (
@@ -32,23 +36,6 @@ const PrevAndNextSection = (props) => {
     </div>
   );
 };
-
-function addClassToElements(elements, className) {
-  for (const element of elements) {
-    element.classList.add(className);
-  }
-}
-
-function getRelatedHighlights(annotationId) {
-  return document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationId}"]`
-  );
-}
-
-function addHoverClassToRelatedHighlights(annotationId) {
-  const relatedHighlights = getRelatedHighlights(annotationId);
-  addClassToElements(relatedHighlights, "hover-highlight");
-}
 
 function extractAnnotationIdFromEvent(e) {
   return e.target.dataset.annotationId || "";

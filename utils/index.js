@@ -164,10 +164,27 @@ function getAllHoveredHighlights() {
   return document.getElementsByClassName("hover-highlight");
 }
 
+function getRelatedHighlights(annotationId) {
+  return document.querySelectorAll(
+    `.highlight[data-annotation-id="${annotationId}"]`
+  );
+}
+
+function addClassToElements(elements, className) {
+  for (const element of elements) {
+    element.classList.add(className);
+  }
+}
+
 function removeClassFromElements(elements, className) {
   for (const element of elements) {
     element.classList.remove(className);
   }
+}
+
+export function addHoverClassToRelatedHighlights(annotationId) {
+  const relatedHighlights = getRelatedHighlights(annotationId);
+  addClassToElements(relatedHighlights, "hover-highlight");
 }
 
 export function removeAllHoverClasses() {
