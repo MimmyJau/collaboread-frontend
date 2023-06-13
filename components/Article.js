@@ -47,7 +47,7 @@ function getRelatedHighlights(annotationId) {
 
 function addHoverClassToRelatedHighlights(annotationId) {
   const relatedHighlights = getRelatedHighlights(annotationId);
-  addClassToElements(relatedHighlights, "bg-yellow-400");
+  addClassToElements(relatedHighlights, "hover-highlight");
 }
 
 function extractAnnotationIdFromEvent(e) {

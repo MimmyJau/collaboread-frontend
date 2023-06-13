@@ -143,10 +143,7 @@ export function isSelectionInElementById(id) {
 }
 
 export function isSelectionValid(annotations) {
-  return (
-    // !isSelectionOverlapping(annotations) &&
-    isSelectionInElementById("content-highlightable")
-  );
+  return isSelectionInElementById("content-highlightable");
 }
 
 function isMouseInArticle(e) {
@@ -164,7 +161,7 @@ export function isClickingEmptyArea(e) {
 // SyncHoverBehaviour functions
 
 function getAllHoveredHighlights() {
-  return document.getElementsByClassName("bg-yellow-400");
+  return document.getElementsByClassName("hover-highlight");
 }
 
 function removeClassFromElements(elements, className) {
@@ -177,5 +174,5 @@ export function removeAllHoverClasses() {
   // We use Array.from() since geElementsByClassName returns a live collection.
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
   const hoveredHighlights = Array.from(getAllHoveredHighlights());
-  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
+  removeClassFromElements(hoveredHighlights, "hover-highlight");
 }

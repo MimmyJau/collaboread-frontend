@@ -19,6 +19,10 @@
   @apply bg-yellow-300 bg-opacity-50 mix-blend-multiply;
 }
 
+#article .hover-highlight {
+  @apply bg-yellow-400 bg-opacity-50 mix-blend-multiply;
+}
+
 /* For Webkit-based browsers (Chrome, Safari and Opera) */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
