@@ -51,6 +51,7 @@ const Article = (props) => {
   }, [props.html, props.fetchedAnnotations]);
 
   function syncHoverBehavior(e) {
+    if (e.buttons !== 0) return;
     const annotationId = extractAnnotationIdFromEvent(e);
     if (annotationId) {
       removeAllHoverClasses();
