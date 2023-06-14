@@ -165,9 +165,7 @@ function getAllHoveredHighlights() {
 }
 
 function getRelatedHighlights(annotationId) {
-  return document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationId}"]`
-  );
+  return document.getElementsByClassName(annotationId);
 }
 
 function addClassToElements(elements, className) {
