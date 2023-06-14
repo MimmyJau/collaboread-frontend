@@ -57,9 +57,7 @@ const CommentClickable = (props) => {
       tabIndex="0"
       onClick={() => {
         document
-          .querySelector(
-            `.highlight[data-annotation-id="${props.annotationUuid}"]`
-          )
+          .querySelector(`.highlight-${props.annotationUuid}`)
           .scrollIntoView({ behavior: "smooth", block: "center" });
       }}
     >

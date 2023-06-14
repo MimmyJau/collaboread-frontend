@@ -114,7 +114,7 @@ export function highlightFetchedAnnotations(annotations) {
  */
 function removeHangingSpanTags(annotationUuid) {
   const highlightFragments = document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationUuid}"]`
+    `.highlight-${annotationUuid}`
   );
   highlightFragments.forEach((el) => {
     const pa = el.parentNode;
