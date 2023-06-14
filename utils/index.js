@@ -44,12 +44,32 @@ function unselectSelection() {
  * @param {Document} doc: New param to specific document to use
  * returns {object} { uuid: annotationUuid, highlight: range }
  */
+const highlightCountClasses = [
+  "highlight_count_0",
+  "highlight_count_1",
+  "highlight_count_2",
+  "highlight_count_3",
+  "highlight_count_4",
+];
+
+function addHighlightCount(el) {
+  let numberOfHighlights = 0;
+  for (const className of el.classList) {
+    if (className.startsWith("highlight-")) {
+      numberOfHighlights += 1;
+    }
+  }
+  numberOfHighlights = Math.min(4, numberOfHighlights);
+  el.classList.add(highlightCountClasses[numberOfHighlights]);
+}
+
 function highlightSelection(annotationUuid = crypto.randomUUID()) {
   const range = getRangeFromSelection(document.getSelection());
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   const highlighter = rangy.createHighlighter();
+  const className = "highlight-" + annotationUuid;
   highlighter.addClassApplier(
-    rangy.createClassApplier(annotationUuid, {
+    rangy.createClassApplier(className, {
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add("highlight");
@@ -58,7 +78,11 @@ function highlightSelection(annotationUuid = crypto.randomUUID()) {
       tagNames: ["span"],
     })
   );
-  highlighter.highlightSelection(annotationUuid, { exclusive: false });
+  highlighter.highlightSelection(className, { exclusive: false });
+  const elList = document.getElementsByClassName(className);
+  for (const el of elList) {
+    addHighlightCount(el);
+  }
 
   return { uuid: annotationUuid, highlight: range };
 }
@@ -164,8 +188,8 @@ function getAllHoveredHighlights() {
   return document.getElementsByClassName("hover-highlight");
 }
 
-function getRelatedHighlights(annotationId) {
-  return document.getElementsByClassName(annotationId);
+function getRelatedHighlights(className) {
+  return document.getElementsByClassName(className);
 }
 
 function addClassToElements(elements, className) {
@@ -181,7 +205,7 @@ function removeClassFromElements(elements, className) {
 }
 
 export function addHoverClassToRelatedHighlights(annotationId) {
-  const relatedHighlights = getRelatedHighlights(annotationId);
+  const relatedHighlights = getRelatedHighlights("highlight-" + annotationId);
   addClassToElements(relatedHighlights, "hover-highlight");
 }
 
