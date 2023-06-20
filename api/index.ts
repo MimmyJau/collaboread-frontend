@@ -15,20 +15,20 @@ function fetchTableOfContents(rootSlug) {
   return ky.get(route).json();
 }
 
-function fetchArticle(articleUuid) {
-  const route = `${API_BASE_URL}/articles/${articleUuid}/`;
+function fetchArticle(slug) {
+  const route = `${API_BASE_URL}/articles/${slug}/`;
   return ky.get(route).json();
 }
 
 function updateArticle(article, token) {
-  const route = `${API_BASE_URL}/articles/${article.uuid}/`;
+  const route = `${API_BASE_URL}/articles/${article.slugFull}/`;
   return ky
     .put(route, { headers: { Authorization: `Token ${token}` }, json: article })
     .json();
 }
 
-function createAnnotation(articleUuid, highlightData, token) {
-  const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
+function createAnnotation(slug, highlightData, token) {
+  const route = `${API_BASE_URL}/articles/${slug}/annotations/`;
   return ky
     .post(route, {
       headers: { Authorization: `Token ${token}` },
@@ -37,8 +37,8 @@ function createAnnotation(articleUuid, highlightData, token) {
     .json();
 }
 
-function fetchAnnotations(articleUuid, token): Promise<Array<FlatAnnotation>> {
-  const route = `${API_BASE_URL}/articles/${articleUuid}/annotations/`;
+function fetchAnnotations(slug, token): Promise<Array<FlatAnnotation>> {
+  const route = `${API_BASE_URL}/articles/${slug}/annotations/`;
   return ky
     .get(route, { headers: { Authorization: token ? `Token ${token}` : "" } })
     .json();

@@ -1,5 +1,6 @@
 export interface Article {
   uuid: string;
+  slugFull: string;
   user: string;
   title: string;
   author?: string;

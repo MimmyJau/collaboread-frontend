@@ -44,12 +44,32 @@ function unselectSelection() {
  * @param {Document} doc: New param to specific document to use
  * returns {object} { uuid: annotationUuid, highlight: range }
  */
+const highlightCountClasses = [
+  "highlight_count_0",
+  "highlight_count_1",
+  "highlight_count_2",
+  "highlight_count_3",
+  "highlight_count_4",
+];
+
+function addHighlightCount(el) {
+  let numberOfHighlights = 0;
+  for (const className of el.classList) {
+    if (className.startsWith("highlight-")) {
+      numberOfHighlights += 1;
+    }
+  }
+  numberOfHighlights = Math.min(4, numberOfHighlights);
+  el.classList.add(highlightCountClasses[numberOfHighlights]);
+}
+
 function highlightSelection(annotationUuid = crypto.randomUUID()) {
   const range = getRangeFromSelection(document.getSelection());
   // Source: https://github.com/timdown/rangy/issues/417#issuecomment-440244884
   const highlighter = rangy.createHighlighter();
+  const className = "highlight-" + annotationUuid;
   highlighter.addClassApplier(
-    rangy.createClassApplier("bg-yellow-300", {
+    rangy.createClassApplier(className, {
       ignoreWhiteSpace: true,
       onElementCreate: (el) => {
         el.classList.add("highlight");
@@ -58,7 +78,11 @@ function highlightSelection(annotationUuid = crypto.randomUUID()) {
       tagNames: ["span"],
     })
   );
-  highlighter.highlightSelection("bg-yellow-300");
+  highlighter.highlightSelection(className, { exclusive: false });
+  const elList = document.getElementsByClassName(className);
+  for (const el of elList) {
+    addHighlightCount(el);
+  }
 
   return { uuid: annotationUuid, highlight: range };
 }
@@ -90,7 +114,7 @@ export function highlightFetchedAnnotations(annotations) {
  */
 function removeHangingSpanTags(annotationUuid) {
   const highlightFragments = document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationUuid}"]`
+    `.highlight-${annotationUuid}`
   );
   highlightFragments.forEach((el) => {
     const pa = el.parentNode;
@@ -137,15 +161,13 @@ function isSelectionOverlapping(annotations) {
   return doAnyHighlightsOverlap(range, annotations);
 }
 
-function isSelectionInArticle() {
-  const selection = document.getSelection();
-  const selectionRange = selection.getRangeAt(0);
-  const content = document.getElementById("content-highlightable");
-  return content.contains(selectionRange.commonAncestorContainer);
+export function isSelectionInElementById(id) {
+  const range = document.getSelection().getRangeAt(0);
+  return document.getElementById(id)?.contains(range.commonAncestorContainer);
 }
 
 export function isSelectionValid(annotations) {
-  return !isSelectionOverlapping(annotations) && isSelectionInArticle();
+  return isSelectionInElementById("content-highlightable");
 }
 
 function isMouseInArticle(e) {
@@ -163,7 +185,17 @@ export function isClickingEmptyArea(e) {
 // SyncHoverBehaviour functions
 
 function getAllHoveredHighlights() {
-  return document.getElementsByClassName("bg-yellow-400");
+  return document.getElementsByClassName("hover-highlight");
+}
+
+function getRelatedHighlights(className) {
+  return document.getElementsByClassName(className);
+}
+
+function addClassToElements(elements, className) {
+  for (const element of elements) {
+    element.classList.add(className);
+  }
 }
 
 function removeClassFromElements(elements, className) {
@@ -172,9 +204,14 @@ function removeClassFromElements(elements, className) {
   }
 }
 
+export function addHoverClassToRelatedHighlights(annotationId) {
+  const relatedHighlights = getRelatedHighlights("highlight-" + annotationId);
+  addClassToElements(relatedHighlights, "hover-highlight");
+}
+
 export function removeAllHoverClasses() {
   // We use Array.from() since geElementsByClassName returns a live collection.
   // Source: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCollection
   const hoveredHighlights = Array.from(getAllHoveredHighlights());
-  removeClassFromElements(hoveredHighlights, "bg-yellow-400");
+  removeClassFromElements(hoveredHighlights, "hover-highlight");
 }

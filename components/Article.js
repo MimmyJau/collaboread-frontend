@@ -3,7 +3,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useDeleteAnnotation } from "hooks";
-import { highlightFetchedAnnotations, removeAllHoverClasses } from "utils";
+import {
+  addHoverClassToRelatedHighlights,
+  highlightFetchedAnnotations,
+  removeAllHoverClasses,
+} from "utils";
 
 const NavButton = ({ text, href }) => {
   return (
@@ -33,23 +37,6 @@ const PrevAndNextSection = (props) => {
   );
 };
 
-function addClassToElements(elements, className) {
-  for (const element of elements) {
-    element.classList.add(className);
-  }
-}
-
-function getRelatedHighlights(annotationId) {
-  return document.querySelectorAll(
-    `.highlight[data-annotation-id="${annotationId}"]`
-  );
-}
-
-function addHoverClassToRelatedHighlights(annotationId) {
-  const relatedHighlights = getRelatedHighlights(annotationId);
-  addClassToElements(relatedHighlights, "bg-yellow-400");
-}
-
 function extractAnnotationIdFromEvent(e) {
   return e.target.dataset.annotationId || "";
 }
@@ -64,6 +51,7 @@ const Article = (props) => {
   }, [props.html, props.fetchedAnnotations]);
 
   function syncHoverBehavior(e) {
+    if (e.buttons !== 0) return;
     const annotationId = extractAnnotationIdFromEvent(e);
     if (annotationId) {
       removeAllHoverClasses();
@@ -77,19 +65,13 @@ const Article = (props) => {
       className={`flex flex-col items-center ${props.className}`}
       onMouseOver={(e) => syncHoverBehavior(e, setFocus)}
     >
-      <PrevAndNextSection
-        prevHref={props.prev?.join("/")}
-        nextHref={props.next?.join("/")}
-      />
+      <PrevAndNextSection prevHref={props.prev} nextHref={props.next} />
       <div id="article" className="prose w-full">
         <div id="content-highlightable">
           <div dangerouslySetInnerHTML={{ __html: props.html }} />
         </div>
       </div>
-      <PrevAndNextSection
-        prevHref={props.prev?.join("/")}
-        nextHref={props.next?.join("/")}
-      />
+      <PrevAndNextSection prevHref={props.prev} nextHref={props.next} />
     </div>
   );
 };

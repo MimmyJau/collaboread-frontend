@@ -11,8 +11,36 @@
   pointer-events: none;
 }
 
-#article ::selection {
-  @apply bg-yellow-400;
+#article ::selection, #article span[class^='highlight-'] {
+  @apply bg-yellow-300 bg-opacity-50 mix-blend-multiply;
+}
+
+#article .highlight_count_2 {
+  background: linear-gradient(theme('colors.yellow.300' / 50%), theme('colors.yellow.300' / 50%));
+  @apply bg-blend-darken;
+}
+
+#article .highlight_count_3 {
+  background: linear-gradient(theme('colors.yellow.300' / 50%), theme('colors.yellow.300' / 50%)),
+    linear-gradient(theme('colors.yellow.300' / 50%), theme('colors.yellow.300' / 50%));
+  @apply bg-blend-darken;
+}
+
+#article .highlight_count_4 {
+  background: linear-gradient(theme('colors.yellow.300' / 50%), theme('colors.yellow.300' / 50%)),
+              linear-gradient(theme('colors.yellow.300' / 50%), theme('colors.yellow.300' / 50%)),
+              linear-gradient(theme('colors.yellow.300' / 50%), theme('colors.yellow.300' / 50%));
+  @apply bg-blend-darken;
+}
+
+/* When hovering a highlight that has a overlapped area, we 
+ * don't want that overlap area to look different.*/
+#article .hover-highlight span[class^='highlight-'], #article span[class^='highlight-'] .hover-highlight {
+  @apply bg-yellow-400 mix-blend-darken;
+}
+
+#article .hover-highlight {
+  @apply bg-yellow-400 !important;
 }
 
 /* For Webkit-based browsers (Chrome, Safari and Opera) */

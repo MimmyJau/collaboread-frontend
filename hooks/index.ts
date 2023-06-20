@@ -62,17 +62,17 @@ function useFetchTableOfContents(rootSlug) {
   });
 }
 
-function useFetchArticle(uuid) {
+function useFetchArticle(slug) {
   return useQuery({
-    enabled: !!uuid,
-    queryKey: ["article", uuid],
-    queryFn: () => fetchArticle(uuid),
+    enabled: !!slug,
+    queryKey: ["article", slug],
+    queryFn: () => fetchArticle(slug),
   });
 }
 
-function useUpdateArticle(articleUuid) {
+function useUpdateArticle(slug) {
   const queryClient = useQueryClient();
-  const article = queryClient.getQueryData(["article", articleUuid]) as Article;
+  const article = queryClient.getQueryData(["article", slug]) as Article;
   return useMutation({
     mutationFn: ({
       html,
@@ -90,23 +90,23 @@ function useUpdateArticle(articleUuid) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["article", articleUuid],
+        queryKey: ["article", slug],
       });
     },
   });
 }
 
-function useCreateAnnotation(articleUuid) {
+function useCreateAnnotation(slug) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (highlight: Highlight) => {
       return createAnnotation(
-        articleUuid,
+        slug,
         {
           highlightStart: highlight.characterRange.start,
           highlightEnd: highlight.characterRange.end,
           highlightBackward: highlight.backward,
-          article: articleUuid,
+          article: slug,
           isPublic: "False",
         },
         getTokenLocalStorage()
@@ -114,19 +114,19 @@ function useCreateAnnotation(articleUuid) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", articleUuid],
+        queryKey: ["annotations", slug],
       });
     },
   });
 }
 
-function useFetchAnnotations(articleUuid) {
+function useFetchAnnotations(slug) {
   return useQuery({
-    enabled: !!articleUuid,
-    queryKey: ["annotations", articleUuid],
+    enabled: !!slug,
+    queryKey: ["annotations", slug],
     queryFn: async (): Promise<Array<Annotation>> => {
       const flatAnnotations = await fetchAnnotations(
-        articleUuid,
+        slug,
         getTokenLocalStorage()
       ).catch((error) => {
         return [];
@@ -136,13 +136,13 @@ function useFetchAnnotations(articleUuid) {
   });
 }
 
-function useMakeAnnotationPublic(articleUuid, annotationUuid) {
+function useMakeAnnotationPublic(slug, annotationUuid) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (annotationUuid: string) => {
       const annotations = queryClient.getQueryData([
         "annotations",
-        articleUuid,
+        slug,
       ]) as Array<Annotation>;
       const annotation = annotations.filter(
         (annotation) => annotation.uuid === annotationUuid
@@ -155,37 +155,20 @@ function useMakeAnnotationPublic(articleUuid, annotationUuid) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", articleUuid],
+        queryKey: ["annotations", slug],
       });
     },
   });
 }
 
-function useUpdateAnnotation(articleUuid) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (annotation: Annotation) => {
-      return updateAnnotation(
-        flattenAnnotation(annotation),
-        getTokenLocalStorage()
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["annotations", articleUuid],
-      });
-    },
-  });
-}
-
-function useDeleteAnnotation(articleUuid) {
+function useDeleteAnnotation(slug) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (annotationUuid) =>
       deleteAnnotation(annotationUuid, getTokenLocalStorage()),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["annotations", articleUuid],
+        queryKey: ["annotations", slug],
       });
     },
   });
@@ -241,7 +224,6 @@ export {
   useFetchAnnotations,
   useCreateAnnotation,
   useMakeAnnotationPublic,
-  useUpdateAnnotation,
   useDeleteAnnotation,
   useCreateComment,
   useUpdateComment,
