@@ -15,6 +15,10 @@
   @apply bg-yellow-300 bg-opacity-50 mix-blend-multiply;
 }
 
+#article code span[class^='highlight-'] {
+  @apply text-gray-800 bg-yellow-300 bg-opacity-70 mix-blend-lighten;
+}
+
 #article .highlight_count_2 {
   background: linear-gradient(theme('colors.yellow.300' / 50%), theme('colors.yellow.300' / 50%));
   @apply bg-blend-darken;
