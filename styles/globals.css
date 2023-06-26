@@ -47,6 +47,12 @@
   @apply bg-yellow-400 !important;
 }
 
+/*
+#article .bookmark {
+  @apply bg-blue-300;
+}
+*/
+
 /* For Webkit-based browsers (Chrome, Safari and Opera) */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

@@ -17,6 +17,7 @@ import {
   isSelectionCollapsed,
   isSelectionInElementById,
   removeAllHoverClasses,
+  createOrUpdateBookmark,
 } from "utils";
 import Comments from "components/Comments.js";
 
@@ -48,6 +49,9 @@ const Reader = (props) => {
     if (isSelectionCollapsed()) {
       if (isClickingEmptyArea(e)) {
         setFocusedHighlightId(null);
+        // NOTE: May not want to set focusedHighlight to null
+        // Add bookmark
+        createOrUpdateBookmark();
         removeAllHoverClasses();
       }
       return;

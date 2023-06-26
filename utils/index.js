@@ -215,3 +215,45 @@ export function removeAllHoverClasses() {
   const hoveredHighlights = Array.from(getAllHoveredHighlights());
   removeClassFromElements(hoveredHighlights, "hover-highlight");
 }
+
+// Bookmark functions
+function removeAllBookmarkClasses() {
+  const bookmarkedHighlights = document.getElementsByClassName("bookmark");
+  removeClassFromElements(bookmarkedHighlights, "bookmark");
+}
+
+function addBookmarkClassToArticle() {
+  // Get range (must be non-empty for highlighter to work)
+  const range = getRangeFromSelection(document.getSelection());
+  const innerText = rangy.innerText(getHighlightableRoot());
+  if (range[0].characterRange.end === innerText.length) {
+    range[0].characterRange.start = range[0].characterRange.end - 1;
+  } else {
+    range[0].characterRange.end = range[0].characterRange.start + 1;
+  }
+  setSelectionFromRange(range);
+
+  // Add highlight
+  const highlighter = rangy.createHighlighter();
+  const className = "bookmark";
+  highlighter.addClassApplier(
+    rangy.createClassApplier(className, {
+      tagNames: ["span"],
+    })
+  );
+  highlighter.highlightSelection(className, {
+    exclusive: false,
+    containerElementId: "content-highlightable",
+  });
+
+  unselectSelection();
+  return range;
+}
+
+export function createOrUpdateBookmark() {
+  // Remove any existing bookmark classes
+  removeAllBookmarkClasses();
+  // Apply special highlight class for bookmarks
+  const range = addBookmarkClassToArticle();
+  console.log("bookmark updated at ", range);
+}
