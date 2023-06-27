@@ -53,16 +53,14 @@
 }
 */
 
+#article {
+  position: relative;
+}
+
 .bookmark::before {
-  content: "➡️";
-  width: 0;
-  height: 0;
-  border-left: 5px solid blue;
-  border-right: 5px solid blue;
-  border-bottom: 5px solid blue;
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  content: "🔖";
+  top: -0.5em;
 }
 
 /* For Webkit-based browsers (Chrome, Safari and Opera) */
