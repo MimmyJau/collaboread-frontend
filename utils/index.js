@@ -226,10 +226,12 @@ function addBookmarkClassToArticle() {
   // Get range (must be non-empty for highlighter to work)
   const range = getRangeFromSelection(document.getSelection());
   const innerText = rangy.innerText(getHighlightableRoot());
+  let triedExtendingEnd = false;
   if (range[0].characterRange.end === innerText.length) {
     range[0].characterRange.start = range[0].characterRange.end - 1;
   } else {
     range[0].characterRange.end = range[0].characterRange.start + 1;
+    triedExtendingEnd = true;
   }
   setSelectionFromRange(range);
 
@@ -238,14 +240,43 @@ function addBookmarkClassToArticle() {
   const className = "bookmark";
   highlighter.addClassApplier(
     rangy.createClassApplier(className, {
+      ignoreWhiteSpace: true,
       tagNames: ["span"],
     })
   );
-  highlighter.highlightSelection(className, {
+  const highlightList = highlighter.highlightSelection(className, {
     exclusive: false,
     containerElementId: "content-highlightable",
   });
 
+  // console.log("Range is ", range);
+  // console.log("highlightSelection returns ", highlightList);
+
+  // If highlight didn't add properly, try the other range.
+  if (highlightList.length !== 0) {
+  } else if (triedExtendingEnd) {
+    range[0].characterRange.end = range[0].characterRange.start;
+    range[0].characterRange.start = range[0].characterRange.end - 1;
+    setSelectionFromRange(range);
+    const className = "bookmark";
+    highlighter.addClassApplier(
+      rangy.createClassApplier(className, {
+        ignoreWhiteSpace: true,
+        tagNames: ["span"],
+      })
+    );
+  } else {
+    range[0].characterRange.start = range[0].characterRange.end;
+    range[0].characterRange.end = range[0].characterRange.end + 1;
+    setSelectionFromRange(range);
+    const className = "bookmark";
+    highlighter.addClassApplier(
+      rangy.createClassApplier(className, {
+        ignoreWhiteSpace: true,
+        tagNames: ["span"],
+      })
+    );
+  }
   unselectSelection();
   return range;
 }
@@ -255,5 +286,4 @@ export function createOrUpdateBookmark() {
   removeAllBookmarkClasses();
   // Apply special highlight class for bookmarks
   const range = addBookmarkClassToArticle();
-  console.log("bookmark updated at ", range);
 }
