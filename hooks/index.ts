@@ -12,9 +12,18 @@ import {
   createComment,
   updateComment,
   deleteComment,
+  fetchBookmark,
+  createBookmark,
+  updateBookmark,
 } from "api";
 
-import { Article, Annotation, FlatAnnotation, Highlight } from "types";
+import {
+  Article,
+  Annotation,
+  Bookmark,
+  FlatAnnotation,
+  Highlight,
+} from "types";
 
 // Helper Functions
 function unflattenAnnotation(flatAnnotation: FlatAnnotation): Annotation {
@@ -216,6 +225,49 @@ function useDeleteComment() {
   });
 }
 
+function useFetchBookmark(book) {
+  return useQuery({
+    enabled: !!slug,
+    queryKey: ["bookmark", book],
+    queryFn: async (): Promise<Bookmark> => {
+      const bookmark = await fetchBookmark(slug, getTokenLocalStorage()).catch(
+        (error) => {
+          return null;
+        }
+      );
+      return bookmark;
+    },
+  });
+}
+
+function useCreateBookmark(book) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (bookmark: Bookmark) => {
+      return createBookmark(bookmark, getTokenLocalStorage());
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["bookmark", book],
+      });
+    },
+  });
+}
+
+function useUpdateBookmark(book) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (bookmark: Bookmark) => {
+      return updateBookmark(bookmark, getTokenLocalStorage());
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["bookmark", book],
+      });
+    },
+  });
+}
+
 export {
   useFetchArticles,
   useFetchTableOfContents,
@@ -228,4 +280,7 @@ export {
   useCreateComment,
   useUpdateComment,
   useDeleteComment,
+  useFetchBookmark,
+  useCreateBookmark,
+  useUpdateBookmark,
 };

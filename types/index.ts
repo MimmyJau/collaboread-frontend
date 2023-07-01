@@ -41,6 +41,13 @@ export interface Annotation {
   isPublic: boolean;
 }
 
+export interface Bookmark {
+  uuid?: string;
+  user: string;
+  article: string;
+  highlight: Array<Highlight>;
+}
+
 export interface FlatAnnotation {
   uuid?: string;
   user: string;

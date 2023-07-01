@@ -1,6 +1,6 @@
 import ky from "ky-universal";
 
-import { FlatAnnotation } from "types";
+import { Bookmark, FlatAnnotation } from "types";
 
 const BASE_URL = process.env.SERVER;
 const API_BASE_URL = `${BASE_URL}/api`;
@@ -91,6 +91,29 @@ function deleteComment(comment, token) {
     .json();
 }
 
+function fetchBookmark(book, token): Promise<Bookmark> {
+  const route = `${API_BASE_URL}/bookmark/${book}/`;
+  return ky
+    .get(route, { headers: { Authorization: token ? `Token ${token}` : "" } })
+    .json();
+}
+
+function createBookmark(bookmark, token) {
+  const route = `${API_BASE_URL}/bookmarks/`;
+  return ky.post(route, {
+    headers: { Authorization: `Token ${token}` },
+    json: bookmark,
+  });
+}
+
+function updateBookmark(bookmark, token) {
+  const route = `${API_BASE_URL}/bookmarks/`;
+  return ky.put(route, {
+    headers: { Authorization: `Token ${token}` },
+    json: bookmark,
+  });
+}
+
 export {
   fetchArticles,
   fetchTableOfContents,
@@ -103,4 +126,7 @@ export {
   createComment,
   updateComment,
   deleteComment,
+  fetchBookmark,
+  createBookmark,
+  updateBookmark,
 };
