@@ -222,68 +222,56 @@ function removeAllBookmarkClasses() {
   removeClassFromElements(bookmarkedHighlights, "bookmark");
 }
 
-function addBookmarkClassToArticle() {
+function getBookmarkRange() {
   // Get range (must be non-empty for highlighter to work)
   const range = getRangeFromSelection(document.getSelection());
   const innerText = rangy.innerText(getHighlightableRoot());
-  let triedExtendingEnd = false;
   if (range[0].characterRange.end === innerText.length) {
     range[0].characterRange.start = range[0].characterRange.end - 1;
   } else {
     range[0].characterRange.end = range[0].characterRange.start + 1;
-    triedExtendingEnd = true;
   }
-  setSelectionFromRange(range);
+  return range;
+}
 
+function getAdjacentRange(range) {
+  if (!range) {
+    range = getRangeFromSelection(document.getSelection());
+  }
+  if (range[0].characterRange.start === 0) {
+    return null;
+  }
+  range[0].characterRange.start -= 1;
+  range[0].characterRange.end -= 1;
+  return range;
+}
+
+function addBookmarkToArticle(range) {
+  setSelectionFromRange(range);
   // Add highlight
-  const highlighter = rangy.createHighlighter();
-  const className = "bookmark";
-  highlighter.addClassApplier(
-    rangy.createClassApplier(className, {
-      ignoreWhiteSpace: true,
-      tagNames: ["span"],
-    })
-  );
-  const highlightList = highlighter.highlightSelection(className, {
+  const bookmarker = rangy.createHighlighter();
+  const bookmarkClass = rangy.createClassApplier("bookmark", {
+    ignoreWhiteSpace: true,
+    tagNames: ["span"],
+  });
+  bookmarker.addClassApplier(bookmarkClass);
+  const bookmarkList = bookmarker.highlightSelection("bookmark", {
     exclusive: false,
     containerElementId: "content-highlightable",
   });
 
-  // console.log("Range is ", range);
-  // console.log("highlightSelection returns ", highlightList);
-
-  // If highlight didn't add properly, try the other range.
-  if (highlightList.length !== 0) {
-  } else if (triedExtendingEnd) {
-    range[0].characterRange.end = range[0].characterRange.start;
-    range[0].characterRange.start = range[0].characterRange.end - 1;
-    setSelectionFromRange(range);
-    const className = "bookmark";
-    highlighter.addClassApplier(
-      rangy.createClassApplier(className, {
-        ignoreWhiteSpace: true,
-        tagNames: ["span"],
-      })
-    );
-  } else {
-    range[0].characterRange.start = range[0].characterRange.end;
-    range[0].characterRange.end = range[0].characterRange.end + 1;
-    setSelectionFromRange(range);
-    const className = "bookmark";
-    highlighter.addClassApplier(
-      rangy.createClassApplier(className, {
-        ignoreWhiteSpace: true,
-        tagNames: ["span"],
-      })
-    );
-  }
   unselectSelection();
-  return range;
+  return bookmarkList;
 }
 
 export function createOrUpdateBookmark() {
-  // Remove any existing bookmark classes
   removeAllBookmarkClasses();
-  // Apply special highlight class for bookmarks
-  const range = addBookmarkClassToArticle();
+  let range = getBookmarkRange();
+  let bookmarkList = [];
+  do {
+    bookmarkList = addBookmarkToArticle(range);
+    if (bookmarkList.length === 0) {
+      range = getAdjacentRange(range);
+    }
+  } while (bookmarkList.length === 0);
 }
