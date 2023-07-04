@@ -2,11 +2,12 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { useDeleteAnnotation } from "hooks";
+import { useDeleteAnnotation, useFetchBookmark } from "hooks";
 import {
   addHoverClassToRelatedHighlights,
   highlightFetchedAnnotations,
   removeAllHoverClasses,
+  createOrUpdateBookmark,
 } from "utils";
 
 const NavButton = ({ text, href }) => {
@@ -45,6 +46,12 @@ const Article = (props) => {
   const slug = useRouter().query.slug || [];
   const rootSlug = slug[0];
   const setFocus = props.setFocus;
+  const {
+    isLoading: isLoadingBookmark,
+    isError: isErrorBookmark,
+    data: bookmark,
+    error: errorBookmark,
+  } = useFetchBookmark(rootSlug);
 
   useEffect(() => {
     highlightFetchedAnnotations(props.fetchedAnnotations);

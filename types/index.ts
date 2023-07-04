@@ -45,6 +45,7 @@ export interface Bookmark {
   uuid?: string;
   user: string;
   article: string;
+  book: string;
   highlight: Array<Highlight>;
 }
 

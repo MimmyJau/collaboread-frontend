@@ -6,6 +6,7 @@ import {
   useFetchAnnotations,
   useCreateAnnotation,
   useDeleteAnnotation,
+  useUpdateBookmark,
 } from "hooks";
 import useAuth from "hooks/auth";
 import Article from "components/Article.js";
@@ -23,6 +24,7 @@ import Comments from "components/Comments.js";
 
 const Reader = (props) => {
   const slugList = useRouter().query.slug || []; // Initially returns undefined
+  const book = slugList[0];
   const slug = slugList.join("/");
   const createAnnotation = useCreateAnnotation(slug);
   const deleteAnnotation = useDeleteAnnotation(slug);
@@ -39,6 +41,7 @@ const Reader = (props) => {
     data: annotations,
     error: errorAnnotations,
   } = useFetchAnnotations(slug);
+  const updateBookmark = useUpdateBookmark(book);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
 
@@ -50,8 +53,9 @@ const Reader = (props) => {
       if (isClickingEmptyArea(e)) {
         setFocusedHighlightId(null);
         // NOTE: May not want to set focusedHighlight to null
-        // Add bookmark
-        createOrUpdateBookmark();
+        const bookmark = createOrUpdateBookmark();
+        // TODO: check if bookmark already exists or not
+        updateBookmark.mutate(bookmark);
         removeAllHoverClasses();
       }
       return;
