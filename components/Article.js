@@ -1,18 +1,9 @@
-import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import {
-  useDeleteAnnotation,
-  useFetchAnnotations,
-  useFetchBookmark,
-} from "hooks";
-import {
-  addHoverClassToRelatedHighlights,
-  highlightFetchedAnnotations,
-  removeAllHoverClasses,
-  addBookmarkToArticle,
-} from "utils";
+import { useDeleteAnnotation } from "hooks";
+import { useRenderBookmark, useRenderHighlights } from "hooks/pages";
+import { addHoverClassToRelatedHighlights, removeAllHoverClasses } from "utils";
 
 const NavButton = ({ text, href }) => {
   return (
@@ -45,38 +36,6 @@ const PrevAndNextSection = (props) => {
 function extractAnnotationIdFromEvent(e) {
   return e.target.dataset.annotationId || "";
 }
-
-const useGetUrl = () => {
-  const slugs = useRouter().query.slug || [];
-  const book = slugs[0];
-  const section = slugs[slugs.length - 1];
-  const path = slugs.join("/");
-  return { book, section, path };
-};
-
-const useRenderBookmark = () => {
-  const { book, path } = useGetUrl();
-  const { isLoading, isError, data, error, status } = useFetchBookmark(book);
-
-  useEffect(() => {
-    if (status !== "success") return;
-    const isBookmarkInThisSection = data.article === path;
-    if (isBookmarkInThisSection) {
-      addBookmarkToArticle(data.highlight);
-    }
-  }, [path, status]);
-};
-
-const useRenderHighlights = () => {
-  const { path } = useGetUrl();
-  const { isLoading, isError, data, error, status } = useFetchAnnotations(path);
-
-  useEffect(() => {
-    if (status === "success") {
-      highlightFetchedAnnotations(data);
-    }
-  }, [path, status]);
-};
 
 const Article = (props) => {
   const setFocus = props.setFocus;
