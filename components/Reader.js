@@ -89,7 +89,6 @@ const Reader = (props) => {
       <Article
         className="col-start-1 col-span-6 md:col-start-2 md:col-span-3 md:place-self-end px-2 overflow-y-auto h-full w-full"
         html={article.articleHtml}
-        fetchedAnnotations={annotations}
         prev={article.prev}
         next={article.next}
         setFocus={setFocusedHighlightId}

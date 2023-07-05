@@ -2,7 +2,11 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { useDeleteAnnotation, useFetchBookmark } from "hooks";
+import {
+  useDeleteAnnotation,
+  useFetchAnnotations,
+  useFetchBookmark,
+} from "hooks";
 import {
   addHoverClassToRelatedHighlights,
   highlightFetchedAnnotations,
@@ -63,21 +67,21 @@ const useRenderBookmark = () => {
   }, [path, status]);
 };
 
-const useGetUrl = () => {
-  const slugs = useRouter().query.slug || [];
-  const book = slugs[0];
-  const section = slugs[slugs.length - 1];
-  const path = slugs.join("/");
-  return { book, section, path };
+const useRenderHighlights = () => {
+  const { path } = useGetUrl();
+  const { isLoading, isError, data, error, status } = useFetchAnnotations(path);
+
+  useEffect(() => {
+    if (status === "success") {
+      highlightFetchedAnnotations(data);
+    }
+  }, [path, status]);
 };
 
 const Article = (props) => {
   const setFocus = props.setFocus;
   useRenderBookmark();
-
-  useEffect(() => {
-    highlightFetchedAnnotations(props.fetchedAnnotations);
-  }, [props.html, props.fetchedAnnotations]);
+  useRenderHighlights();
 
   function syncHoverBehavior(e) {
     if (e.buttons !== 0) return;

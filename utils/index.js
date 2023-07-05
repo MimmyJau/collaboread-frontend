@@ -248,6 +248,7 @@ function getAdjacentRange(range) {
 
 export function addBookmarkToArticle(range) {
   setSelectionFromRange(range);
+  // Add highlight
   const bookmarker = rangy.createHighlighter();
   const bookmarkClass = rangy.createClassApplier("bookmark", {
     ignoreWhiteSpace: true,
