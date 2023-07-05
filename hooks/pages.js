@@ -33,7 +33,6 @@ const useRenderHighlights = () => {
     if (status === "success") {
       highlightFetchedAnnotations(data);
     }
-  }, [path, status]);
-};
-
 export { useRenderBookmark, useRenderHighlights };
+  }, [path, data, status]);
+}
