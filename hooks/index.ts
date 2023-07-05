@@ -1,3 +1,4 @@
+import { usePostSignup } from "@/api/auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -73,11 +74,12 @@ function useFetchTableOfContents(rootSlug) {
   });
 }
 
-function useFetchArticle(slug) {
+function useFetchArticle() {
+  const { path } = useGetUrl();
   return useQuery({
-    enabled: !!slug,
-    queryKey: ["article", slug],
-    queryFn: () => fetchArticle(slug),
+    enabled: !!path,
+    queryKey: ["article", path],
+    queryFn: () => fetchArticle(path),
   });
 }
 

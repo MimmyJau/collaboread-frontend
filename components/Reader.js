@@ -27,12 +27,6 @@ const Reader = (props) => {
   const slug = slugList.join("/");
   const createAnnotation = useCreateAnnotation(slug);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
-  const {
-    isLoading: isLoadingArticle,
-    isError: isErrorArticle,
-    data: article,
-    error: errorArticle,
-  } = useFetchArticle(slug);
   const updateBookmark = useUpdateBookmark(book);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
@@ -71,7 +65,6 @@ const Reader = (props) => {
     });
   }
 
-  if (isLoadingArticle || isErrorArticle) return;
   return (
     <div
       className="grid grid-cols-6 gap-1 h-full overflow-hidden"
@@ -80,9 +73,6 @@ const Reader = (props) => {
       <TableOfContents className="hidden md:flex md:flex-col col-start-1 col-span-1 overflow-y-auto px-3 pb-10" />
       <Article
         className="col-start-1 col-span-6 md:col-start-2 md:col-span-3 md:place-self-end px-2 overflow-y-auto h-full w-full"
-        html={article.articleHtml}
-        prev={article.prev}
-        next={article.next}
         setFocus={setFocusedHighlightId}
       />
       <Comments

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { useDeleteAnnotation } from "hooks";
+import { useFetchArticle } from "hooks";
 import { useRenderBookmark, useRenderHighlights } from "hooks/pages";
 import { addHoverClassToRelatedHighlights, removeAllHoverClasses } from "utils";
 
@@ -41,6 +41,7 @@ const Article = (props) => {
   const setFocus = props.setFocus;
   useRenderBookmark();
   useRenderHighlights();
+  const { data: article, status } = useFetchArticle();
 
   function syncHoverBehavior(e) {
     if (e.buttons !== 0) return;
@@ -52,18 +53,19 @@ const Article = (props) => {
     }
   }
 
+  if (status !== "success") return;
   return (
     <div
       className={`flex flex-col items-center ${props.className}`}
       onMouseOver={(e) => syncHoverBehavior(e, setFocus)}
     >
-      <PrevAndNextSection prevHref={props.prev} nextHref={props.next} />
+      <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
       <div id="article" className="prose w-full">
         <div id="content-highlightable">
-          <div dangerouslySetInnerHTML={{ __html: props.html }} />
+          <div dangerouslySetInnerHTML={{ __html: article.articleHtml }} />
         </div>
       </div>
-      <PrevAndNextSection prevHref={props.prev} nextHref={props.next} />
+      <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
     </div>
   );
 };
