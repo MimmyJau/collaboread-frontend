@@ -35,12 +35,6 @@ const Reader = (props) => {
     data: article,
     error: errorArticle,
   } = useFetchArticle(slug);
-  const {
-    isLoading: isLoadingAnnotations,
-    isError: isErrorAnnotations,
-    data: annotations,
-    error: errorAnnotations,
-  } = useFetchAnnotations(slug);
   const updateBookmark = useUpdateBookmark(book);
   const { user } = useAuth();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
@@ -97,7 +91,6 @@ const Reader = (props) => {
         unauthorizedSelection={unauthorizedSelection}
         className="hidden md:grid col-start-5 col-span-2 overflow-y-auto h-full"
         focusedHighlightId={focusedHighlightId}
-        fetchedAnnotations={annotations}
       />
     </div>
   );

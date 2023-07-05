@@ -7,6 +7,7 @@ import { Interweave } from "interweave";
 import Dropdown from "components/Dropdown";
 import Editor from "components/CommentEditor";
 import {
+  useFetchAnnotations,
   useMakeAnnotationPublic,
   useDeleteAnnotation,
   useCreateComment,
@@ -330,9 +331,11 @@ const SignUpMessage = () => {
 };
 
 const Comments = (props) => {
-  if (!props.fetchedAnnotations) return;
+  const { data: annotations, status } = useFetchAnnotations();
+  if (status !== "success") return;
+
   const annotationUuid = props.focusedHighlightId;
-  const focusedAnnotation = props.fetchedAnnotations.find(
+  const focusedAnnotation = annotations.find(
     (annotation) => annotation.uuid === annotationUuid
   );
   const showSignUpMessage = props.unauthorizedSelection && !focusedAnnotation;

@@ -17,6 +17,8 @@ import {
   updateBookmark,
 } from "api";
 
+import { useGetUrl } from "hooks/pages";
+
 import {
   Article,
   Annotation,
@@ -130,12 +132,14 @@ function useCreateAnnotation(slug) {
 }
 
 function useFetchAnnotations(slug) {
+  const { path } = useGetUrl();
+
   return useQuery({
-    enabled: !!slug,
-    queryKey: ["annotations", slug],
+    enabled: !!path,
+    queryKey: ["annotations", path],
     queryFn: async (): Promise<Array<Annotation>> => {
       const flatAnnotations = await fetchAnnotations(
-        slug,
+        path,
         getTokenLocalStorage()
       ).catch((error) => {
         return [];
