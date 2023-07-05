@@ -42,27 +42,32 @@ function extractAnnotationIdFromEvent(e) {
   return e.target.dataset.annotationId || "";
 }
 
+const useRenderBookmark = (book) => {
+  const { isLoading, isError, data, error, status } = useFetchBookmark(book);
+
+  useEffect(() => {
+    if (status === "success") {
+      addBookmarkToArticle(data.highlight);
+    }
+  }, [status]);
+};
+
+const useGetUrl = () => {
+  const slugs = useRouter().query.slug || [];
+  const book = slugs[0];
+  const section = slugs[slugs.length - 1];
+  const full = slugs;
+  return { book, section, full };
+};
+
 const Article = (props) => {
-  const slug = useRouter().query.slug || [];
-  const rootSlug = slug[0];
   const setFocus = props.setFocus;
-  const {
-    isLoading: isLoadingBookmark,
-    isError: isErrorBookmark,
-    data: dataBookmark,
-    error: errorBookmark,
-    status: statusBookmark,
-  } = useFetchBookmark(rootSlug);
+  const { book } = useGetUrl();
+  useRenderBookmark(book);
 
   useEffect(() => {
     highlightFetchedAnnotations(props.fetchedAnnotations);
   }, [props.html, props.fetchedAnnotations]);
-
-  useEffect(() => {
-    if (statusBookmark === "success") {
-      addBookmarkToArticle(dataBookmark.highlight);
-    }
-  }, [statusBookmark]);
 
   function syncHoverBehavior(e) {
     if (e.buttons !== 0) return;
