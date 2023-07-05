@@ -5,7 +5,6 @@ import {
   useFetchArticle,
   useFetchAnnotations,
   useCreateAnnotation,
-  useDeleteAnnotation,
   useUpdateBookmark,
 } from "hooks";
 import useAuth from "hooks/auth";
@@ -27,7 +26,6 @@ const Reader = (props) => {
   const book = slugList[0];
   const slug = slugList.join("/");
   const createAnnotation = useCreateAnnotation(slug);
-  const deleteAnnotation = useDeleteAnnotation(slug);
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const {
     isLoading: isLoadingArticle,
