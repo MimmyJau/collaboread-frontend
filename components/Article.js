@@ -42,28 +42,29 @@ function extractAnnotationIdFromEvent(e) {
   return e.target.dataset.annotationId || "";
 }
 
-const useRenderBookmark = (book) => {
+const useRenderBookmark = () => {
+  const { book, path } = useGetUrl();
   const { isLoading, isError, data, error, status } = useFetchBookmark(book);
 
   useEffect(() => {
-    if (status === "success") {
+    const isBookmarkInThisSection = data.article === path;
+    if (status === "success" && isBookmarkInThisSection) {
       addBookmarkToArticle(data.highlight);
     }
-  }, [status]);
+  }, [path, status]);
 };
 
 const useGetUrl = () => {
   const slugs = useRouter().query.slug || [];
   const book = slugs[0];
   const section = slugs[slugs.length - 1];
-  const full = slugs;
-  return { book, section, full };
+  const path = slugs.join("/");
+  return { book, section, path };
 };
 
 const Article = (props) => {
   const setFocus = props.setFocus;
-  const { book } = useGetUrl();
-  useRenderBookmark(book);
+  useRenderBookmark();
 
   useEffect(() => {
     highlightFetchedAnnotations(props.fetchedAnnotations);
