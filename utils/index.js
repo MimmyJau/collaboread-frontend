@@ -166,7 +166,7 @@ export function isSelectionInElementById(id) {
   return document.getElementById(id)?.contains(range.commonAncestorContainer);
 }
 
-export function isSelectionValid(annotations) {
+export function isSelectionValid() {
   return isSelectionInElementById("content-highlightable");
 }
 

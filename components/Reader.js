@@ -63,7 +63,7 @@ const Reader = (props) => {
     if (isSelectionInElementById("Comments")) {
       return;
     }
-    if (!isSelectionValid(annotations)) {
+    if (!isSelectionValid()) {
       document.getSelection().collapse(null);
       return;
     }

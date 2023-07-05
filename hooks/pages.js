@@ -4,15 +4,15 @@ import { useEffect } from "react";
 import { useFetchAnnotations, useFetchBookmark } from "hooks";
 import { highlightFetchedAnnotations, addBookmarkToArticle } from "utils";
 
-const useGetUrl = () => {
+export function useGetUrl() {
   const slugs = useRouter().query.slug || [];
   const book = slugs[0];
   const section = slugs[slugs.length - 1];
   const path = slugs.join("/");
   return { book, section, path };
-};
+}
 
-const useRenderBookmark = () => {
+export function useRenderBookmark() {
   const { book, path } = useGetUrl();
   const { isLoading, isError, data, error, status } = useFetchBookmark(book);
 
@@ -23,9 +23,9 @@ const useRenderBookmark = () => {
       addBookmarkToArticle(data.highlight);
     }
   }, [path, status]);
-};
+}
 
-const useRenderHighlights = () => {
+export function useRenderHighlights() {
   const { path } = useGetUrl();
   const { isLoading, isError, data, error, status } = useFetchAnnotations(path);
 
@@ -33,6 +33,5 @@ const useRenderHighlights = () => {
     if (status === "success") {
       highlightFetchedAnnotations(data);
     }
-export { useRenderBookmark, useRenderHighlights };
   }, [path, data, status]);
 }
