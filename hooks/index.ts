@@ -227,10 +227,10 @@ function useDeleteComment() {
 
 function useFetchBookmark(book) {
   return useQuery({
-    enabled: !!slug,
+    enabled: !!book,
     queryKey: ["bookmark", book],
     queryFn: async (): Promise<Bookmark> => {
-      const bookmark = await fetchBookmark(slug, getTokenLocalStorage()).catch(
+      const bookmark = await fetchBookmark(book, getTokenLocalStorage()).catch(
         (error) => {
           return null;
         }

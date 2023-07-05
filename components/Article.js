@@ -7,7 +7,7 @@ import {
   addHoverClassToRelatedHighlights,
   highlightFetchedAnnotations,
   removeAllHoverClasses,
-  createOrUpdateBookmark,
+  addBookmarkToArticle,
 } from "utils";
 
 const NavButton = ({ text, href }) => {
@@ -49,13 +49,20 @@ const Article = (props) => {
   const {
     isLoading: isLoadingBookmark,
     isError: isErrorBookmark,
-    data: bookmark,
+    data: dataBookmark,
     error: errorBookmark,
+    status: statusBookmark,
   } = useFetchBookmark(rootSlug);
 
   useEffect(() => {
     highlightFetchedAnnotations(props.fetchedAnnotations);
   }, [props.html, props.fetchedAnnotations]);
+
+  useEffect(() => {
+    if (statusBookmark === "success") {
+      addBookmarkToArticle(dataBookmark.highlight);
+    }
+  }, [statusBookmark]);
 
   function syncHoverBehavior(e) {
     if (e.buttons !== 0) return;
