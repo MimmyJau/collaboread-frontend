@@ -38,7 +38,6 @@ function extractAnnotationIdFromEvent(e) {
 }
 
 const Article = (props) => {
-  const setFocus = props.setFocus;
   useRenderBookmark();
   useRenderHighlights();
   const { data: article, status } = useFetchArticle();
@@ -48,7 +47,7 @@ const Article = (props) => {
     const annotationId = extractAnnotationIdFromEvent(e);
     if (annotationId) {
       removeAllHoverClasses();
-      setFocus(annotationId);
+      props.setFocus(annotationId);
       addHoverClassToRelatedHighlights(annotationId);
     }
   }
@@ -57,7 +56,7 @@ const Article = (props) => {
   return (
     <div
       className={`flex flex-col items-center ${props.className}`}
-      onMouseOver={(e) => syncHoverBehavior(e, setFocus)}
+      onMouseOver={(e) => syncHoverBehavior(e, props.setFocus)}
     >
       <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
       <div id="article" className="prose w-full">

@@ -1,12 +1,7 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import {
-  useFetchArticle,
-  useFetchAnnotations,
-  useCreateAnnotation,
-  useUpdateBookmark,
-} from "hooks";
+import { useCreateAnnotation, useUpdateBookmark } from "hooks";
 import useAuth from "hooks/auth";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
