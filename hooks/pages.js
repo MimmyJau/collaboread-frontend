@@ -19,6 +19,7 @@ export function useRenderBookmark(ref) {
 
   useEffect(() => {
     if (bookmarkStatus !== "success" || articleStatus !== "success") return;
+    if (data === null) return;
     const isBookmarkInThisSection = data.article === path;
     if (isBookmarkInThisSection) {
       addBookmarkToArticle(data.highlight);
