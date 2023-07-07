@@ -18,8 +18,6 @@ import {
   updateBookmark,
 } from "api";
 
-import { useGetUrl } from "hooks/pages";
-
 import {
   Article,
   Annotation,
@@ -74,8 +72,7 @@ function useFetchTableOfContents(rootSlug) {
   });
 }
 
-function useFetchArticle() {
-  const { path } = useGetUrl();
+function useFetchArticle(path) {
   return useQuery({
     enabled: !!path,
     queryKey: ["article", path],
@@ -133,9 +130,7 @@ function useCreateAnnotation(slug) {
   });
 }
 
-function useFetchAnnotations(slug) {
-  const { path } = useGetUrl();
-
+function useFetchAnnotations(path) {
   return useQuery({
     enabled: !!path,
     queryKey: ["annotations", path],

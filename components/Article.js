@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { useFetchArticle } from "hooks";
-import { useRenderBookmark, useRenderHighlights } from "hooks/pages";
+import { useGetUrl, useRenderBookmark, useRenderHighlights } from "hooks/pages";
 import { addHoverClassToRelatedHighlights, removeAllHoverClasses } from "utils";
 
 const NavButton = ({ text, href }) => {
@@ -41,7 +41,8 @@ const Article = (props) => {
   const ref = useRef(null);
   useRenderBookmark(ref);
   useRenderHighlights(ref);
-  const { data: article, status } = useFetchArticle();
+  const { path } = useGetUrl();
+  const { data: article, status } = useFetchArticle(path);
 
   function syncHoverBehavior(e) {
     if (e.buttons !== 0) return;

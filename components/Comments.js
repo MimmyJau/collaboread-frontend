@@ -14,6 +14,7 @@ import {
   useUpdateComment,
   useDeleteComment,
 } from "hooks";
+import { useGetUrl } from "hooks/pages";
 import useAuth from "hooks/auth";
 import { clearHighlight } from "utils";
 
@@ -331,7 +332,8 @@ const SignUpMessage = () => {
 };
 
 const Comments = (props) => {
-  const { data: annotations, status } = useFetchAnnotations();
+  const { path } = useGetUrl();
+  const { data: annotations, status } = useFetchAnnotations(path);
   if (status !== "success") return;
 
   const annotationUuid = props.focusedHighlightId;

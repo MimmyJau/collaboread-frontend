@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import { useFetchAnnotations, useFetchBookmark } from "hooks";
+import { useFetchAnnotations, useFetchArticle, useFetchBookmark } from "hooks";
 import { highlightFetchedAnnotations, addBookmarkToArticle } from "utils";
 
 export function useGetUrl() {
@@ -14,25 +14,28 @@ export function useGetUrl() {
 
 export function useRenderBookmark(ref) {
   const { book, path } = useGetUrl();
-  const { isLoading, isError, data, error, status } = useFetchBookmark(book);
+  const { data, error, status: bookmarkStatus } = useFetchBookmark(book);
+  const { status: articleStatus } = useFetchArticle(path);
 
   useEffect(() => {
-    if (status !== "success") return;
-    if (ref.current?.innerHTML === undefined) return;
+    if (bookmarkStatus !== "success" || articleStatus !== "success") return;
     const isBookmarkInThisSection = data.article === path;
     if (isBookmarkInThisSection) {
       addBookmarkToArticle(data.highlight);
     }
-  }, [path, status, ref.current?.innerHTML]);
+  }, [path, bookmarkStatus, articleStatus]);
 }
 
 export function useRenderHighlights(ref) {
   const { path } = useGetUrl();
-  const { isLoading, isError, data, error, status } = useFetchAnnotations(path);
+  const { data, status: annotationStatus } = useFetchAnnotations(path);
+  const { status: articleStatus } = useFetchArticle(path);
 
+  // We need to include `data` as a dependency because of the
+  // case  where user creates a new highlight ; the data will
+  // change but the path and annotationStatus will not.
   useEffect(() => {
-    if (status !== "success") return;
-    if (ref.current?.innerHTML === undefined) return;
+    if (annotationStatus !== "success" || articleStatus !== "success") return;
     highlightFetchedAnnotations(data);
-  }, [path, data, status, ref.current?.innerHTML]);
+  }, [path, data, annotationStatus, articleStatus]);
 }
