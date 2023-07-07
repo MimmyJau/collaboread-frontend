@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 import { useFetchAnnotations, useFetchArticle, useFetchBookmark } from "hooks";
-import { highlightFetchedAnnotations, addBookmarkToArticle } from "utils";
+import { highlightFetchedAnnotations, renderBookmark } from "utils";
 
 export function useGetUrl() {
   const slugs = useRouter().query.slug || [];
@@ -22,7 +22,7 @@ export function useRenderBookmark(ref) {
     if (data === null) return;
     const isBookmarkInThisSection = data.article === path;
     if (isBookmarkInThisSection) {
-      addBookmarkToArticle(data.highlight);
+      renderBookmark(data.highlight);
     }
   }, [path, bookmarkStatus, articleStatus]);
 }

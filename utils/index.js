@@ -2,6 +2,7 @@ import rangy from "rangy";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 import "rangy/lib/rangy-highlighter";
+import { getMarkRange } from "@tiptap/react";
 
 function getHighlightableRoot() {
   return document.getElementById("content-highlightable");
@@ -222,9 +223,9 @@ function removeAllBookmarkClasses() {
   removeClassFromElements(bookmarkedHighlights, "bookmark");
 }
 
-function getBookmarkRange() {
+// The point of this function is to try a bunch of different ranges.
+function unCollapseCollapsedRange(range) {
   // Get range (must be non-empty for highlighter to work)
-  const range = getRangeFromSelection(document.getSelection());
   const innerText = rangy.innerText(getHighlightableRoot());
   if (range[0].characterRange.end === innerText.length) {
     range[0].characterRange.start = range[0].characterRange.end - 1;
@@ -246,7 +247,7 @@ function getAdjacentRange(range) {
   return range;
 }
 
-export function addBookmarkToArticle(range) {
+export function applyBookmarkClassToRange(range) {
   setSelectionFromRange(range);
   // Add highlight
   const bookmarker = rangy.createHighlighter();
@@ -264,12 +265,29 @@ export function addBookmarkToArticle(range) {
   return bookmarkList;
 }
 
+export function renderBookmark(
+  collapsedRange = getRangeFromSelection(document.getSelection())
+) {
+  let range = unCollapseCollapsedRange(collapsedRange);
+  let bookmarkList = [];
+  // We don't know a priori if range will actually render anything to screen.
+  // Rangy has some nuance on how it applies classes to whitespace.
+  // So we loop here, trying adjacent ranges until something sticks.
+  do {
+    bookmarkList = applyBookmarkClassToRange(range);
+    if (bookmarkList.length === 0) {
+      range = getAdjacentRange(range);
+    }
+  } while (bookmarkList.length === 0);
+}
+
 export function createOrUpdateBookmark() {
   removeAllBookmarkClasses();
-  let range = getBookmarkRange();
+  const collapsedRange = getRangeFromSelection(document.getSelection());
+  let range = unCollapseCollapsedRange(collapsedRange);
   let bookmarkList = [];
   do {
-    bookmarkList = addBookmarkToArticle(range);
+    bookmarkList = applyBookmarkClassToRange(range);
     if (bookmarkList.length === 0) {
       range = getAdjacentRange(range);
     }
