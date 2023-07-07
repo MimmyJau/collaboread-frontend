@@ -12,26 +12,27 @@ export function useGetUrl() {
   return { book, section, path };
 }
 
-export function useRenderBookmark() {
+export function useRenderBookmark(ref) {
   const { book, path } = useGetUrl();
   const { isLoading, isError, data, error, status } = useFetchBookmark(book);
 
   useEffect(() => {
     if (status !== "success") return;
+    if (ref.current?.innerHTML === undefined) return;
     const isBookmarkInThisSection = data.article === path;
     if (isBookmarkInThisSection) {
       addBookmarkToArticle(data.highlight);
     }
-  }, [path, status]);
+  }, [path, status, ref.current?.innerHTML]);
 }
 
-export function useRenderHighlights() {
+export function useRenderHighlights(ref) {
   const { path } = useGetUrl();
   const { isLoading, isError, data, error, status } = useFetchAnnotations(path);
 
   useEffect(() => {
-    if (status === "success") {
-      highlightFetchedAnnotations(data);
-    }
-  }, [path, data, status]);
+    if (status !== "success") return;
+    if (ref.current?.innerHTML === undefined) return;
+    highlightFetchedAnnotations(data);
+  }, [path, data, status, ref.current?.innerHTML]);
 }

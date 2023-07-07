@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useFetchArticle } from "hooks";
 import { useRenderBookmark, useRenderHighlights } from "hooks/pages";
@@ -38,8 +38,9 @@ function extractAnnotationIdFromEvent(e) {
 }
 
 const Article = (props) => {
-  useRenderBookmark();
-  useRenderHighlights();
+  const ref = useRef(null);
+  useRenderBookmark(ref);
+  useRenderHighlights(ref);
   const { data: article, status } = useFetchArticle();
 
   function syncHoverBehavior(e) {
@@ -61,7 +62,10 @@ const Article = (props) => {
       <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
       <div id="article" className="prose w-full">
         <div id="content-highlightable">
-          <div dangerouslySetInnerHTML={{ __html: article.articleHtml }} />
+          <div
+            dangerouslySetInnerHTML={{ __html: article.articleHtml }}
+            ref={ref}
+          />
         </div>
       </div>
       <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
