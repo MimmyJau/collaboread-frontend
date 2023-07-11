@@ -12,7 +12,7 @@ export function useGetUrl() {
   return { book, section, path };
 }
 
-export function useRenderBookmark(ref) {
+export function useRenderBookmark() {
   const { book, path } = useGetUrl();
   const { data, error, status: bookmarkStatus } = useFetchBookmark(book);
   const { status: articleStatus } = useFetchArticle(path);
@@ -27,7 +27,7 @@ export function useRenderBookmark(ref) {
   }, [path, bookmarkStatus, articleStatus]);
 }
 
-export function useRenderHighlights(ref) {
+export function useRenderHighlights() {
   const { path } = useGetUrl();
   const { data, status: annotationStatus } = useFetchAnnotations(path);
   const { status: articleStatus } = useFetchArticle(path);

@@ -38,10 +38,9 @@ function extractAnnotationIdFromEvent(e) {
 }
 
 const Article = (props) => {
-  const ref = useRef(null);
-  useRenderBookmark(ref);
-  useRenderHighlights(ref);
-  const { path } = useGetUrl();
+  useRenderBookmark();
+  useRenderHighlights();
+  const { book, path } = useGetUrl();
   const { data: article, status } = useFetchArticle(path);
 
   function syncHoverBehavior(e) {
@@ -63,10 +62,7 @@ const Article = (props) => {
       <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
       <div id="article" className="prose w-full">
         <div id="content-highlightable">
-          <div
-            dangerouslySetInnerHTML={{ __html: article.articleHtml }}
-            ref={ref}
-          />
+          <div dangerouslySetInnerHTML={{ __html: article.articleHtml }} />
         </div>
       </div>
       <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
