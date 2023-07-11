@@ -167,10 +167,6 @@ export function isSelectionInElementById(id) {
   return document.getElementById(id)?.contains(range.commonAncestorContainer);
 }
 
-export function isSelectionValid() {
-  return isSelectionInElementById("content-highlightable");
-}
-
 function isMouseInArticle(e) {
   return document.getElementById("article").contains(e.target);
 }
@@ -179,7 +175,7 @@ function isMouseInHighlight(e) {
   return e.target.classList.contains("highlight");
 }
 
-export function isClickingEmptyArea(e) {
+export function isClickingNonHighlightedAreaInArticle(e) {
   return isMouseInArticle(e) && !isMouseInHighlight(e);
 }
 

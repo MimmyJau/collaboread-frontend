@@ -7,8 +7,7 @@ import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
   getRangeFromSelection,
-  isClickingEmptyArea,
-  isSelectionValid,
+  isClickingNonHighlightedAreaInArticle,
   isSelectionCollapsed,
   isSelectionInElementById,
   removeAllHoverClasses,
@@ -31,10 +30,9 @@ const Reader = (props) => {
     // Source: https://softwareengineering.stackexchange.com/a/18454
     setUnauthorizedSelection(false);
     if (isSelectionCollapsed()) {
-      if (isClickingEmptyArea(e)) {
+      if (isClickingNonHighlightedAreaInArticle(e)) {
         setFocusedHighlightId(null);
         // NOTE: May not want to set focusedHighlight to null
-        const bookmark = createOrUpdateBookmark();
         // TODO: check if bookmark already exists or not
         updateBookmark.mutate(bookmark);
         removeAllHoverClasses();
@@ -44,7 +42,7 @@ const Reader = (props) => {
     if (isSelectionInElementById("Comments")) {
       return;
     }
-    if (!isSelectionValid()) {
+    if (!isSelectionInElementById("content-highlightable")) {
       document.getSelection().collapse(null);
       return;
     }
