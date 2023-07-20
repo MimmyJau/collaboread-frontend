@@ -107,7 +107,7 @@ function createBookmark(bookmark, token) {
 }
 
 function updateBookmark(bookmark, token) {
-  const route = `${API_BASE_URL}/bookmarks/`;
+  const route = `${API_BASE_URL}/bookmark/${bookmark.book}/`;
   return ky.put(route, {
     headers: { Authorization: `Token ${token}` },
     json: bookmark,

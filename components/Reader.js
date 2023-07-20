@@ -1,8 +1,13 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { useCreateAnnotation, useUpdateBookmark } from "hooks";
+import {
+  useCreateAnnotation,
+  useFetchBookmark,
+  useUpdateBookmark,
+} from "hooks";
 import useAuth from "hooks/auth";
+import { useGetUrl } from "hooks/pages";
 import Article from "components/Article.js";
 import TableOfContents from "components/TableOfContents.js";
 import {
@@ -11,19 +16,17 @@ import {
   isSelectionCollapsed,
   isSelectionInElementById,
   removeAllHoverClasses,
-  createOrUpdateBookmark,
 } from "utils";
 import Comments from "components/Comments.js";
 
 const Reader = (props) => {
-  const slugList = useRouter().query.slug || []; // Initially returns undefined
-  const book = slugList[0];
-  const slug = slugList.join("/");
-  const createAnnotation = useCreateAnnotation(slug);
-  const [focusedHighlightId, setFocusedHighlightId] = useState();
-  const updateBookmark = useUpdateBookmark(book);
+  const { book, path } = useGetUrl();
   const { user } = useAuth();
+  const [focusedHighlightId, setFocusedHighlightId] = useState();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
+  const createAnnotation = useCreateAnnotation(path);
+  const { data: bookmarkData } = useFetchBookmark(path);
+  const updateBookmark = useUpdateBookmark(book);
 
   function handleMouseUp(e) {
     // Use inverted if statements to reduce nesting
@@ -31,10 +34,10 @@ const Reader = (props) => {
     setUnauthorizedSelection(false);
     if (isSelectionCollapsed()) {
       if (isClickingNonHighlightedAreaInArticle(e)) {
-        setFocusedHighlightId(null);
         // NOTE: May not want to set focusedHighlight to null
-        // TODO: check if bookmark already exists or not
-        updateBookmark.mutate(bookmark);
+        setFocusedHighlightId(null);
+        bookmarkData.highlight = getRangeFromSelection(document.getSelection());
+        updateBookmark.mutate(bookmarkData);
         removeAllHoverClasses();
       }
       return;
