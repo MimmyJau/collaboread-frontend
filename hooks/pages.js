@@ -17,14 +17,18 @@ export function useRenderBookmark() {
   const { data, error, status: bookmarkStatus } = useFetchBookmark(book);
   const { status: articleStatus } = useFetchArticle(path);
 
+  // We need to include `data` as a dependency because of the
+  // case where user creates a new bookmark ; the data will
+  // change but the path and bookmarkStatus will not.
   useEffect(() => {
     if (bookmarkStatus !== "success" || articleStatus !== "success") return;
     if (data === null) return;
     const isBookmarkInThisSection = data.article === path;
+    // remove existing bookmarks
     if (isBookmarkInThisSection) {
       renderBookmark(data.highlight);
     }
-  }, [path, bookmarkStatus, articleStatus]);
+  }, [path, data, bookmarkStatus, articleStatus]);
 }
 
 export function useRenderHighlights() {
@@ -33,7 +37,7 @@ export function useRenderHighlights() {
   const { status: articleStatus } = useFetchArticle(path);
 
   // We need to include `data` as a dependency because of the
-  // case  where user creates a new highlight ; the data will
+  // case where user creates a new highlight ; the data will
   // change but the path and annotationStatus will not.
   useEffect(() => {
     if (annotationStatus !== "success" || articleStatus !== "success") return;

@@ -25,7 +25,7 @@ const Reader = (props) => {
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
   const createAnnotation = useCreateAnnotation(path);
-  const { data: bookmarkData } = useFetchBookmark(path);
+  const { data: bookmarkData } = useFetchBookmark(book);
   const updateBookmark = useUpdateBookmark(book);
 
   function handleMouseUp(e) {
