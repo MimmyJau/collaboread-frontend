@@ -2,7 +2,6 @@ import rangy from "rangy";
 import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 import "rangy/lib/rangy-highlighter";
-import { getMarkRange } from "@tiptap/react";
 
 function getHighlightableRoot() {
   return document.getElementById("content-highlightable");
@@ -15,7 +14,7 @@ export function getRangeFromSelection(selection) {
   return rangy.getSelection().saveCharacterRanges(highlightableRoot);
 }
 
-//Given a range object, convert it to a selection.
+// Given a range object, convert it to a selection.
 function setSelectionFromRange(range) {
   const highlightableRoot = getHighlightableRoot();
   return rangy.getSelection().restoreCharacterRanges(highlightableRoot, range);
@@ -243,7 +242,7 @@ function getAdjacentRange(range) {
   return range;
 }
 
-export function applyBookmarkClassToRange(range) {
+function applyBookmarkClassToRange(range) {
   setSelectionFromRange(range);
   // Add highlight
   const bookmarker = rangy.createHighlighter();
