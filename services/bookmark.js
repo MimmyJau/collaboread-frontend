@@ -101,7 +101,8 @@ function render(collapsedRange = convertSelectionToRange()) {
   } while (!highlight.length);
 }
 
-// bookmark.getRange() to use by updateBookmark hook
+// We need a function that returns the exact object structure needed to
+// to post to database. One question is whether thie design pattern makes sense.
 
 // The addition of import and export basically makes IIFE  obsolete.
 const bookmark = {

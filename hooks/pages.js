@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { useFetchAnnotations, useFetchArticle, useFetchBookmark } from "hooks";
-import { highlightFetchedAnnotations, renderBookmark } from "utils";
+import { highlightFetchedAnnotations } from "utils";
 import bookmark from "services/bookmark";
 
 export function useGetUrl() {
