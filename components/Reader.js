@@ -25,8 +25,6 @@ const Reader = (props) => {
   const [focusedHighlightId, setFocusedHighlightId] = useState();
   const [unauthorizedSelection, setUnauthorizedSelection] = useState(false);
   const createAnnotation = useCreateAnnotation(path);
-  const { data: bookmarkData } = useFetchBookmark(book);
-  const updateBookmark = useUpdateBookmark(book);
 
   function handleMouseUp(e) {
     // Use inverted if statements to reduce nesting
@@ -36,8 +34,6 @@ const Reader = (props) => {
       if (isClickingNonHighlightedAreaInArticle(e)) {
         // NOTE: May not want to set focusedHighlight to null
         setFocusedHighlightId(null);
-        bookmarkData.highlight = getRangeFromSelection(document.getSelection());
-        updateBookmark.mutate(bookmarkData);
         removeAllHoverClasses();
       }
       return;

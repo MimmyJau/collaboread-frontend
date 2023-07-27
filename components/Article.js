@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-import { useFetchArticle } from "hooks";
+import { useFetchArticle, useFetchBookmark, useUpdateBookmark } from "hooks";
 import { useGetUrl, useRenderBookmark, useRenderHighlights } from "hooks/pages";
-import { addHoverClassToRelatedHighlights, removeAllHoverClasses } from "utils";
+import {
+  addHoverClassToRelatedHighlights,
+  getRangeFromSelection,
+  isClickingNonHighlightedAreaInArticle,
+  isSelectionCollapsed,
+  removeAllHoverClasses,
+} from "utils";
 
 const NavButton = ({ text, href }) => {
   return (
@@ -42,6 +48,8 @@ const Article = (props) => {
   useRenderHighlights();
   const { book, path } = useGetUrl();
   const { data: article, status } = useFetchArticle(path);
+  const { data: bookmarkData } = useFetchBookmark(book);
+  const updateBookmark = useUpdateBookmark(book);
 
   function syncHoverBehavior(e) {
     if (e.buttons !== 0) return;
@@ -53,6 +61,14 @@ const Article = (props) => {
     }
   }
 
+  function handleMouseUp(e) {
+    if (!isSelectionCollapsed()) return;
+    if (!isClickingNonHighlightedAreaInArticle(e)) return;
+    bookmarkData.highlight = getRangeFromSelection(document.getSelection());
+    updateBookmark.mutate(bookmarkData);
+    removeAllHoverClasses();
+  }
+
   if (status !== "success") return;
   return (
     <div
@@ -60,7 +76,11 @@ const Article = (props) => {
       onMouseOver={(e) => syncHoverBehavior(e, props.setFocus)}
     >
       <PrevAndNextSection prevHref={article.prev} nextHref={article.next} />
-      <div id="article" className="prose w-full">
+      <div
+        id="article"
+        className="prose w-full"
+        onMouseUp={(e) => handleMouseUp(e)}
+      >
         <div id="content-highlightable">
           <div dangerouslySetInnerHTML={{ __html: article.articleHtml }} />
         </div>
