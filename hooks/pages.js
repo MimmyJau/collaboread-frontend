@@ -2,8 +2,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { useFetchAnnotations, useFetchArticle, useFetchBookmark } from "hooks";
+import useBookmark from "hooks/useBookmark";
 import { highlightFetchedAnnotations } from "utils";
-import bookmark from "services/bookmark";
 
 export function useGetUrl() {
   const slugs = useRouter().query.slug || [];
@@ -17,6 +17,7 @@ export function useRenderBookmark() {
   const { book, path } = useGetUrl();
   const { data, error, status: bookmarkStatus } = useFetchBookmark(book);
   const { status: articleStatus } = useFetchArticle(path);
+  const Bookmark = useBookmark();
   // I think I need to add the old bookmark object as state here so that I can delete it later
 
   // We need to include `data` as a dependency because of the
@@ -26,10 +27,8 @@ export function useRenderBookmark() {
     if (bookmarkStatus !== "success" || articleStatus !== "success") return;
     if (data === null) return;
     const isBookmarkInThisSection = data.article === path;
-    // remove existing bookmarks
     if (isBookmarkInThisSection) {
-      bookmark.render(data.highlight);
-      // update state of previous bookmark
+      Bookmark.render(data.highlight);
     }
   }, [path, data, bookmarkStatus, articleStatus]);
 }

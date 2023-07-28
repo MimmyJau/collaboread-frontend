@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Pagination from "components/Pagination";
 import { useFetchArticle, useFetchBookmark, useUpdateBookmark } from "hooks";
 import useAuth from "hooks/auth";
+import useBookmark from "hooks/useBookmark";
 import { useGetUrl, useRenderBookmark, useRenderHighlights } from "hooks/pages";
 import {
   addHoverClassToRelatedHighlights,
@@ -22,7 +23,7 @@ const Article = (props) => {
   const { user } = useAuth();
   const { book, path } = useGetUrl();
   const { data: article, status } = useFetchArticle(path);
-  const { data: bookmark } = useFetchBookmark(book);
+  const Bookmark = useBookmark();
   const updateBookmark = useUpdateBookmark(book);
 
   function syncHoverBehavior(e) {
@@ -39,8 +40,7 @@ const Article = (props) => {
     if (!isSelectionCollapsed()) return;
     if (!isClickingNonHighlightedAreaInArticle(e)) return;
     if (!user) return;
-    bookmark.highlight = getRangeFromSelection(document.getSelection());
-    updateBookmark.mutate(bookmark);
+    updateBookmark.mutate(Bookmark.bookmark);
     removeAllHoverClasses();
   }
 
