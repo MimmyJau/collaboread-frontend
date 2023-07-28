@@ -5,7 +5,7 @@ import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 import "rangy/lib/rangy-highlighter";
 
-import { useFetchBookmark } from "hooks"; // rename to hooks/api
+import { useFetchBookmark } from "hooks/api";
 import { useGetUrl } from "hooks/pages";
 
 /* These helper functions could go into
@@ -63,7 +63,6 @@ const useBookmark = () => {
 
   const { book, path } = useGetUrl();
   const { data: bookmark } = useFetchBookmark(book);
-  // const updateBookmark = useUpdateBookmark(book);
 
   // Rangy needs to be on client to work, so we need to use useEffect
   useEffect(() => {

@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 
-import { useDeleteAnnotation } from "hooks";
+import { useDeleteAnnotation } from "hooks/api";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

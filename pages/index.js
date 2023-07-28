@@ -2,7 +2,7 @@ import * as amplitude from "@amplitude/analytics-browser";
 import Link from "next/link";
 
 import NavBar from "components/NavBar";
-import { useFetchArticles } from "hooks";
+import { useFetchArticles } from "hooks/api";
 
 import { ampTrack } from "utils/amplitude";
 

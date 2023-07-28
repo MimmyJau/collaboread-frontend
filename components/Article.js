@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
 import Pagination from "components/Pagination";
-import { useFetchArticle, useFetchBookmark, useUpdateBookmark } from "hooks";
+import {
+  useFetchArticle,
+  useFetchBookmark,
+  useUpdateBookmark,
+} from "hooks/api";
 import useAuth from "hooks/auth";
 import useBookmark from "hooks/useBookmark";
 import { useGetUrl, useRenderBookmark, useRenderHighlights } from "hooks/pages";

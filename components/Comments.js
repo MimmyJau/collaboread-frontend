@@ -13,7 +13,7 @@ import {
   useCreateComment,
   useUpdateComment,
   useDeleteComment,
-} from "hooks";
+} from "hooks/api";
 import { useGetUrl } from "hooks/pages";
 import useAuth from "hooks/auth";
 import { clearHighlight } from "utils";

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useFetchTableOfContents } from "hooks";
+import { useFetchTableOfContents } from "hooks/api";
 
 const ROOT_LEVEL = 1;
 

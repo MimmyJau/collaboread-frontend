@@ -1,7 +1,11 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import { useFetchAnnotations, useFetchArticle, useFetchBookmark } from "hooks";
+import {
+  useFetchAnnotations,
+  useFetchArticle,
+  useFetchBookmark,
+} from "hooks/api";
 import useBookmark from "hooks/useBookmark";
 import { highlightFetchedAnnotations } from "utils";
 

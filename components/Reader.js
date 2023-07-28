@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { useCreateAnnotation, useFetchBookmark } from "hooks";
+import { useCreateAnnotation, useFetchBookmark } from "hooks/api";
 import useAuth from "hooks/auth";
 import { useGetUrl } from "hooks/pages";
 import Article from "components/Article.js";

@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { Editor } from "components/ArticleEditor";
 import NavBar from "components/NavBar";
-import { useFetchArticle } from "hooks";
+import { useFetchArticle } from "hooks/api";
 import { useGetUrl } from "hooks/pages";
 
 export default function Page() {

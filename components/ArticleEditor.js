@@ -22,7 +22,7 @@ import ts from "highlight.js/lib/languages/typescript";
 lowlight.registerLanguage("js", js);
 lowlight.registerLanguage("ts", ts);
 
-import { useUpdateArticle } from "hooks";
+import { useUpdateArticle } from "hooks/api";
 
 const printJson = (editor) => {
   console.log(editor.getJSON());
