@@ -167,7 +167,7 @@ export function isSelectionInElementById(id) {
 }
 
 function isMouseInArticle(e) {
-  return document.getElementById("article").contains(e.target);
+  return document.getElementById("article")?.contains(e.target);
 }
 
 function isMouseInHighlight(e) {

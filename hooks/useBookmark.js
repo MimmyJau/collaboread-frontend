@@ -63,9 +63,7 @@ function unselectSelection() {
 }
 
 function newRange() {
-  if (!range) {
-    range = rangy.createRange().toCharacterRange();
-  }
+  const range = rangy.createRange().toCharacterRange();
   return [
     {
       characterRange: range,
