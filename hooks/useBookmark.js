@@ -5,7 +5,11 @@ import "rangy/lib/rangy-classapplier";
 import "rangy/lib/rangy-textrange";
 import "rangy/lib/rangy-highlighter";
 
-import { useFetchBookmark } from "hooks/api";
+import {
+  useCreateBookmark,
+  useFetchArticle,
+  useFetchBookmark,
+} from "hooks/api";
 import { useGetUrl } from "hooks/pages";
 
 /* These helper functions could go into
@@ -58,11 +62,29 @@ function unselectSelection() {
   rangy.getSelection().collapseToEnd();
 }
 
+function newRange() {
+  if (!range) {
+    range = rangy.createRange().toCharacterRange();
+  }
+  return [
+    {
+      characterRange: range,
+    },
+  ];
+}
+
+// The only thing we expose is the getter function since
+// updating the bookmark is triggered by user event (aka clicking).
+// Rendering the bookmark and creating a new bookmark is behaviour
+// we want done automatically, so we don't need to expose anything.
+// As a result, the behaviour is encapsulated in a useEffect hook.
 const useBookmark = () => {
   const [bookmarker, setBookmarker] = useState(null);
 
   const { book, path } = useGetUrl();
-  const { data: bookmark } = useFetchBookmark(book);
+  const createBookmark = useCreateBookmark(book);
+  const { status: articleStatus } = useFetchArticle(path);
+  const { data: bookmark, status: bookmarkStatus } = useFetchBookmark(book);
 
   // Rangy needs to be on client to work, so we need to use useEffect
   useEffect(() => {
@@ -72,6 +94,24 @@ const useBookmark = () => {
     bookmarker.addClassApplier(bookmarkClass);
     setBookmarker(bookmarker);
   }, []);
+
+  //  This hooks will either render existing bookmark or
+  //  create a new bookmark automatically.
+  useEffect(() => {
+    if (bookmarkStatus !== "success" || articleStatus !== "success") return;
+    if (bookmark === null) {
+      const bookmark = newBookmark();
+      createBookmark.mutate(bookmark);
+      return;
+    }
+    const isBookmarkInThisSection = bookmark.article === path;
+    if (isBookmarkInThisSection) {
+      render(bookmark.highlight);
+    }
+    // We need to include `data` as a dependency because of the
+    // case where user creates a new bookmark ; the data will
+    // change but the path and bookmarkStatus will not.
+  }, [path, bookmark, bookmarkStatus, articleStatus]);
 
   function clearBookmarks() {
     bookmarker.removeAllHighlights();
@@ -103,6 +143,14 @@ const useBookmark = () => {
     } while (!highlight.length);
   }
 
+  function newBookmark(range) {
+    return {
+      book: book,
+      article: path,
+      highlight: newRange(),
+    };
+  }
+
   function getBookmark() {
     return {
       uuid: bookmark.uuid,
@@ -113,7 +161,6 @@ const useBookmark = () => {
   }
 
   return {
-    render: render,
     get bookmark() {
       return getBookmark();
     },

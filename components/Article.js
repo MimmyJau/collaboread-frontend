@@ -8,7 +8,7 @@ import {
 } from "hooks/api";
 import useAuth from "hooks/auth";
 import useBookmark from "hooks/useBookmark";
-import { useGetUrl, useRenderBookmark, useRenderHighlights } from "hooks/pages";
+import { useGetUrl, useRenderHighlights } from "hooks/pages";
 import {
   addHoverClassToRelatedHighlights,
   getRangeFromSelection,
@@ -22,7 +22,6 @@ function extractAnnotationIdFromEvent(e) {
 }
 
 const Article = (props) => {
-  useRenderBookmark();
   useRenderHighlights();
   const { user } = useAuth();
   const { book, path } = useGetUrl();
