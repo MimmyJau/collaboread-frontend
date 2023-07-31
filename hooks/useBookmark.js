@@ -108,8 +108,8 @@ const useBookmark = () => {
     if (isBookmarkInThisSection) {
       render(bookmark.highlight);
     }
-    // We need to include `data` as a dependency because of the
-    // case where user creates a new bookmark ; the data will
+    // We need to include `bookmark` as a dependency because of the
+    // case where user creates a new bookmark ; the `bookmark` will
     // change but the path and bookmarkStatus will not.
   }, [path, bookmark, bookmarkStatus, articleStatus]);
 
@@ -129,16 +129,15 @@ const useBookmark = () => {
   function render(collapsedRange = convertSelectionToRange()) {
     clearBookmarks();
     let range = unCollapseCollapsedRange(collapsedRange);
-    convertRangeToSelection(range);
     let highlight;
     // We don't know a priori if range will actually render anything to screen.
     // Rangy has some nuance on how it applies classes to whitespace.
     // So we loop here, trying adjacent ranges until something sticks.
     do {
+      convertRangeToSelection(range);
       highlight = highlightSelection();
       if (!highlight.length) {
         range = getAdjacentRange(range);
-        convertRangeToSelection(range);
       }
     } while (!highlight.length);
   }
