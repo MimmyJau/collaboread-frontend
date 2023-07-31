@@ -9,6 +9,7 @@ import {
   useCreateBookmark,
   useFetchArticle,
   useFetchBookmark,
+  useUpdateBookmark,
 } from "hooks/api";
 import { useGetUrl } from "hooks/pages";
 
@@ -62,7 +63,7 @@ function unselectSelection() {
   rangy.getSelection().collapseToEnd();
 }
 
-function newRange() {
+function newHighlight() {
   const range = rangy.createRange().toCharacterRange();
   return [
     {
@@ -83,6 +84,7 @@ const useBookmark = () => {
   const createBookmark = useCreateBookmark(book);
   const { status: articleStatus } = useFetchArticle(path);
   const { data: bookmark, status: bookmarkStatus } = useFetchBookmark(book);
+  const updateBookmark = useUpdateBookmark(book);
 
   // Rangy needs to be on client to work, so we need to use useEffect
   useEffect(() => {
@@ -145,7 +147,7 @@ const useBookmark = () => {
     return {
       book: book,
       article: path,
-      highlight: newRange(),
+      highlight: newHighlight(),
     };
   }
 
@@ -158,10 +160,12 @@ const useBookmark = () => {
     };
   }
 
+  function update() {
+    updateBookmark.mutate(getBookmark());
+  }
+
   return {
-    get bookmark() {
-      return getBookmark();
-    },
+    update: update,
   };
 };
 
