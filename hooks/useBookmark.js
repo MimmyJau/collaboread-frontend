@@ -6,7 +6,6 @@ import "rangy/lib/rangy-textrange";
 import "rangy/lib/rangy-highlighter";
 
 import {
-  useCreateBookmark,
   useFetchArticle,
   useFetchBookmark,
   useUpdateBookmark,
@@ -81,7 +80,6 @@ const useBookmark = () => {
   const [bookmarker, setBookmarker] = useState(null);
 
   const { book, path } = useGetUrl();
-  const createBookmark = useCreateBookmark(book);
   const { status: articleStatus } = useFetchArticle(path);
   const { data: bookmark, status: bookmarkStatus } = useFetchBookmark(book);
   const updateBookmark = useUpdateBookmark(book);
@@ -101,7 +99,7 @@ const useBookmark = () => {
     if (bookmarkStatus !== "success" || articleStatus !== "success") return;
     if (bookmark === null) {
       const bookmark = newBookmark();
-      createBookmark.mutate(bookmark);
+      updateBookmark.mutate(bookmark);
       return;
     }
     const isBookmarkInThisSection = bookmark.article === path;
@@ -114,7 +112,7 @@ const useBookmark = () => {
   }, [path, bookmark, bookmarkStatus, articleStatus]);
 
   function clearBookmarks() {
-    bookmarker.removeAllHighlights();
+    bookmarker?.removeAllHighlights();
   }
 
   function highlightSelection() {
