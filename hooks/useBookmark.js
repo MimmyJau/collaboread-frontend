@@ -102,6 +102,7 @@ const useBookmark = () => {
       updateBookmark.mutate(bookmark);
       return;
     }
+    if (bookmarker === null) return;
     const isBookmarkInThisSection = bookmark.article === path;
     if (isBookmarkInThisSection) {
       render(bookmark.highlight);
@@ -109,7 +110,7 @@ const useBookmark = () => {
     // We need to include `bookmark` as a dependency because of the
     // case where user creates a new bookmark ; the `bookmark` will
     // change but the path and bookmarkStatus will not.
-  }, [path, bookmark, bookmarkStatus, articleStatus]);
+  }, [path, bookmark, bookmarker, bookmarkStatus, articleStatus]);
 
   function clearBookmarks() {
     bookmarker?.removeAllHighlights();
