@@ -8,10 +8,11 @@ import { ampTrack } from "utils/amplitude";
 
 const zarathustraSlug = process.env.SLUG;
 
-const Card = ({ slugFull, title, author }) => {
+const Card = ({ slugFull, bookmarkPath, title, author }) => {
+  const path = bookmarkPath || slugFull;
   return (
     <div className="bg-yellow-50 rounded-lg my-2 hover:bg-yellow-100 hover:rounded-lg">
-      <Link href={`/a/${slugFull}/`} onClick={() => ampTrack(title)}>
+      <Link href={`/a/${path}/`} onClick={() => ampTrack(title)}>
         <div className="p-5">
           <h2 className="text-xl">{title}</h2>
           {author ? <h3 className="text-sm">by {author}</h3> : null}

@@ -61,7 +61,7 @@ function getTokenLocalStorage() {
 function useFetchArticles() {
   return useQuery({
     queryKey: ["articles"],
-    queryFn: () => fetchArticles(),
+    queryFn: () => fetchArticles(getTokenLocalStorage()),
   });
 }
 

@@ -5,9 +5,11 @@ import { Bookmark, FlatAnnotation } from "types";
 const BASE_URL = process.env.SERVER;
 const API_BASE_URL = `${BASE_URL}/api`;
 
-function fetchArticles() {
+function fetchArticles(token) {
   const route = `${API_BASE_URL}/articles/`;
-  return ky.get(route).json();
+  return ky
+    .get(route, { headers: { Authorization: token ? `Token ${token}` : "" } })
+    .json();
 }
 
 function fetchTableOfContents(rootSlug) {
