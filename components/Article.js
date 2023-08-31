@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Pagination from "components/Pagination";
 import { useFetchArticle } from "hooks/api";
 import useAuth from "hooks/auth";
 import useBookmark from "hooks/useBookmark";
+import useHighlight from "hooks/useHighlight";
 import { useGetUrl, useRenderHighlights } from "hooks/pages";
 import {
   addHoverClassToRelatedHighlights,
-  getRangeFromSelection,
   isClickingNonHighlightedAreaInArticle,
   isSelectionCollapsed,
   removeAllHoverClasses,
@@ -18,11 +18,12 @@ function extractAnnotationIdFromEvent(e) {
 }
 
 const Article = (props) => {
-  useRenderHighlights();
   const { user } = useAuth();
   const { book, path } = useGetUrl();
   const { data: article, status } = useFetchArticle(path);
   const Bookmark = useBookmark();
+  const Highlight = useHighlight();
+  // useRenderHighlights();
 
   function syncHoverBehavior(e) {
     if (e.buttons !== 0) return;
