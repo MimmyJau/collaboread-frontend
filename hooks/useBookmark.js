@@ -107,9 +107,11 @@ const useBookmark = () => {
     if (isBookmarkInThisSection) {
       render(bookmark.highlight);
     }
-    // We need to include `bookmark` as a dependency because of the
-    // case where user creates a new bookmark ; the `bookmark` will
-    // change but the path and bookmarkStatus will not.
+    // path: if path changes, check if bookmark is in this section.
+    // bookmark: if user creates a new bookmark, `bookmark` will change but not path or bookmarkStatus.
+    // bookmarker: don't try and highlight until highlighter is ready.
+    // bookmarkStatus: don't try to render until we've fetched bookmark.
+    // articleStatus: don't try to render until we've fetched article.
   }, [path, bookmark, bookmarker, bookmarkStatus, articleStatus]);
 
   function clearBookmarks() {
